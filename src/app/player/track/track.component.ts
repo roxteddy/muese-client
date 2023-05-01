@@ -70,9 +70,6 @@ export class TrackComponent implements AfterViewInit, OnChanges, OnDestroy {
     }
 
     public mute() {
-        if (this.audioTrack) {
-            this.audioTrack.nativeElement.muted = !this.audioTrack.nativeElement.muted;
-        }
         this.muted = !this.muted;
     }
 
