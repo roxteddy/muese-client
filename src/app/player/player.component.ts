@@ -26,6 +26,7 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     paused: boolean = true;
     playSubject: Subject<void> = new Subject<void>();
     pauseSubject: Subject<void> = new Subject<void>();
+    tracksReady = 0;
 
     tracksElements: HTMLAudioElement[] = [];
 
@@ -38,6 +39,7 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     ngOnChanges(changes: SimpleChanges) {
         if (changes['song']) {
             this.paused = true;
+            this.tracksReady = 0;
         }
     }
 
@@ -61,6 +63,13 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         return `${SERVER_URL}/music/output/${this.song?.filename}/other.mp3`;
     }
 
+    public getPlayButtonText(): string {
+        if (this.tracksReady < 5) {
+            return 'LOADING';
+        }
+        return this.paused ? 'PLAY' : 'PAUSE';
+    }
+
     public onDragEvent(dragData: DragData | null) {
         this.dragData = dragData;
     }
@@ -71,6 +80,10 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
 
     public onTimeChange(time: number) {
         this.newTime = time;
+    }
+
+    public onTrackLoaded() {
+        this.tracksReady += 1;
     }
 
     public playPause(): void {

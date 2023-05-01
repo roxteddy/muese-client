@@ -35,6 +35,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() url?: string;
 
     @Output() dragStatus: EventEmitter<DragData | null> = new EventEmitter<DragData | null>();
+    @Output() loaded: EventEmitter<void> = new EventEmitter<void>();
     @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
     @Output() ended: EventEmitter<void> = new EventEmitter<void>();
 
@@ -64,6 +65,9 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                 const url = (window.URL || window.webkitURL ).createObjectURL(blob);
                 this.audio = new Howl({src: url, format: 'mp3'});
                 drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
+                this.audio?.on('load', () => this.loaded.emit());
+            }, (e) => {
+                this.loaded.emit();
             });
 
             if (!changes['url'].firstChange) {
