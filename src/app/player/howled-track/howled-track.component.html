@@ -11,4 +11,4 @@
     </div>
     <button class="mute-button" (click)="mute()">{{muted ? 'UNMUTE' : 'MUTE'}}</button>
 </div>
-<div class="counter">{{currentTime}}</div>
+<div class="counter">{{currentTime | number : '2.3-3'}}</div>

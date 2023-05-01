@@ -12,10 +12,11 @@ import {
 import { Howl as HowlObject } from 'howler';
 import { DragData } from '../track/track.component';
 import { Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 declare var Howl: any;
 
-declare function drawAudio(url: string, canvas: HTMLCanvasElement): void;
+declare function drawAudio(blob: Promise<ArrayBuffer>, canvas: HTMLCanvasElement): void;
 
 @Component({
   selector: 'app-howled-track',
@@ -44,7 +45,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
 
     private audio?: HowlObject;
 
-    constructor() {}
+    constructor(private readonly httpClient: HttpClient) {}
 
     ngOnInit() {
         this.playSubject?.subscribe(() => this.audio?.play());
@@ -59,7 +60,11 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
             if (this.audio) {
                 this.audio.unload();
             }
-            this.audio = new Howl({src: this.url});
+            this.httpClient.get(changes['url'].currentValue, {responseType: 'blob'}).subscribe((blob: Blob) => {
+                const url = (window.URL || window.webkitURL ).createObjectURL(blob);
+                this.audio = new Howl({src: url, format: 'mp3'});
+                drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
+            });
 
             if (!changes['url'].firstChange) {
                 this.currentTime = 0;
@@ -71,7 +76,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                     if (context) {
                         context.canvas.width = context.canvas.width;
                     }
-                    drawAudio(changes['url'].currentValue, this.canvasElementRef.nativeElement);
                 }
             }
         }
@@ -80,7 +84,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     ngAfterViewInit() {
         this.intervalId = setInterval(() => this.updateCounter(), 25);
         if (this.url && this.canvasElementRef) {
-            drawAudio(this.url, this.canvasElementRef.nativeElement);
+            // drawAudio(this.url, this.canvasElementRef.nativeElement);
         }
     }
 
@@ -129,7 +133,10 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     }
 
     private setCurrentTime(time: number) {
-        this.audio?.seek(time);
+        if (this.audio) {
+            this.audio.seek(time);
+            this.setProgress(time / this.audio.duration())
+        }
     }
     private setProgress(value: number) {
         this.progressWidth = value * 100;

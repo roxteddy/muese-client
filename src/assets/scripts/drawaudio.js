@@ -21,12 +21,12 @@ let audioContext;
  * Retrieves audio from an external source, the initializes the drawing function
  * @param {String} url the url of the audio we'd like to fetch
  */
-const drawAudio = (url, canvas) => {
+const drawAudio = (arrayPromise, canvas) => {
   if (!audioContext) {
     audioContext = new AudioContext();
   }
-  fetch(url)
-    .then(response => response.arrayBuffer())
+
+  arrayPromise
     .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
     .then(audioBuffer => draw(normalizeData(filterData(audioBuffer)), canvas));
 };
