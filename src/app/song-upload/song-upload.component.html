@@ -5,5 +5,5 @@
     <input #fileUpload type="file" name="file" ngModel>
     <br/>
     <br/>
-    <input type="submit" value="submit">
+    <input type="submit" value="submit" [disabled]="!submittable">
 </form>
