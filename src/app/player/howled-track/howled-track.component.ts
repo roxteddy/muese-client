@@ -66,6 +66,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                 this.audio = new Howl({src: url, format: 'mp3'});
                 drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
                 this.audio?.on('load', () => this.loaded.emit());
+                this.audio?.on('end', () => this.ended.emit());
             }, (e) => {
                 this.loaded.emit();
             });

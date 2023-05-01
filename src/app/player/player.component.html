@@ -34,7 +34,6 @@
     [playSubject]="playSubject"
     [title]="'Piano'"
     [url]="getPianoUrl()"
-    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
     (timeChange)="onTimeChange($event)">
@@ -54,7 +53,6 @@
     [playSubject]="playSubject"
     [title]="'Bass'"
     [url]="getBassUrl()"
-    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
     (timeChange)="onTimeChange($event)">
@@ -74,7 +72,6 @@
     [playSubject]="playSubject"
     [title]="'Vocals'"
     [url]="getVocalsUrl()"
-    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
     (timeChange)="onTimeChange($event)">
@@ -94,7 +91,6 @@
     [playSubject]="playSubject"
     [title]="'Other'"
     [url]="getOtherUrl()"
-    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
     (timeChange)="onTimeChange($event)">
