@@ -28,23 +28,23 @@ export class PlayerComponent implements AfterViewInit, OnDestroy {
     }
 
     public getDrumsUrl(): string {
-        return `${SERVER_URL}/music/${this.song?.filename}/drums.wav`;
+        return `${SERVER_URL}/music/${this.song?.filename}/drums.mp3`;
     }
 
     public getPianoUrl(): string {
-        return `${SERVER_URL}/music/${this.song?.filename}/piano.wav`;
+        return `${SERVER_URL}/music/${this.song?.filename}/piano.mp3`;
     }
 
     public getBassUrl(): string {
-        return `${SERVER_URL}/music/${this.song?.filename}/bass.wav`;
+        return `${SERVER_URL}/music/${this.song?.filename}/bass.mp3`;
     }
 
     public getVocalsUrl(): string {
-        return `${SERVER_URL}/music/${this.song?.filename}/vocals.wav`;
+        return `${SERVER_URL}/music/${this.song?.filename}/vocals.mp3`;
     }
 
     public getOtherUrl(): string {
-        return `${SERVER_URL}/music/${this.song?.filename}/other.wav`;
+        return `${SERVER_URL}/music/${this.song?.filename}/other.mp3`;
     }
 
     public onDragEvent(dragData: DragData | null) {
