@@ -1,0 +1,28 @@
+.canvas-container {
+    position: relative;
+    height: 75px;
+    width: 100%;
+    background-color: black;
+
+    &.muted {
+        background-color: grey;
+    }
+}
+canvas {
+    height: 100%;
+    width: 100%;
+}
+.canvas-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0;
+    background-color: red;
+    opacity: 0.66;
+    border-right: solid 1px yellow;
+
+    &.dragged {
+        background-color: blue;
+    }
+}

@@ -1,0 +1,19 @@
+<div>
+    {{title}}<br>
+    <audio #audioTrack
+           class="track"
+           [src]="url"
+           type="audio/mp3"
+           preload="auto">
+    </audio>
+    <div #canvasContainer class="canvas-container"
+         [ngClass]="{muted: muted}"
+         (mousedown)="onCanvasMouseDown($event, canvasContainer)"
+         (click)="onCanvasClick($event, canvasContainer)"
+    >
+        <canvas></canvas>
+        <div #canvasProgress class="canvas-progress" [ngClass]="{dragged: !!dragData}" [style.width.%]="progressWidth"></div>
+    </div>
+    <button class="mute-button" (click)="mute()">{{muted ? 'UNMUTE' : 'MUTE'}}</button>
+</div>
+<div class="counter">{{currentTime}}</div>

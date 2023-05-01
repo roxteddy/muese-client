@@ -1,0 +1,7 @@
+<app-track [title]="'Drums'" [url]="getDrumsUrl()"></app-track>
+<app-track [title]="'Piano'" [url]="getPianoUrl()"></app-track>
+<app-track [title]="'Bass'" [url]="getBassUrl()"></app-track>
+<app-track [title]="'Vocals'" [url]="getVocalsUrl()"></app-track>
+<app-track [title]="'Other'" [url]="getOtherUrl()"></app-track>
+
+<button id="play-button" (click)="playPause()">{{paused ? 'PLAY' : 'PAUSE'}}</button>
