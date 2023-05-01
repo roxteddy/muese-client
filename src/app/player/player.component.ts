@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    HostListener,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    SimpleChanges
+} from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
 import { DragData } from './track/track.component';
 
@@ -7,7 +17,7 @@ import { DragData } from './track/track.component';
   templateUrl: './player.component.html',
   styleUrls: ['./player.component.scss']
 })
-export class PlayerComponent implements AfterViewInit, OnDestroy {
+export class PlayerComponent implements AfterViewInit, OnChanges {
     @Input() song?: Song;
 
     dragData: DragData | null = null;
@@ -20,11 +30,12 @@ export class PlayerComponent implements AfterViewInit, OnDestroy {
 
     ngAfterViewInit() {
         this.tracksElements = this.elementRef.nativeElement.querySelectorAll('.track');
-        document.addEventListener('keypress', this.handleKeyPress);
     }
 
-    ngOnDestroy() {
-        document.removeEventListener('keypress', this.handleKeyPress);
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['song']) {
+            this.paused = true;
+        }
     }
 
     public getDrumsUrl(): string {
@@ -60,10 +71,10 @@ export class PlayerComponent implements AfterViewInit, OnDestroy {
     }
 
     // Private
-
+    @HostListener('document:keypress', ['$event'])
     private handleKeyPress(e: KeyboardEvent): void {
         if (e.code == 'Space') {
-            console.log('COUCOU');
+            this.playPause();
         }
     }
 
@@ -78,12 +89,6 @@ export class PlayerComponent implements AfterViewInit, OnDestroy {
         this.paused = true;
         for (let track of this.tracksElements) {
             track.pause();
-        }
-    }
-
-    private setCurrentTime(time: number) {
-        for (let track of this.tracksElements) {
-            track.currentTime = time;
         }
     }
 }

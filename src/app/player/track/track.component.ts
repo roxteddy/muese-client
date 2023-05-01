@@ -48,6 +48,7 @@ export class TrackComponent implements AfterViewInit, OnChanges, OnDestroy {
         }
         if (changes['url'] && !changes['url'].firstChange) {
             this.currentTime = 0;
+            this.muted = false;
             this.progressWidth = 0;
             if (this.canvasElementRef) {
                 drawAudio(changes['url'].currentValue, this.canvasElementRef.nativeElement);
