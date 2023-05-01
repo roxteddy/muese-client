@@ -10,7 +10,4 @@
     </ul>
     <p *ngIf="loading">loading...</p>
 </div>
-<!--<div #player>-->
-<!--    <audio *ngIf="selectedSong" [src]="SERVER_URL + '/music/' + selectedSong.filename + '/vocals.wav'" controls></audio>-->
-<!--</div>-->
 <app-player *ngIf="selectedSong" [song]="selectedSong"></app-player>

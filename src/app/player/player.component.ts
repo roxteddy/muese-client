@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
+import { DragData } from './track/track.component';
 
 @Component({
   selector: 'app-player',
@@ -9,13 +10,13 @@ import { SERVER_URL, Song } from '../app.component';
 export class PlayerComponent implements AfterViewInit, OnDestroy {
     @Input() song?: Song;
 
+    dragData: DragData | null = null;
+    newTime?: number;
     paused: boolean = true;
 
     tracksElements: HTMLAudioElement[] = [];
 
-    constructor(private readonly elementRef: ElementRef) {
-
-    }
+    constructor(private readonly elementRef: ElementRef) {}
 
     ngAfterViewInit() {
         this.tracksElements = this.elementRef.nativeElement.querySelectorAll('.track');
@@ -44,6 +45,14 @@ export class PlayerComponent implements AfterViewInit, OnDestroy {
 
     public getOtherUrl(): string {
         return `${SERVER_URL}/music/${this.song?.filename}/other.wav`;
+    }
+
+    public onDragEvent(dragData: DragData | null) {
+        this.dragData = dragData;
+    }
+
+    public onTimeChange(time: number) {
+        this.newTime = time;
     }
 
     public playPause(): void {

@@ -1,26 +1,54 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+    AfterViewInit,
+    Component,
+    ElementRef, EventEmitter,
+    HostListener,
+    Input, OnChanges,
+    OnDestroy,
+    OnInit,
+    Output, SimpleChanges,
+    ViewChild
+} from '@angular/core';
+
+export interface DragData {
+    rect: DOMRect
+    offsetWidth: number
+    newWidth: number
+    origin: TrackComponent
+}
 
 @Component({
   selector: 'app-track',
   templateUrl: './track.component.html',
   styleUrls: ['./track.component.scss']
 })
-export class TrackComponent implements AfterViewInit, OnDestroy {
+export class TrackComponent implements AfterViewInit, OnChanges, OnDestroy {
     @ViewChild('audioTrack') audioTrack?: ElementRef;
     @ViewChild('canvasProgress') canvasProgress?: ElementRef;
 
+    @Input() dragData: DragData | null = null;
+    @Input() newTime: number | undefined;
     @Input() title?: string;
     @Input() url?: string;
+
+    @Output() dragStatus: EventEmitter<DragData | null> = new EventEmitter<DragData | null>();
+    @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
 
     currentTime: number = 0;
     intervalId?: number;
     muted: boolean = false;
-    dragData?: {rect: DOMRect, offsetWidth: number, newWidth?: number};
     progressWidth: number = 0;
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['newTime']?.currentValue !== undefined) {
+            this.setCurrentTime(changes['newTime'].currentValue);
+        }
+    }
 
     ngAfterViewInit() {
         this.intervalId = setInterval(() => this.updateCounter(), 25);
     }
+
 
     ngOnDestroy() {
         if (this.intervalId) {
@@ -35,48 +63,45 @@ export class TrackComponent implements AfterViewInit, OnDestroy {
         this.muted = !this.muted;
     }
 
-    public onCanvasClick(e: MouseEvent, canvas: HTMLDivElement) {
-        let ratio = e.offsetX / canvas.offsetWidth;
-        if (this.audioTrack) {
-            this.setCurrentTime(this.audioTrack.nativeElement.duration * ratio)
-        }
-        e.stopPropagation();
-    }
+    // public onCanvasClick(e: MouseEvent, canvas: HTMLDivElement) {
+    //     let ratio = e.offsetX / canvas.offsetWidth;
+    //     if (this.audioTrack) {
+    //         this.timeChange.emit(this.audioTrack.nativeElement.duration * ratio);
+    //     }
+    // }
 
     public onCanvasMouseDown(e: MouseEvent, canvas: HTMLDivElement) {
         let rect = canvas.getBoundingClientRect();
-        this.dragData = {
+        this.dragStatus.emit({
             rect,
             offsetWidth: canvas.offsetWidth,
-            newWidth: e.clientX - rect.left
-        }
+            newWidth: e.clientX - rect.left,
+            origin: this
+        });
     }
 
     @HostListener('document:mousemove', ['$event'])
     public onCanvasMouseMove(e: MouseEvent) {
-        if (this.dragData) {
-            this.dragData.newWidth = e.clientX - this.dragData.rect.left;
-            if (this.dragData.newWidth > this.dragData.offsetWidth) {
-                this.dragData.newWidth = this.dragData.offsetWidth;
+        if (this.dragData?.origin == this) {
+            let newWidth = e.clientX - this.dragData.rect.left;
+            if (newWidth > this.dragData.offsetWidth) {
+                newWidth = this.dragData.offsetWidth;
             }
-            this.setProgress(this.dragData.newWidth / this.dragData.offsetWidth);
+            this.dragStatus.emit({
+                ...this.dragData,
+                newWidth: newWidth
+            });
         }
     }
 
     @HostListener('window:mouseup', ['$event'])
     public onCanvasMouseUp(e: MouseEvent) {
-        if (this.dragData?.newWidth) {
+        if (this.dragData?.origin == this) {
             const time = this.dragData.newWidth / this.dragData.offsetWidth * this.audioTrack?.nativeElement.duration;
-            this.setCurrentTime(time);
-            this.dragData = undefined;
+            this.timeChange.emit(time);
+            this.dragStatus.emit(null);
         }
     }
-
-    // public onTimeUpdate() {
-    //     if (!this.dragData && this.audioTrack) {
-    //         this.setProgress(this.audioTrack.nativeElement.currentTime / this.audioTrack.nativeElement.duration);
-    //     }
-    // }
 
     private setCurrentTime(time: number) {
         if (this.audioTrack) {

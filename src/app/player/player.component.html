@@ -1,7 +1,42 @@
-<app-track [title]="'Drums'" [url]="getDrumsUrl()"></app-track>
-<app-track [title]="'Piano'" [url]="getPianoUrl()"></app-track>
-<app-track [title]="'Bass'" [url]="getBassUrl()"></app-track>
-<app-track [title]="'Vocals'" [url]="getVocalsUrl()"></app-track>
-<app-track [title]="'Other'" [url]="getOtherUrl()"></app-track>
+<app-track
+    [dragData]="dragData"
+    [newTime]="newTime"
+    [title]="'Drums'"
+    [url]="getDrumsUrl()"
+    (dragStatus)="onDragEvent($event)"
+    (timeChange)="onTimeChange($event)">
+</app-track>
+<app-track
+    [dragData]="dragData"
+    [newTime]="newTime"
+    [title]="'Piano'"
+    [url]="getPianoUrl()"
+    (dragStatus)="onDragEvent($event)"
+    (timeChange)="onTimeChange($event)">
+</app-track>
+<app-track
+    [dragData]="dragData"
+    [newTime]="newTime"
+    [title]="'Bass'"
+    [url]="getBassUrl()"
+    (dragStatus)="onDragEvent($event)"
+    (timeChange)="onTimeChange($event)">
+</app-track>
+<app-track
+    [dragData]="dragData"
+    [newTime]="newTime"
+    [title]="'Vocals'"
+    [url]="getVocalsUrl()"
+    (dragStatus)="onDragEvent($event)"
+    (timeChange)="onTimeChange($event)">
+</app-track>
+<app-track
+    [dragData]="dragData"
+    [newTime]="newTime"
+    [title]="'Other'"
+    [url]="getOtherUrl()"
+    (dragStatus)="onDragEvent($event)"
+    (timeChange)="onTimeChange($event)">
+</app-track>
 
 <button id="play-button" (click)="playPause()">{{paused ? 'PLAY' : 'PAUSE'}}</button>
