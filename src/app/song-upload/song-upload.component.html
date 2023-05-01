@@ -1,0 +1,9 @@
+<h1>Song upload</h1>
+<form #uploader="ngForm" (ngSubmit)="onSubmit(uploader)">
+    <input type="text" name="artist" placeholder="Artist" ngModel>
+    <input type="text" name="title" placeholder="Title" ngModel>
+    <input #fileUpload type="file" name="file" ngModel>
+    <br/>
+    <br/>
+    <input type="submit" value="submit">
+</form>

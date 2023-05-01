@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { delay, timeout } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { SongUploadComponent } from './song-upload/song-upload.component';
 
 export interface Song {
     id: number
@@ -22,7 +24,8 @@ export class AppComponent implements OnInit {
     songs: Song[] = [];
     selectedSong?: Song;
     SERVER_URL = SERVER_URL;
-    constructor(private readonly http: HttpClient) {}
+    constructor(private readonly dialog: MatDialog,
+    private readonly http: HttpClient) {}
 
     ngOnInit(): void {
         this.getSongs();
@@ -37,7 +40,7 @@ export class AppComponent implements OnInit {
     }
 
     public addSong(): void {
-
+        this.dialog.open(SongUploadComponent);
     }
 
     private getSongs(): void {

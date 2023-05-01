@@ -5,16 +5,24 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { PlayerComponent } from './player/player.component';
 import { TrackComponent } from './player/track/track.component';
+import { SongUploadComponent } from './song-upload/song-upload.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [
         AppComponent,
         PlayerComponent,
         TrackComponent,
+        SongUploadComponent,
     ],
     imports: [
         BrowserModule,
         HttpClientModule,
+        BrowserAnimationsModule,
+        MatDialogModule,
+        FormsModule,
     ],
     providers: [],
     bootstrap: [AppComponent]
