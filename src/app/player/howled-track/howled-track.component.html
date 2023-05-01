@@ -10,5 +10,6 @@
              [style.width.%]="dragData ? dragData.newWidth / dragData.offsetWidth * 100 : progressWidth"></div>
     </div>
     <button class="mute-button" (click)="mute()">{{muted ? 'UNMUTE' : 'MUTE'}}</button>
+    <button class="solo-button" (click)="onSolo()">SOLO</button>
 </div>
 <div class="counter">{{currentTime | number : '2.3-3'}}</div>

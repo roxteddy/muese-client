@@ -17,7 +17,8 @@
     (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)">
+    (timeChange)="onTimeChange($event)"
+    (solo)="onSolo($event)">
 </app-howled-track>
 <!--<app-track-->
 <!--    [dragData]="dragData"-->
@@ -36,7 +37,8 @@
     [url]="getPianoUrl()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)">
+    (timeChange)="onTimeChange($event)"
+    (solo)="onSolo($event)">
 </app-howled-track>
 <!--<app-track-->
 <!--    [dragData]="dragData"-->
@@ -55,7 +57,8 @@
     [url]="getBassUrl()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)">
+    (timeChange)="onTimeChange($event)"
+    (solo)="onSolo($event)">
 </app-howled-track>
 <!--<app-track-->
 <!--    [dragData]="dragData"-->
@@ -74,7 +77,8 @@
     [url]="getVocalsUrl()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)">
+    (timeChange)="onTimeChange($event)"
+    (solo)="onSolo($event)">
 </app-howled-track>
 <!--<app-track-->
 <!--    [dragData]="dragData"-->
@@ -93,7 +97,8 @@
     [url]="getOtherUrl()"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)">
+    (timeChange)="onTimeChange($event)"
+    (solo)="onSolo($event)">
 </app-howled-track>
 
 <button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>

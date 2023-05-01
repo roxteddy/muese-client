@@ -38,6 +38,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Output() loaded: EventEmitter<void> = new EventEmitter<void>();
     @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
     @Output() ended: EventEmitter<void> = new EventEmitter<void>();
+    @Output() solo: EventEmitter<HowledTrackComponent> = new EventEmitter<HowledTrackComponent>();
 
     currentTime: number = 0;
     intervalId?: number;
@@ -89,7 +90,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     ngAfterViewInit() {
         this.intervalId = setInterval(() => this.updateCounter(), 25);
         if (this.url && this.canvasElementRef) {
-            // drawAudio(this.url, this.canvasElementRef.nativeElement);
         }
     }
 
@@ -99,8 +99,12 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         }
     }
 
-    public mute() {
-        this.muted = !this.muted;
+    public mute(muted?: boolean) {
+        if (typeof muted === 'undefined') {
+            this.muted = !this.muted;
+        } else {
+            this.muted = muted;
+        }
         this.audio?.mute(this.muted);
     }
 
@@ -135,6 +139,10 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
             this.timeChange.emit(time);
             this.dragStatus.emit(null);
         }
+    }
+
+    public onSolo() {
+        this.solo.emit(this);
     }
 
     private setCurrentTime(time: number) {

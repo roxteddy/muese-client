@@ -7,11 +7,12 @@ import {
     OnChanges,
     OnDestroy,
     OnInit,
-    SimpleChanges
+    SimpleChanges, ViewChildren
 } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
 import { DragData } from './track/track.component';
 import { Subject } from 'rxjs';
+import { HowledTrackComponent } from './howled-track/howled-track.component';
 
 @Component({
   selector: 'app-player',
@@ -19,6 +20,8 @@ import { Subject } from 'rxjs';
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent implements AfterViewInit, OnChanges {
+    @ViewChildren(HowledTrackComponent) trackComponents?: HowledTrackComponent[];
+
     @Input() song?: Song;
 
     dragData: DragData | null = null;
@@ -72,6 +75,14 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
 
     public onDragEvent(dragData: DragData | null) {
         this.dragData = dragData;
+    }
+
+    public onSolo(track: HowledTrackComponent) {
+        if (this.trackComponents) {
+            for (let trackComponent of this.trackComponents) {
+                trackComponent.mute(track != trackComponent);
+            }
+        }
     }
 
     public onSongEnd() {
