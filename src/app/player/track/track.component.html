@@ -5,7 +5,8 @@
            [src]="url"
            [muted]="muted"
            type="audio/mp3"
-           preload="auto">
+           preload="auto"
+           (ended)="ended.emit()">
     </audio>
     <div #canvasContainer class="canvas-container"
          [ngClass]="{muted: muted}"

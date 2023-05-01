@@ -62,6 +62,10 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.dragData = dragData;
     }
 
+    public onSongEnd() {
+        this.paused = true;
+    }
+
     public onTimeChange(time: number) {
         this.newTime = time;
     }

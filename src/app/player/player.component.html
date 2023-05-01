@@ -3,6 +3,7 @@
     [newTime]="newTime"
     [title]="'Drums'"
     [url]="getDrumsUrl()"
+    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (timeChange)="onTimeChange($event)">
 </app-track>

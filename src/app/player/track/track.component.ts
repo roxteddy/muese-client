@@ -36,6 +36,7 @@ export class TrackComponent implements AfterViewInit, OnChanges, OnDestroy {
 
     @Output() dragStatus: EventEmitter<DragData | null> = new EventEmitter<DragData | null>();
     @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
+    @Output() ended: EventEmitter<void> = new EventEmitter<void>();
 
     currentTime: number = 0;
     intervalId?: number;
