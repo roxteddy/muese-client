@@ -51,6 +51,11 @@ export class TrackComponent implements AfterViewInit, OnChanges, OnDestroy {
             this.muted = false;
             this.progressWidth = 0;
             if (this.canvasElementRef) {
+                let canvas = this.canvasElementRef.nativeElement as HTMLCanvasElement;
+                let context = canvas.getContext('2d');
+                if (context) {
+                    context.canvas.width = context.canvas.width;
+                }
                 drawAudio(changes['url'].currentValue, this.canvasElementRef.nativeElement);
             }
         }
