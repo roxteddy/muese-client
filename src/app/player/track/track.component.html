@@ -9,7 +9,7 @@
     <div #canvasContainer class="canvas-container"
          [ngClass]="{muted: muted}"
          (mousedown)="onCanvasMouseDown($event, canvasContainer)">
-        <canvas></canvas>
+        <canvas #canvas></canvas>
         <div #canvasProgress
              class="canvas-progress"
              [ngClass]="{dragged: !!dragData}"

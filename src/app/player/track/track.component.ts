@@ -10,6 +10,8 @@ import {
     ViewChild
 } from '@angular/core';
 
+declare function drawAudio(url: string, canvas: HTMLCanvasElement): void;
+
 export interface DragData {
     rect: DOMRect
     offsetWidth: number
@@ -24,6 +26,7 @@ export interface DragData {
 })
 export class TrackComponent implements AfterViewInit, OnChanges, OnDestroy {
     @ViewChild('audioTrack') audioTrack?: ElementRef;
+    @ViewChild('canvas') canvasElementRef?: ElementRef;
     @ViewChild('canvasProgress') canvasProgress?: ElementRef;
 
     @Input() dragData: DragData | null = null;
@@ -43,12 +46,18 @@ export class TrackComponent implements AfterViewInit, OnChanges, OnDestroy {
         if (changes['newTime']?.currentValue !== undefined) {
             this.setCurrentTime(changes['newTime'].currentValue);
         }
+        if (changes['url'] && !changes['url'].firstChange && this.canvasElementRef) {
+            drawAudio(changes['url'].currentValue, this.canvasElementRef.nativeElement);
+        }
     }
 
     ngAfterViewInit() {
         this.intervalId = setInterval(() => this.updateCounter(), 25);
-    }
+        if (this.url && this.canvasElementRef) {
+            drawAudio(this.url, this.canvasElementRef.nativeElement);
+        }
 
+    }
 
     ngOnDestroy() {
         if (this.intervalId) {

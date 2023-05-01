@@ -36,7 +36,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/scripts/drawaudio.js"
+            ]
           },
           "configurations": {
             "production": {
