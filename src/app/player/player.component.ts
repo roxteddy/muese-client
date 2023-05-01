@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
 import { DragData } from './track/track.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-player',
@@ -23,6 +24,8 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     dragData: DragData | null = null;
     newTime?: number;
     paused: boolean = true;
+    playSubject: Subject<void> = new Subject<void>();
+    pauseSubject: Subject<void> = new Subject<void>();
 
     tracksElements: HTMLAudioElement[] = [];
 
@@ -84,15 +87,11 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
 
     private play(): void {
         this.paused = false;
-        for (let track of this.tracksElements) {
-            track.play();
-        }
+        this.playSubject.next();
     }
 
     private pause(): void {
         this.paused = true;
-        for (let track of this.tracksElements) {
-            track.pause();
-        }
+        this.pauseSubject.next();
     }
 }

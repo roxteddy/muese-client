@@ -1,0 +1,14 @@
+<div>
+    {{title}}<br>
+    <div #canvasContainer class="canvas-container"
+         [ngClass]="{muted: muted}"
+         (mousedown)="onCanvasMouseDown($event, canvasContainer)">
+        <canvas #canvas></canvas>
+        <div #canvasProgress
+             class="canvas-progress"
+             [ngClass]="{dragged: !!dragData}"
+             [style.width.%]="dragData ? dragData.newWidth / dragData.offsetWidth * 100 : progressWidth"></div>
+    </div>
+    <button class="mute-button" (click)="mute()">{{muted ? 'UNMUTE' : 'MUTE'}}</button>
+</div>
+<div class="counter">{{currentTime}}</div>

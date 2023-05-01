@@ -1,43 +1,98 @@
-<app-track
+<!--<app-track-->
+<!--    [dragData]="dragData"-->
+<!--    [newTime]="newTime"-->
+<!--    [title]="'Drums'"-->
+<!--    [url]="getDrumsUrl()"-->
+<!--    (ended)="onSongEnd()"-->
+<!--    (dragStatus)="onDragEvent($event)"-->
+<!--    (timeChange)="onTimeChange($event)">-->
+<!--</app-track>-->
+<app-howled-track
     [dragData]="dragData"
     [newTime]="newTime"
+    [pauseSubject]="pauseSubject"
+    [playSubject]="playSubject"
     [title]="'Drums'"
     [url]="getDrumsUrl()"
     (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (timeChange)="onTimeChange($event)">
-</app-track>
-<app-track
+</app-howled-track>
+<!--<app-track-->
+<!--    [dragData]="dragData"-->
+<!--    [newTime]="newTime"-->
+<!--    [title]="'Piano'"-->
+<!--    [url]="getPianoUrl()"-->
+<!--    (dragStatus)="onDragEvent($event)"-->
+<!--    (timeChange)="onTimeChange($event)">-->
+<!--</app-track>-->
+<app-howled-track
     [dragData]="dragData"
     [newTime]="newTime"
+    [pauseSubject]="pauseSubject"
+    [playSubject]="playSubject"
     [title]="'Piano'"
     [url]="getPianoUrl()"
+    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (timeChange)="onTimeChange($event)">
-</app-track>
-<app-track
+</app-howled-track>
+<!--<app-track-->
+<!--    [dragData]="dragData"-->
+<!--    [newTime]="newTime"-->
+<!--    [title]="'Bass'"-->
+<!--    [url]="getBassUrl()"-->
+<!--    (dragStatus)="onDragEvent($event)"-->
+<!--    (timeChange)="onTimeChange($event)">-->
+<!--</app-track>-->
+<app-howled-track
     [dragData]="dragData"
     [newTime]="newTime"
+    [pauseSubject]="pauseSubject"
+    [playSubject]="playSubject"
     [title]="'Bass'"
     [url]="getBassUrl()"
+    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (timeChange)="onTimeChange($event)">
-</app-track>
-<app-track
+</app-howled-track>
+<!--<app-track-->
+<!--    [dragData]="dragData"-->
+<!--    [newTime]="newTime"-->
+<!--    [title]="'Vocals'"-->
+<!--    [url]="getVocalsUrl()"-->
+<!--    (dragStatus)="onDragEvent($event)"-->
+<!--    (timeChange)="onTimeChange($event)">-->
+<!--</app-track>-->
+<app-howled-track
     [dragData]="dragData"
     [newTime]="newTime"
+    [pauseSubject]="pauseSubject"
+    [playSubject]="playSubject"
     [title]="'Vocals'"
     [url]="getVocalsUrl()"
+    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (timeChange)="onTimeChange($event)">
-</app-track>
-<app-track
+</app-howled-track>
+<!--<app-track-->
+<!--    [dragData]="dragData"-->
+<!--    [newTime]="newTime"-->
+<!--    [title]="'Other'"-->
+<!--    [url]="getOtherUrl()"-->
+<!--    (dragStatus)="onDragEvent($event)"-->
+<!--    (timeChange)="onTimeChange($event)">-->
+<!--</app-track>-->
+<app-howled-track
     [dragData]="dragData"
     [newTime]="newTime"
+    [pauseSubject]="pauseSubject"
+    [playSubject]="playSubject"
     [title]="'Other'"
     [url]="getOtherUrl()"
+    (ended)="onSongEnd()"
     (dragStatus)="onDragEvent($event)"
     (timeChange)="onTimeChange($event)">
-</app-track>
+</app-howled-track>
 
 <button id="play-button" (click)="playPause()">{{paused ? 'PLAY' : 'PAUSE'}}</button>

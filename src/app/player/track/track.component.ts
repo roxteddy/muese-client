@@ -9,6 +9,7 @@ import {
     Output, SimpleChanges,
     ViewChild
 } from '@angular/core';
+import { HowledTrackComponent } from '../howled-track/howled-track.component';
 
 declare function drawAudio(url: string, canvas: HTMLCanvasElement): void;
 
@@ -16,7 +17,7 @@ export interface DragData {
     rect: DOMRect
     offsetWidth: number
     newWidth: number
-    origin: TrackComponent
+    origin: TrackComponent | HowledTrackComponent
 }
 
 @Component({
