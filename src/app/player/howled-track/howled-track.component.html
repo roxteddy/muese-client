@@ -6,7 +6,7 @@
         <canvas #canvas></canvas>
         <div #canvasProgress
              class="canvas-progress"
-             [ngClass]="{dragged: !!dragData}"
+             [ngClass]="{dragged: !!dragData, loading: loading}"
              [style.width.%]="dragData ? dragData.newWidth / dragData.offsetWidth * 100 : progressWidth"></div>
     </div>
     <button class="mute-button" (click)="mute()">{{muted ? 'UNMUTE' : 'MUTE'}}</button>

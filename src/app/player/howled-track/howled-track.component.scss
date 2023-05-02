@@ -25,4 +25,7 @@ canvas {
     &.dragged {
         background-color: blue;
     }
+    &.loading {
+        background-color: yellow;
+    }
 }

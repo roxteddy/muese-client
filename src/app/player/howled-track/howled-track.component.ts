@@ -2,17 +2,20 @@ import {
     AfterViewInit,
     Component,
     ElementRef,
-    EventEmitter, HostListener,
+    EventEmitter,
+    HostListener,
     Input,
     OnChanges,
-    OnDestroy, OnInit,
-    Output, SimpleChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    SimpleChanges,
     ViewChild
 } from '@angular/core';
 import { Howl as HowlObject } from 'howler';
 import { DragData } from '../track/track.component';
 import { Subject } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 
 declare var Howl: any;
 
@@ -40,10 +43,15 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Output() ended: EventEmitter<void> = new EventEmitter<void>();
     @Output() solo: EventEmitter<HowledTrackComponent> = new EventEmitter<HowledTrackComponent>();
 
-    currentTime: number = 0;
+    currentTime: number = 0
+    loading: boolean = false;
     intervalId?: number;
     muted: boolean = false;
     progressWidth: number = 0;
+    volumeStatus?: {
+        rect: DOMRect,
+        volume: number
+    };
 
     private audio?: HowlObject;
 
@@ -62,14 +70,40 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
             if (this.audio) {
                 this.audio.unload();
             }
-            this.httpClient.get(changes['url'].currentValue, {responseType: 'blob'}).subscribe((blob: Blob) => {
-                const url = (window.URL || window.webkitURL ).createObjectURL(blob);
-                this.audio = new Howl({src: url, format: 'mp3'});
-                drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
-                this.audio?.on('load', () => this.loaded.emit());
-                this.audio?.on('end', () => this.ended.emit());
-            }, (e) => {
-                this.loaded.emit();
+            this.loading = true;
+            this.httpClient.get(changes['url'].currentValue, {
+                observe: 'events',
+                reportProgress: true,
+                responseType: 'blob'
+            }).subscribe({
+                next : (event: HttpEvent<Blob>) => {
+                    if (event.type == HttpEventType.DownloadProgress) {
+                        if (event.total) {
+                            this.setProgress(event.loaded / event.total);
+                        }
+                    }
+                    if (event.type == HttpEventType.Response) {
+                        let blob = event.body;
+                        if (blob) {
+                            const url = (window.URL || window.webkitURL ).createObjectURL(blob);
+                            this.audio = new Howl({src: url, format: 'mp3'});
+                            drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
+                            this.audio?.on('load', () => {
+                                this.loaded.emit();
+                                this.loading = false;
+                            });
+                            this.audio?.on('end', () => this.ended.emit());
+                        } else {
+                            // TODO: error case
+                            this.loaded.emit();
+                            this.loading = false;
+                        }
+                    }
+                }, error: (e) => {
+                    // TODO: error case
+                    this.loaded.emit();
+                    this.loading = false;
+                }
             });
 
             if (!changes['url'].firstChange) {
@@ -118,8 +152,19 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         });
     }
 
+    public onVolumeMouseDown(e: MouseEvent, volumeContainer: HTMLDivElement) {
+        if (this.audio) {
+            const rect = volumeContainer.getBoundingClientRect();
+            let volume = (e.clientX - rect.left) / this.audio?.duration();
+            volume = volume > 1 ? 1 : volume;
+            this.volumeStatus = {
+                rect,
+                volume
+            }
+        }
+    }
     @HostListener('document:mousemove', ['$event'])
-    public onCanvasMouseMove(e: MouseEvent) {
+    public documentMouseMove(e: MouseEvent) {
         if (this.dragData?.origin == this) {
             let newWidth = e.clientX - this.dragData.rect.left;
             if (newWidth > this.dragData.offsetWidth) {
@@ -133,7 +178,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     }
 
     @HostListener('window:mouseup', ['$event'])
-    public onCanvasMouseUp(e: MouseEvent) {
+    public windowMouseUp(e: MouseEvent) {
         if (this.dragData?.origin == this && this.audio) {
             const time = this.dragData.newWidth / this.dragData.offsetWidth * this.audio.duration();
             this.timeChange.emit(time);
