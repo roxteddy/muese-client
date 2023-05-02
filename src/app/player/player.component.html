@@ -7,6 +7,7 @@
     [title]="'Drums'"
     [url]="getDrumsUrl()"
     (ended)="onSongEnd()"
+    (timeProgress)="timeProgress = $event"
     (dragStatus)="onDragEvent($event)"
     (loaded)="onTrackLoaded()"
     (timeChange)="onTimeChange($event)"

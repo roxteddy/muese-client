@@ -32,7 +32,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
 
     @Input() dragData: DragData | null = null;
     @Input() newTime: number | undefined;
-    @Input() playSubject?: Subject<void>;
+    @Input() playSubject?: Subject<number>;
     @Input() pauseSubject?: Subject<void>;
     @Input() speedSubject?: Subject<number>;
     @Input() title?: string;
@@ -41,6 +41,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Output() dragStatus: EventEmitter<DragData | null> = new EventEmitter<DragData | null>();
     @Output() loaded: EventEmitter<void> = new EventEmitter<void>();
     @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
+    @Output() timeProgress: EventEmitter<number> = new EventEmitter<number>();
     @Output() ended: EventEmitter<void> = new EventEmitter<void>();
     @Output() solo: EventEmitter<HowledTrackComponent> = new EventEmitter<HowledTrackComponent>();
 
@@ -61,7 +62,10 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     constructor(private readonly httpClient: HttpClient) {}
 
     ngOnInit() {
-        this.playSubject?.subscribe(() => this.audio?.play());
+        this.playSubject?.subscribe((time) => {
+            this.audio?.seek(time);
+            this.audio?.play();
+        });
         this.pauseSubject?.subscribe(() => this.audio?.pause());
         this.speedSubject?.subscribe((speed) => this.audio?.rate(speed));
     }
@@ -133,8 +137,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
 
     ngAfterViewInit() {
         this.intervalId = setInterval(() => this.updateCounter(), 25);
-        if (this.url && this.canvasElementRef) {
-        }
     }
 
     ngOnDestroy() {
@@ -230,6 +232,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     private updateCounter() {
         if (this.audio) {
             this.currentTime = this.audio.seek();
+            this.timeProgress.emit(this.currentTime);
             if (!this.dragData) {
                 this.setProgress(this.currentTime / this.audio.duration());
             }

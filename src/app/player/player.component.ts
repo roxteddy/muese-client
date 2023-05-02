@@ -11,7 +11,6 @@ import { SERVER_URL, Song } from '../app.component';
 import { Subject } from 'rxjs';
 import { HowledTrackComponent } from './howled-track/howled-track.component';
 import { DragData } from '../app.module';
-import { DialogRef } from '@angular/cdk/dialog';
 import { MatDialog } from '@angular/material/dialog';
 
 declare var Howler: HowlerGlobal;
@@ -30,18 +29,19 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     dragData: DragData | null = null;
     newTime?: number;
     paused: boolean = true;
-    playSubject: Subject<void> = new Subject<void>();
+    playSubject: Subject<number> = new Subject<number>();
     pauseSubject: Subject<void> = new Subject<void>();
     speedSubject: Subject<number> = new Subject<number>();
     tracksReady = 0;
-    volumeStatus: {
-        rect?: DOMRect,
-        volume: number
-    } = {volume: 0.75};
     speedStatus: {
         rect?: DOMRect,
         speed: number
     }  = {speed: 1};
+    timeProgress: number = 0;
+    volumeStatus: {
+        rect?: DOMRect,
+        volume: number
+    } = {volume: 0.75};
 
     constructor(private readonly elementRef: ElementRef,
                 private readonly matDialog: MatDialog) {
@@ -167,7 +167,7 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
 
     private play(): void {
         this.paused = false;
-        this.playSubject.next();
+        this.playSubject.next(this.timeProgress);
     }
 
     private pause(): void {
