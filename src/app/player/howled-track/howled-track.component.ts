@@ -48,9 +48,11 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     intervalId?: number;
     muted: boolean = false;
     progressWidth: number = 0;
-    volumeStatus?: {
-        rect: DOMRect,
+    volumeStatus: {
+        rect?: DOMRect,
         volume: number
+    } = {
+        volume : 1
     };
 
     private audio?: HowlObject;
@@ -86,11 +88,16 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                         let blob = event.body;
                         if (blob) {
                             const url = (window.URL || window.webkitURL ).createObjectURL(blob);
-                            this.audio = new Howl({src: url, format: 'mp3'});
                             drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
+                            this.audio = new Howl({src: url, format: 'mp3'});
                             this.audio?.on('load', () => {
                                 this.loaded.emit();
                                 this.loading = false;
+                            });
+                            this.audio?.on('volume', () => {
+                                if (this.audio) {
+                                    this.volumeStatus.volume = this.audio.volume();
+                                }
                             });
                             this.audio?.on('end', () => this.ended.emit());
                         } else {
@@ -142,30 +149,33 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         this.audio?.mute(this.muted);
     }
 
-    public onCanvasMouseDown(e: MouseEvent, canvas: HTMLDivElement) {
-        let rect = canvas.getBoundingClientRect();
+    public onCanvasMouseDown(e: MouseEvent, container: HTMLDivElement) {
+        let rect = container.getBoundingClientRect();
         this.dragStatus.emit({
             rect,
-            offsetWidth: canvas.offsetWidth,
+            offsetWidth: container.offsetWidth,
             newWidth: e.clientX - rect.left,
             origin: this
         });
     }
 
-    public onVolumeMouseDown(e: MouseEvent, volumeContainer: HTMLDivElement) {
-        if (this.audio) {
-            const rect = volumeContainer.getBoundingClientRect();
-            let volume = (e.clientX - rect.left) / this.audio?.duration();
-            volume = volume > 1 ? 1 : volume;
-            this.volumeStatus = {
-                rect,
-                volume
-            }
+    public onVolumeMouseDown(e: MouseEvent, container: HTMLDivElement) {
+        const rect = container.getBoundingClientRect();
+        let volume = (e.clientX - rect.left) / container.offsetWidth;
+        if (volume < 0) {
+            volume = 0;
+        } else if (volume > 1) {
+            volume = 1;
+        }
+        this.volumeStatus = {
+            rect,
+            volume
         }
     }
     @HostListener('document:mousemove', ['$event'])
     public documentMouseMove(e: MouseEvent) {
         if (this.dragData?.origin == this) {
+            e.preventDefault();
             let newWidth = e.clientX - this.dragData.rect.left;
             if (newWidth > this.dragData.offsetWidth) {
                 newWidth = this.dragData.offsetWidth;
@@ -175,6 +185,17 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                 newWidth: newWidth
             });
         }
+
+        if (this.volumeStatus.rect) {
+            e.preventDefault();
+            let volume = (e.clientX - this.volumeStatus.rect.left) / this.volumeStatus.rect.width;
+            if (volume < 0) {
+                volume = 0;
+            } else if (volume > 1) {
+                volume = 1;
+            }
+            this.audio?.volume(volume);
+        }
     }
 
     @HostListener('window:mouseup', ['$event'])
@@ -183,6 +204,10 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
             const time = this.dragData.newWidth / this.dragData.offsetWidth * this.audio.duration();
             this.timeChange.emit(time);
             this.dragStatus.emit(null);
+        }
+
+        if (this.volumeStatus.rect) {
+            this.volumeStatus.rect = undefined;
         }
     }
 

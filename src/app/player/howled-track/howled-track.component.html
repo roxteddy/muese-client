@@ -11,5 +11,14 @@
     </div>
     <button class="mute-button" (click)="mute()">{{muted ? 'UNMUTE' : 'MUTE'}}</button>
     <button class="solo-button" (click)="onSolo()">SOLO</button>
+    <div #volumeContainer
+         class="volume-container"
+         (mousedown)="onVolumeMouseDown($event, volumeContainer)">
+        <div #volumeProgress
+             class="volume-progress"
+             [ngClass]="{dragged: !!volumeStatus.rect}"
+             [style.width.%]="volumeStatus.volume * 100">
+        </div>
+    </div>
 </div>
 <div class="counter">{{currentTime | number : '2.3-3'}}</div>

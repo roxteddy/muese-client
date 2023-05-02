@@ -29,3 +29,29 @@ canvas {
         background-color: yellow;
     }
 }
+
+.volume-container {
+    position: relative;
+    height: 25px;
+    width: 100px;
+    background-color: black;
+
+    &.muted {
+        background-color: grey;
+    }
+
+    .volume-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0;
+        background-color: red;
+        opacity: 0.66;
+        border-right: solid 1px yellow;
+
+        &.dragged {
+            background-color: blue;
+        }
+    }
+}
