@@ -38,3 +38,42 @@
         }
     }
 }
+
+.speed-container {
+    position: relative;
+    height: 25px;
+    width: 400px;
+    background-color: grey;
+
+    .filler-1 {
+        position: absolute;
+        top: 0;
+        left: 12.5%;
+        height: 100%;
+        width: 12.5%;
+        background-color: papayawhip;
+    }
+    .filler-2 {
+        position: absolute;
+        top: 0;
+        left: 25%;
+        height: 100%;
+        width: 75%;
+        background-color: palegoldenrod;
+    }
+
+    .speed-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 0;
+        background-color: red;
+        opacity: 0.66;
+        border-right: solid 1px yellow;
+
+        &.dragged {
+            background-color: blue;
+        }
+    }
+}

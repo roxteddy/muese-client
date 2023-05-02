@@ -34,6 +34,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() newTime: number | undefined;
     @Input() playSubject?: Subject<void>;
     @Input() pauseSubject?: Subject<void>;
+    @Input() speedSubject?: Subject<number>;
     @Input() title?: string;
     @Input() url?: string;
 
@@ -62,6 +63,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     ngOnInit() {
         this.playSubject?.subscribe(() => this.audio?.play());
         this.pauseSubject?.subscribe(() => this.audio?.pause());
+        this.speedSubject?.subscribe((speed) => this.audio?.rate(speed));
     }
 
     ngOnChanges(changes: SimpleChanges) {

@@ -12,6 +12,7 @@
     [newTime]="newTime"
     [pauseSubject]="pauseSubject"
     [playSubject]="playSubject"
+    [speedSubject]="speedSubject"
     [title]="'Drums'"
     [url]="getDrumsUrl()"
     (ended)="onSongEnd()"
@@ -33,6 +34,7 @@
     [newTime]="newTime"
     [pauseSubject]="pauseSubject"
     [playSubject]="playSubject"
+    [speedSubject]="speedSubject"
     [title]="'Piano'"
     [url]="getPianoUrl()"
     (dragStatus)="onDragEvent($event)"
@@ -53,6 +55,7 @@
     [newTime]="newTime"
     [pauseSubject]="pauseSubject"
     [playSubject]="playSubject"
+    [speedSubject]="speedSubject"
     [title]="'Bass'"
     [url]="getBassUrl()"
     (dragStatus)="onDragEvent($event)"
@@ -73,6 +76,7 @@
     [newTime]="newTime"
     [pauseSubject]="pauseSubject"
     [playSubject]="playSubject"
+    [speedSubject]="speedSubject"
     [title]="'Vocals'"
     [url]="getVocalsUrl()"
     (dragStatus)="onDragEvent($event)"
@@ -93,6 +97,7 @@
     [newTime]="newTime"
     [pauseSubject]="pauseSubject"
     [playSubject]="playSubject"
+    [speedSubject]="speedSubject"
     [title]="'Other'"
     [url]="getOtherUrl()"
     (dragStatus)="onDragEvent($event)"
@@ -102,13 +107,27 @@
 </app-howled-track>
 
 <button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>
+
+Volume
 <div #volumeContainer
      class="volume-container"
      (mousedown)="onVolumeMouseDown($event, volumeContainer)">
     <div class="filler"></div>
-    <div #volumeProgress
-         class="volume-progress"
+    <div class="volume-progress"
          [ngClass]="{dragged: !!volumeStatus.rect}"
          [style.width.%]="volumeStatus.volume * 100">
     </div>
 </div>
+
+Speed
+<div #speedContainer
+     class="speed-container"
+     (mousedown)="onSpeedMouseDown($event, speedContainer)">
+    <div class="filler-1"></div>
+    <div class="filler-2"></div>
+    <div class="speed-progress"
+         [ngClass]="{dragged: !!speedStatus.rect}"
+         [style.width.%]="(speedStatus.speed / 4) * 100">
+    </div>
+</div>
+{{speedStatus.speed}}

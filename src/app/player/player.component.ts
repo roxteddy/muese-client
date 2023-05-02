@@ -32,13 +32,16 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     paused: boolean = true;
     playSubject: Subject<void> = new Subject<void>();
     pauseSubject: Subject<void> = new Subject<void>();
+    speedSubject: Subject<number> = new Subject<number>();
     tracksReady = 0;
     volumeStatus: {
         rect?: DOMRect,
         volume: number
-    } = {
-        volume : 0.75
-    };
+    } = {volume: 0.75};
+    speedStatus: {
+        rect?: DOMRect,
+        speed: number
+    }  = {speed: 1};
 
     constructor(private readonly elementRef: ElementRef) {
         this.setVolume(this.volumeStatus.volume);
@@ -98,6 +101,10 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.paused = true;
     }
 
+    public onSpeedChange(speed: number) {
+        this.speedSubject.next(speed);
+    }
+
     public onTimeChange(time: number) {
         this.newTime = time;
     }
@@ -106,34 +113,39 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.tracksReady += 1;
     }
 
+    public onSpeedMouseDown(e: MouseEvent, container: HTMLDivElement) {
+        const rect = container.getBoundingClientRect();
+        const speed = ((e.clientX - rect.left) / container.offsetWidth) * 4;
+        this.speedStatus.rect = rect;
+        this.setSpeed(speed);
+    }
+
     public onVolumeMouseDown(e: MouseEvent, container: HTMLDivElement) {
         const rect = container.getBoundingClientRect();
-        let volume = (e.clientX - rect.left) / container.offsetWidth;
-        if (volume < 0) {
-            volume = 0;
-        } else if (volume > 1) {
-            volume = 1;
-        }
+        const volume = (e.clientX - rect.left) / container.offsetWidth;
         this.volumeStatus.rect = rect;
         this.setVolume(volume);
     }
 
     @HostListener('document:mousemove', ['$event'])
     public documentMouseMove(e: MouseEvent) {
+        if (this.speedStatus.rect) {
+            e.preventDefault();
+            const speed = ((e.clientX - this.speedStatus.rect.left) / this.speedStatus.rect.width) * 4;
+            this.setSpeed(speed);
+        }
         if (this.volumeStatus.rect) {
             e.preventDefault();
-            let volume = (e.clientX - this.volumeStatus.rect.left) / this.volumeStatus.rect.width;
-            if (volume < 0) {
-                volume = 0;
-            } else if (volume > 1) {
-                volume = 1;
-            }
+            const volume = (e.clientX - this.volumeStatus.rect.left) / this.volumeStatus.rect.width;
             this.setVolume(volume);
         }
     }
 
     @HostListener('window:mouseup', ['$event'])
     public windowMouseUp(e: MouseEvent) {
+        if (this.speedStatus.rect) {
+            this.speedStatus.rect = undefined;
+        }
         if (this.volumeStatus.rect) {
             this.volumeStatus.rect = undefined;
         }
@@ -161,7 +173,22 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.pauseSubject.next();
     }
 
+    private setSpeed(speed: number) {
+        if (speed < 0.5) {
+            speed = 0.5;
+        } else if (speed > 4) {
+            speed = 4;
+        }
+        this.speedStatus.speed = speed;
+        this.speedSubject.next(speed);
+    }
+
     private setVolume(volume: number) {
+        if (volume < 0) {
+            volume = 0;
+        } else if (volume > 1) {
+            volume = 1;
+        }
         this.volumeStatus.volume = volume;
         Howler.volume(volume);
     }
