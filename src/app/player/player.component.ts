@@ -5,14 +5,14 @@ import {
     HostListener,
     Input,
     OnChanges,
-    OnDestroy,
-    OnInit,
     SimpleChanges, ViewChildren
 } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
-import { DragData } from './track/track.component';
 import { Subject } from 'rxjs';
 import { HowledTrackComponent } from './howled-track/howled-track.component';
+import { DragData } from '../app.module';
+import { DialogRef } from '@angular/cdk/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 declare var Howler: HowlerGlobal;
 
@@ -43,7 +43,8 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         speed: number
     }  = {speed: 1};
 
-    constructor(private readonly elementRef: ElementRef) {
+    constructor(private readonly elementRef: ElementRef,
+                private readonly matDialog: MatDialog) {
         this.setVolume(this.volumeStatus.volume);
     }
 
@@ -152,6 +153,7 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     }
 
     public playPause(): void {
+        if (this.tracksReady == 5 && !this.matDialog.openDialogs.length)
         this.paused ? this.play() : this.pause();
     }
 

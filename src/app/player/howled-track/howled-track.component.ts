@@ -13,9 +13,9 @@ import {
     ViewChild
 } from '@angular/core';
 import { Howl as HowlObject } from 'howler';
-import { DragData } from '../track/track.component';
 import { Subject } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
+import { DragData } from '../../app.module';
 
 declare var Howl: any;
 
