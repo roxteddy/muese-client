@@ -52,7 +52,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         rect?: DOMRect,
         volume: number
     } = {
-        volume : 1
+        volume : 0.75
     };
 
     private audio?: HowlObject;
@@ -90,6 +90,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                             const url = (window.URL || window.webkitURL ).createObjectURL(blob);
                             drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
                             this.audio = new Howl({src: url, format: 'mp3'});
+                            this.audio?.volume(this.volumeStatus.volume);
                             this.audio?.on('load', () => {
                                 this.loaded.emit();
                                 this.loading = false;

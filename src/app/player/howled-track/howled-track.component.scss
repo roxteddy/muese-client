@@ -40,6 +40,16 @@ canvas {
         background-color: grey;
     }
 
+    .filler {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 25%;
+        background-color: yellow;
+        opacity: 0.66;
+    }
+
     .volume-progress {
         position: absolute;
         top: 0;

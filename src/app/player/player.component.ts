@@ -14,6 +14,8 @@ import { DragData } from './track/track.component';
 import { Subject } from 'rxjs';
 import { HowledTrackComponent } from './howled-track/howled-track.component';
 
+declare var Howler: HowlerGlobal;
+
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
@@ -21,6 +23,7 @@ import { HowledTrackComponent } from './howled-track/howled-track.component';
 })
 export class PlayerComponent implements AfterViewInit, OnChanges {
     @ViewChildren(HowledTrackComponent) trackComponents?: HowledTrackComponent[];
+    tracksElements: HTMLAudioElement[] = [];
 
     @Input() song?: Song;
 
@@ -30,10 +33,16 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     playSubject: Subject<void> = new Subject<void>();
     pauseSubject: Subject<void> = new Subject<void>();
     tracksReady = 0;
+    volumeStatus: {
+        rect?: DOMRect,
+        volume: number
+    } = {
+        volume : 0.75
+    };
 
-    tracksElements: HTMLAudioElement[] = [];
-
-    constructor(private readonly elementRef: ElementRef) {}
+    constructor(private readonly elementRef: ElementRef) {
+        this.setVolume(this.volumeStatus.volume);
+    }
 
     ngAfterViewInit() {
         this.tracksElements = this.elementRef.nativeElement.querySelectorAll('.track');
@@ -97,6 +106,39 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.tracksReady += 1;
     }
 
+    public onVolumeMouseDown(e: MouseEvent, container: HTMLDivElement) {
+        const rect = container.getBoundingClientRect();
+        let volume = (e.clientX - rect.left) / container.offsetWidth;
+        if (volume < 0) {
+            volume = 0;
+        } else if (volume > 1) {
+            volume = 1;
+        }
+        this.volumeStatus.rect = rect;
+        this.setVolume(volume);
+    }
+
+    @HostListener('document:mousemove', ['$event'])
+    public documentMouseMove(e: MouseEvent) {
+        if (this.volumeStatus.rect) {
+            e.preventDefault();
+            let volume = (e.clientX - this.volumeStatus.rect.left) / this.volumeStatus.rect.width;
+            if (volume < 0) {
+                volume = 0;
+            } else if (volume > 1) {
+                volume = 1;
+            }
+            this.setVolume(volume);
+        }
+    }
+
+    @HostListener('window:mouseup', ['$event'])
+    public windowMouseUp(e: MouseEvent) {
+        if (this.volumeStatus.rect) {
+            this.volumeStatus.rect = undefined;
+        }
+    }
+
     public playPause(): void {
         this.paused ? this.play() : this.pause();
     }
@@ -117,5 +159,10 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     private pause(): void {
         this.paused = true;
         this.pauseSubject.next();
+    }
+
+    private setVolume(volume: number) {
+        this.volumeStatus.volume = volume;
+        Howler.volume(volume);
     }
 }

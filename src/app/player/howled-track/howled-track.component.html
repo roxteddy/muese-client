@@ -13,7 +13,9 @@
     <button class="solo-button" (click)="onSolo()">SOLO</button>
     <div #volumeContainer
          class="volume-container"
+         [ngClass]="{muted: muted}"
          (mousedown)="onVolumeMouseDown($event, volumeContainer)">
+        <div class="filler"></div>
         <div #volumeProgress
              class="volume-progress"
              [ngClass]="{dragged: !!volumeStatus.rect}"

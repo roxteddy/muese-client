@@ -102,3 +102,13 @@
 </app-howled-track>
 
 <button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>
+<div #volumeContainer
+     class="volume-container"
+     (mousedown)="onVolumeMouseDown($event, volumeContainer)">
+    <div class="filler"></div>
+    <div #volumeProgress
+         class="volume-progress"
+         [ngClass]="{dragged: !!volumeStatus.rect}"
+         [style.width.%]="volumeStatus.volume * 100">
+    </div>
+</div>
