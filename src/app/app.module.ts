@@ -16,8 +16,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface DragData {
     rect: DOMRect
-    newWidth: number
-    origin: HowledTrackComponent
+    progress: number
+    origin: HowledTrackComponent | null
 }
 
 @NgModule({

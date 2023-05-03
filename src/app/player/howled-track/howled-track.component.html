@@ -36,11 +36,9 @@
              (mousedown)="onCanvasMouseDown($event, progressContainer)">
 <!--            <canvas #progressCanvas class="progress-canvas"></canvas>-->
             <svg viewBox="0 0 377 32" preserveAspectRatio="none"><path #path></path></svg>
-            <div #progressBar
-                 class="progress-bar"
+            <div class="progress-bar"
                  [ngClass]="{loading: loading}"
-                 [style.width.%]="dragData ? dragData.newWidth / dragData.rect.width * 100 : progressWidth">
-<!--                <canvas #progressCanvas2 class="progress-canvas-2" [style.width.px]="progressContainer.offsetWidth"></canvas>-->
+                 [style.width.%]="dragData ? dragData.progress * 100 : progressWidth">
                 <svg viewBox="0 0 377 32" preserveAspectRatio="none"
                      [style.width.px]="progressContainer.offsetWidth">
                     <path #path2 [ngClass]="{dragged: !!dragData}"></path>

@@ -155,7 +155,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         let rect = container.getBoundingClientRect();
         this.dragStatus.emit({
             rect,
-            newWidth: e.clientX - rect.left,
+            progress: (e.clientX - rect.left) / rect.width,
             origin: this
         });
     }
@@ -169,15 +169,15 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     public documentMouseMove(e: MouseEvent) {
         if (this.dragData?.origin == this) {
             e.preventDefault();
-            let newWidth = e.clientX - this.dragData.rect.left;
-            if (newWidth < 0) {
-                newWidth = 0;
-            } else if (newWidth > this.dragData.rect.width) {
-                newWidth = this.dragData.rect.width;
+            let progress = (e.clientX - this.dragData.rect.left) / this.dragData.rect.width;
+            if (progress < 0) {
+                progress = 0;
+            } else if (progress > 1) {
+                progress = 1;
             }
             this.dragStatus.emit({
                 ...this.dragData,
-                newWidth: newWidth
+                progress
             });
         }
     }
@@ -185,7 +185,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @HostListener('window:mouseup', ['$event'])
     public windowMouseUp(e: MouseEvent) {
         if (this.dragData?.origin == this && this.audio) {
-            const time = this.dragData.newWidth / this.dragData.rect.width * this.audio.duration();
+            const time = this.dragData.progress * this.audio.duration();
             this.timeChange.emit(time);
             this.dragStatus.emit(null);
         }
