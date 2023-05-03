@@ -34,7 +34,6 @@
         </div>
         <div #progressContainer class="progress-container"
              (mousedown)="onCanvasMouseDown($event, progressContainer)">
-<!--            <canvas #progressCanvas class="progress-canvas"></canvas>-->
             <svg viewBox="0 0 377 32" preserveAspectRatio="none"><path #path></path></svg>
             <div class="progress-bar"
                  [ngClass]="{loading: loading}"

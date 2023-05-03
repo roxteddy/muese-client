@@ -167,7 +167,8 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
 
     @HostListener('document:mousemove', ['$event'])
     public documentMouseMove(e: MouseEvent) {
-        if (this.dragData?.origin == this) {
+        console.log(this.dragData?.rect?.width);
+        if (this.dragData?.origin == this && this.dragData.rect) {
             e.preventDefault();
             let progress = (e.clientX - this.dragData.rect.left) / this.dragData.rect.width;
             if (progress < 0) {
