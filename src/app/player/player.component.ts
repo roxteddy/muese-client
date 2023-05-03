@@ -22,8 +22,6 @@ declare var Howler: HowlerGlobal;
 })
 export class PlayerComponent implements AfterViewInit, OnChanges {
     @ViewChildren(HowledTrackComponent) trackComponents?: HowledTrackComponent[];
-    @ViewChild('livePath') livePathRef?: ElementRef;
-    tracksElements: HTMLAudioElement[] = [];
 
     @Input() song?: Song;
 
@@ -39,18 +37,14 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         speed: number
     }  = {speed: 1};
     timeProgress: number = 0;
-    volumeStatus: {
-        rect?: DOMRect,
-        volume: number
-    } = {volume: 0.75};
+    volume: number = 0.75;
 
     constructor(private readonly elementRef: ElementRef,
                 private readonly matDialog: MatDialog) {
-        this.setVolume(this.volumeStatus.volume);
+        this.setVolume(this.volume);
     }
 
     ngAfterViewInit() {
-        this.tracksElements = this.elementRef.nativeElement.querySelectorAll('.track');
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -122,10 +116,7 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.setSpeed(speed);
     }
 
-    public onVolumeMouseDown(e: MouseEvent, container: HTMLDivElement) {
-        const rect = container.getBoundingClientRect();
-        const volume = (e.clientX - rect.left) / container.offsetWidth;
-        this.volumeStatus.rect = rect;
+    public onVolumeProgress(volume: number) {
         this.setVolume(volume);
     }
 
@@ -136,20 +127,13 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
             const speed = ((e.clientX - this.speedStatus.rect.left) / this.speedStatus.rect.width) * 4;
             this.setSpeed(speed);
         }
-        if (this.volumeStatus.rect) {
-            e.preventDefault();
-            const volume = (e.clientX - this.volumeStatus.rect.left) / this.volumeStatus.rect.width;
-            this.setVolume(volume);
-        }
     }
 
     @HostListener('window:mouseup', ['$event'])
     public windowMouseUp(e: MouseEvent) {
         if (this.speedStatus.rect) {
+            e.preventDefault();
             this.speedStatus.rect = undefined;
-        }
-        if (this.volumeStatus.rect) {
-            this.volumeStatus.rect = undefined;
         }
     }
 
@@ -187,12 +171,7 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     }
 
     private setVolume(volume: number) {
-        if (volume < 0) {
-            volume = 0;
-        } else if (volume > 1) {
-            volume = 1;
-        }
-        this.volumeStatus.volume = volume;
+        this.volume = volume;
         Howler.volume(volume);
     }
 }

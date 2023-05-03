@@ -165,6 +165,11 @@
             color: red;
         }
 
+        app-ui-progress-bar {
+            display: block;
+            width: 100px;
+        }
+
         .progress-container {
             position: relative;
             height: 25px;

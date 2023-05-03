@@ -16,13 +16,10 @@ import { Howl as HowlObject } from 'howler';
 import { Subject } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { DragData } from '../../app.module';
-import { ProgressBarComponent } from '../../../app-ui/progress-bar/progress-bar.component';
 
 declare var Howl: any;
 
 declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
-
-declare function drawAudio(blob: Promise<ArrayBuffer>, canvas: HTMLCanvasElement, color: string): void;
 
 @Component({
   selector: 'app-howled-track',
@@ -95,9 +92,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                         let blob = event.body;
                         if (blob) {
                             const url = (window.URL || window.webkitURL ).createObjectURL(blob);
-                            // drawAudio(blob.arrayBuffer(), this.progressCanvasElementRef?.nativeElement, 'black');
-                            // drawAudio(blob.arrayBuffer(), this.progressCanvas2ElementRef?.nativeElement, 'red');
-
                             this.audio = new Howl({src: url, format: 'mp3'});
                             this.audio?.volume(this.volume);
                             this.audio?.on('load', () => {

@@ -22,17 +22,14 @@
     </div>
     <div class="commands">
         <button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>
+        volume
+        <app-ui-progress-bar
+            [hasButton]="true"
+            [seek]="volume"
+            [seekOnDrag]="true"
+            (progress)="onVolumeProgress($event)"
+        ></app-ui-progress-bar>
 
-        Volume
-        <div #volumeContainer
-             class="progress-container"
-             (mousedown)="onVolumeMouseDown($event, volumeContainer)">
-            <div class="filler"></div>
-            <div class="progress"
-                 [ngClass]="{dragged: !!volumeStatus.rect}"
-                 [style.width.%]="volumeStatus.volume * 100">
-            </div>
-        </div>
     </div>
 </div>
 <div class="tracks">
