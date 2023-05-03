@@ -2,3 +2,31 @@
 
 //html, body { height: 100%; }
 body { margin: 64px; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+@font-face {
+    font-family: "Noah";
+    src: url('assets/fonts/noah-regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Noah";
+    src: url('assets/fonts/noah-regularitalic.otf');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "Noah";
+    src: url('assets/fonts/noah-bold.otf');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Noah";
+    src: url('assets/fonts/noah-bolditalic.otf');
+    font-weight: bold;
+    font-style: italic;
+}
