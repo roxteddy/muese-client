@@ -21,14 +21,14 @@ let audioContext;
  * Retrieves audio from an external source, the initializes the drawing function
  * @param {String} url the url of the audio we'd like to fetch
  */
-const drawAudio = (arrayPromise, canvas) => {
+const drawAudio = (arrayPromise, canvas, color) => {
   if (!audioContext) {
     audioContext = new AudioContext();
   }
 
   arrayPromise
     .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-    .then(audioBuffer => draw(normalizeData(filterData(audioBuffer)), canvas));
+    .then(audioBuffer => draw(normalizeData(filterData(audioBuffer)), canvas, color));
 };
 
 /**
@@ -67,7 +67,7 @@ const normalizeData = filteredData => {
  * @param {Array} normalizedData The filtered array returned from filterData()
  * @returns {Array} a normalized array of data
  */
-const draw = (normalizedData, canvas) => {
+const draw = (normalizedData, canvas, color) => {
   // set up the canvas
   const dpr = window.devicePixelRatio || 1;
   const padding = 20;
@@ -87,7 +87,7 @@ const draw = (normalizedData, canvas) => {
     } else if (height > canvas.offsetHeight / 2) {
         height = canvas.offsetHeight / 2;
     }
-    drawLineSegment(ctx, x, height, width, (i + 1) % 2);
+    drawLineSegment(ctx, x, height, width, (i + 1) % 2, color);
   }
 };
 
@@ -99,9 +99,9 @@ const draw = (normalizedData, canvas) => {
  * @param {number} width the desired width of the line segment
  * @param {boolean} isEven whether or not the segmented is even-numbered
  */
-const drawLineSegment = (ctx, x, height, width, isEven) => {
+const drawLineSegment = (ctx, x, height, width, isEven, color) => {
   ctx.lineWidth = 1; // how thick the line is
-  ctx.strokeStyle = "red"; // what color our line is
+  ctx.strokeStyle = color; // what color our line is
   ctx.beginPath();
   height = isEven ? height : -height;
   ctx.moveTo(x, 0);

@@ -19,7 +19,9 @@ import { DragData } from '../../app.module';
 
 declare var Howl: any;
 
-declare function drawAudio(blob: Promise<ArrayBuffer>, canvas: HTMLCanvasElement): void;
+declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
+
+declare function drawAudio(blob: Promise<ArrayBuffer>, canvas: HTMLCanvasElement, color: string): void;
 
 @Component({
   selector: 'app-howled-track',
@@ -27,8 +29,11 @@ declare function drawAudio(blob: Promise<ArrayBuffer>, canvas: HTMLCanvasElement
   styleUrls: ['./howled-track.component.scss']
 })
 export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy, OnInit {
-    @ViewChild('canvas') canvasElementRef?: ElementRef;
-    @ViewChild('canvasProgress') canvasProgress?: ElementRef;
+    @ViewChild('progressCanvas') progressCanvasElementRef?: ElementRef;
+    @ViewChild('progressCanvas2') progressCanvas2ElementRef?: ElementRef;
+    @ViewChild('progressContainer') progressContainerRef?: ElementRef;
+    @ViewChild('path') pathRef?: ElementRef;
+    @ViewChild('path2') path2Ref?: ElementRef;
 
     @Input() dragData: DragData | null = null;
     @Input() newTime: number | undefined;
@@ -58,7 +63,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     };
 
     private audio?: HowlObject;
-
+    private audioNode?: MediaStreamAudioDestinationNode;
     constructor(private readonly httpClient: HttpClient) {}
 
     ngOnInit() {
@@ -94,12 +99,27 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                         let blob = event.body;
                         if (blob) {
                             const url = (window.URL || window.webkitURL ).createObjectURL(blob);
-                            drawAudio(blob.arrayBuffer(), this.canvasElementRef?.nativeElement);
+                            // drawAudio(blob.arrayBuffer(), this.progressCanvasElementRef?.nativeElement, 'black');
+                            // drawAudio(blob.arrayBuffer(), this.progressCanvas2ElementRef?.nativeElement, 'red');
+
                             this.audio = new Howl({src: url, format: 'mp3'});
                             this.audio?.volume(this.volumeStatus.volume);
                             this.audio?.on('load', () => {
                                 this.loaded.emit();
                                 this.loading = false;
+
+                                if (blob) {
+                                    blob.arrayBuffer()
+                                        .then(arrayBuffer => new AudioContext().decodeAudioData(arrayBuffer))
+                                        .then(audioBuffer => {
+                                            const newPath = linearPath(audioBuffer,
+                                                {samples:150, type: 'mirror', normalize: true, width: 1250, height: 100, paths: [
+                                                    {d:'V', sy: 0, x:50, ey:100 }
+                                                ]});
+                                            this.pathRef?.nativeElement?.setAttribute('d', newPath);
+                                            this.path2Ref?.nativeElement?.setAttribute('d', newPath);
+                                        });
+                                }
                             });
                             this.audio?.on('volume', () => {
                                 if (this.audio) {
@@ -124,13 +144,8 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                 this.currentTime = 0;
                 this.muted = false;
                 this.progressWidth = 0;
-                if (this.canvasElementRef) {
-                    let canvas = this.canvasElementRef.nativeElement as HTMLCanvasElement;
-                    let context = canvas.getContext('2d');
-                    if (context) {
-                        context.canvas.width = context.canvas.width;
-                    }
-                }
+                this.pathRef?.nativeElement?.setAttribute('d', '');
+                this.path2Ref?.nativeElement?.setAttribute('d', '');
             }
         }
     }
@@ -182,7 +197,9 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         if (this.dragData?.origin == this) {
             e.preventDefault();
             let newWidth = e.clientX - this.dragData.rect.left;
-            if (newWidth > this.dragData.offsetWidth) {
+            if (newWidth < 0) {
+                newWidth = 0;
+            } else if (newWidth > this.dragData.offsetWidth) {
                 newWidth = this.dragData.offsetWidth;
             }
             this.dragStatus.emit({

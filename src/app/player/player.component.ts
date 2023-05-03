@@ -5,15 +5,18 @@ import {
     HostListener,
     Input,
     OnChanges,
-    SimpleChanges, ViewChildren
+    SimpleChanges, ViewChild, ViewChildren
 } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
 import { Subject } from 'rxjs';
 import { HowledTrackComponent } from './howled-track/howled-track.component';
 import { DragData } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
+import { Howl } from 'howler';
 
 declare var Howler: HowlerGlobal;
+
+declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
 
 @Component({
   selector: 'app-player',
@@ -22,6 +25,7 @@ declare var Howler: HowlerGlobal;
 })
 export class PlayerComponent implements AfterViewInit, OnChanges {
     @ViewChildren(HowledTrackComponent) trackComponents?: HowledTrackComponent[];
+    @ViewChild('livePath') livePathRef?: ElementRef;
     tracksElements: HTMLAudioElement[] = [];
 
     @Input() song?: Song;

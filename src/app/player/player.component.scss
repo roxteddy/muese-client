@@ -1,3 +1,15 @@
+:host {
+    width: 640px;
+    display: block;
+    background-color: #F2F2F2;
+    padding: 24px;
+
+    app-howled-track {
+        display: block;
+        margin-bottom: 24px;
+    }
+}
+
 #play-button {
     background-color: black;
     color: red;

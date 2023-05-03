@@ -9,6 +9,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { HowledTrackComponent } from './player/howled-track/howled-track.component';
+import { AppUiModule } from '../app-ui/app-ui.module';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface DragData {
     rect: DOMRect
@@ -30,6 +34,10 @@ export interface DragData {
         BrowserAnimationsModule,
         MatDialogModule,
         FormsModule,
+        AppUiModule,
+        MatButtonModule,
+        MatIconModule,
+        MatTooltipModule
     ],
     providers: [],
     bootstrap: [AppComponent]
