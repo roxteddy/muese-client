@@ -1,0 +1,12 @@
+<div class="progress-bar">
+    <div #volumeContainer
+         class="progress-container"
+         [ngClass]="{faded: faded}"
+         (mousedown)="onMouseDown($event, volumeContainer)">
+        <div class="progress"
+             [ngClass]="{dragged: !!progressStatus.rect}"
+             [style.width.%]="progressStatus.progress * 100">
+        </div>
+        <div *ngIf="hasButton" class="button" [style.left.px]="progressStatus.progress * volumeContainer.offsetWidth - 8"></div>
+    </div>
+</div>

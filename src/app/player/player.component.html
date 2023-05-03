@@ -25,10 +25,10 @@
 
         Volume
         <div #volumeContainer
-             class="volume-container"
+             class="progress-container"
              (mousedown)="onVolumeMouseDown($event, volumeContainer)">
             <div class="filler"></div>
-            <div class="volume-progress"
+            <div class="progress"
                  [ngClass]="{dragged: !!volumeStatus.rect}"
                  [style.width.%]="volumeStatus.volume * 100">
             </div>

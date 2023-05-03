@@ -16,6 +16,7 @@ import { Howl as HowlObject } from 'howler';
 import { Subject } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { DragData } from '../../app.module';
+import { ProgressBarComponent } from '../../../app-ui/progress-bar/progress-bar.component';
 
 declare var Howl: any;
 
@@ -55,12 +56,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     intervalId?: number;
     muted: boolean = false;
     progressWidth: number = 0;
-    volumeStatus: {
-        rect?: DOMRect,
-        volume: number
-    } = {
-        volume : 0.75
-    };
+    volume: number = 0.75;
 
     private audio?: HowlObject;
     private audioNode?: MediaStreamAudioDestinationNode;
@@ -103,7 +99,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                             // drawAudio(blob.arrayBuffer(), this.progressCanvas2ElementRef?.nativeElement, 'red');
 
                             this.audio = new Howl({src: url, format: 'mp3'});
-                            this.audio?.volume(this.volumeStatus.volume);
+                            this.audio?.volume(this.volume);
                             this.audio?.on('load', () => {
                                 this.loaded.emit();
                                 this.loading = false;
@@ -119,11 +115,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                                             this.pathRef?.nativeElement?.setAttribute('d', newPath);
                                             this.path2Ref?.nativeElement?.setAttribute('d', newPath);
                                         });
-                                }
-                            });
-                            this.audio?.on('volume', () => {
-                                if (this.audio) {
-                                    this.volumeStatus.volume = this.audio.volume();
                                 }
                             });
                             this.audio?.on('end', () => this.ended.emit());
@@ -179,19 +170,11 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         });
     }
 
-    public onVolumeMouseDown(e: MouseEvent, container: HTMLDivElement) {
-        const rect = container.getBoundingClientRect();
-        let volume = (e.clientX - rect.left) / container.offsetWidth;
-        if (volume < 0) {
-            volume = 0;
-        } else if (volume > 1) {
-            volume = 1;
-        }
-        this.volumeStatus = {
-            rect,
-            volume
-        }
+    public onVolumeProgress(volume: number) {
+        this.volume = volume;
+        this.audio?.volume(volume);
     }
+
     @HostListener('document:mousemove', ['$event'])
     public documentMouseMove(e: MouseEvent) {
         if (this.dragData?.origin == this) {
@@ -207,17 +190,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                 newWidth: newWidth
             });
         }
-
-        if (this.volumeStatus.rect) {
-            e.preventDefault();
-            let volume = (e.clientX - this.volumeStatus.rect.left) / this.volumeStatus.rect.width;
-            if (volume < 0) {
-                volume = 0;
-            } else if (volume > 1) {
-                volume = 1;
-            }
-            this.audio?.volume(volume);
-        }
     }
 
     @HostListener('window:mouseup', ['$event'])
@@ -226,10 +198,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
             const time = this.dragData.newWidth / this.dragData.offsetWidth * this.audio.duration();
             this.timeChange.emit(time);
             this.dragStatus.emit(null);
-        }
-
-        if (this.volumeStatus.rect) {
-            this.volumeStatus.rect = undefined;
         }
     }
 

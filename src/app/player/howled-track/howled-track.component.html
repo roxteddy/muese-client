@@ -24,19 +24,27 @@
                     <mat-icon>directions_subway</mat-icon>
                 </button>
             </div>
-            <div class="volume">
-                <div #volumeContainer
-                     class="volume-container"
-                     [ngClass]="{muted: muted}"
-                     (mousedown)="onVolumeMouseDown($event, volumeContainer)">
-                    <div #volumeProgress
-                         class="volume-progress"
-                         [ngClass]="{dragged: !!volumeStatus.rect}"
-                         [style.width.%]="volumeStatus.volume * 100">
-                    </div>
-                    <div class="volume-button" [style.left.px]="volumeStatus.volume * volumeContainer.offsetWidth - 4"></div>
-                </div>
-            </div>
+            <app-progress-bar
+                #volume
+                [faded]="muted"
+                [hasButton]="true"
+                [seek]="0.75"
+                [seekOnDrag]="true"
+                (progress)="onVolumeProgress($event)"
+            ></app-progress-bar>
+<!--            <div class="progress-bar">-->
+<!--                <div #volumeContainer-->
+<!--                     class="progress-container"-->
+<!--                     [ngClass]="{muted: muted}"-->
+<!--                     (mousedown)="onVolumeMouseDown($event, volumeContainer)">-->
+<!--                    <div #volumeProgress-->
+<!--                         class="progress"-->
+<!--                         [ngClass]="{dragged: !!volumeStatus.rect}"-->
+<!--                         [style.width.%]="volumeStatus.volume * 100">-->
+<!--                    </div>-->
+<!--                    <div class="button" [style.left.px]="volumeStatus.volume * volumeContainer.offsetWidth - 4"></div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
         <div #progressContainer class="progress-container"
              (mousedown)="onCanvasMouseDown($event, progressContainer)">
