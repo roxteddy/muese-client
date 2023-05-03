@@ -1,44 +1,65 @@
 <div class="track">
-    <div class="title">{{title}} - Source</div>
+    <div class="title">
+        <b>{{title}} -</b> Source
+    </div>
     <div class="main">
-        <button mat-mini-fab
-                matTooltip="Mute/Unmute"
-                class="mute"
-                [class.muted]="muted"
-                (click)="mute()">
-            <mat-icon>{{muted ? 'volume_mute' : 'volume_down'}}</mat-icon>
-        </button>
-        <button mat-mini-fab
-                matTooltip="Solo"
-                class="solo"
-                (click)="onSolo()">
-            <mat-icon>volume_up</mat-icon>
-        </button>
+        <div class="left">
+            <div class="top-left">
+                <div class="small-buttons">
+                    <button mat-mini-fab
+                            matTooltip="Mute/Unmute"
+                            class="mute"
+                            [class.muted]="muted"
+                            (click)="mute()">
+                        <mat-icon>{{muted ? 'volume_mute' : 'volume_down'}}</mat-icon>
+                    </button>
+                    <button mat-mini-fab
+                            matTooltip="Solo"
+                            class="solo"
+                            (click)="onSolo()">
+                        <mat-icon>volume_up</mat-icon>
+                    </button>
+                </div>
+                <button mat-fab disabled>
+                    <mat-icon>directions_subway</mat-icon>
+                </button>
+            </div>
+            <div class="volume">
+                <div #volumeContainer
+                     class="volume-container"
+                     [ngClass]="{muted: muted}"
+                     (mousedown)="onVolumeMouseDown($event, volumeContainer)">
+                    <div #volumeProgress
+                         class="volume-progress"
+                         [ngClass]="{dragged: !!volumeStatus.rect}"
+                         [style.width.%]="volumeStatus.volume * 100">
+                    </div>
+                    <div class="volume-button" [style.left.px]="volumeStatus.volume * volumeContainer.offsetWidth - 4"></div>
+                </div>
+            </div>
+        </div>
         <div #progressContainer class="progress-container"
              (mousedown)="onCanvasMouseDown($event, progressContainer)">
 <!--            <canvas #progressCanvas class="progress-canvas"></canvas>-->
-            <svg viewBox="0 0 1250 100" preserveAspectRatio="none"><path #path></path></svg>
+            <svg viewBox="0 0 377 32" preserveAspectRatio="none"><path #path></path></svg>
             <div #progressBar
                  class="progress-bar"
                  [ngClass]="{loading: loading}"
                  [style.width.%]="dragData ? dragData.newWidth / dragData.offsetWidth * 100 : progressWidth">
 <!--                <canvas #progressCanvas2 class="progress-canvas-2" [style.width.px]="progressContainer.offsetWidth"></canvas>-->
-                <svg viewBox="0 0 1250 100" preserveAspectRatio="none" [style.width.px]="progressContainer.offsetWidth"><path #path2 [ngClass]="{dragged: !!dragData}"></path></svg>
+                <svg viewBox="0 0 377 32" preserveAspectRatio="none"
+                     [style.width.px]="progressContainer.offsetWidth">
+                    <path #path2 [ngClass]="{dragged: !!dragData}"></path>
+                    <defs>
+                        <linearGradient id="MyGradient" gradientTransform="rotate(90)">
+                            <stop offset="0%" stop-color="#F95B98" />
+                            <stop offset="100%" stop-color="#FA4D71" />
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
         </div>
-    </div>
-    <div class="bottom">
-        <div #volumeContainer
-             class="volume-container"
-             [ngClass]="{muted: muted}"
-             (mousedown)="onVolumeMouseDown($event, volumeContainer)">
-            <div #volumeProgress
-                 class="volume-progress"
-                 [ngClass]="{dragged: !!volumeStatus.rect}"
-                 [style.width.%]="volumeStatus.volume * 100">
-            </div>
-            <div class="volume-button" [style.left.px]="volumeStatus.volume * volumeContainer.offsetWidth - 4"></div>
-        </div>
-<!--        <div class="counter">{{currentTime | number : '2.3-3'}}</div>-->
     </div>
 </div>
+
+<!--        <div class="counter">{{currentTime | number : '2.3-3'}}</div>-->

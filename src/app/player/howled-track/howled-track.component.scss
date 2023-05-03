@@ -1,72 +1,254 @@
 .track {
+    width: 100%;
+    height: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 8px;
 
     .title {
+        width: 100%;
         height: 22px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0;
+        gap: 8px;
+
+        font-family: 'Noah', serif;
+        font-style: normal;
+        font-size: 16px;
+        line-height: 20px;
+        /* identical to box height */
+
+
+        /* Back to Black */
+        color: #0D0D0D;
     }
 
     .main {
-        position: relative;
-        height: 56px;
         width: 100%;
+        height: 80px;
 
-        button {
-            width: 24px;
-            height: 24px;
-            position: absolute;
-            left: 4px;
-            box-shadow: none;
-            background-color: #5D5FEF;
-            color: white;
+        /* Auto layout */
 
-            &.mute {
-                top: 0;
-                &.muted {
-                    background-color: black;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0;
+        gap: 12px;
+
+        /* Inside auto layout */
+
+        flex: none;
+        order: 1;
+        align-self: stretch;
+        flex-grow: 1;
+
+        .left {
+            width: 92px;
+            height: 80px;
+
+            /* Auto layout */
+
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0px 0px 4px;
+            gap: 8px;
+
+
+            /* Inside auto layout */
+
+            flex: none;
+            order: 0;
+            align-self: stretch;
+            flex-grow: 0;
+
+            .top-left {
+                /* Auto layout */
+
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                padding: 0px;
+                gap: 12px;
+
+                width: 92px;
+                height: 56px;
+
+
+                /* Inside auto layout */
+
+                flex: none;
+                order: 0;
+                flex-grow: 0;
+
+                .small-buttons {
+                    /* Auto layout */
+
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    padding: 0px;
+                    gap: 8px;
+
+                    width: 24px;
+                    height: 56px;
+
+
+                    /* Inside auto layout */
+
+                    flex: none;
+                    order: 0;
+                    align-self: stretch;
+                    flex-grow: 1;
+
+                    button {
+                        width: 24px;
+                        height: 24px;
+
+                        /* Inside auto layout */
+
+                        flex: none;
+                        order: 0;
+                        flex-grow: 0;
+
+                        box-shadow: none;
+                        background-color: #5D5FEF;
+                        color: white;
+
+                        &.mute {
+                            top: 0;
+                            &.muted {
+                                background-color: black;
+                            }
+                        }
+                        &.solo {
+                            bottom: 0;
+                        }
+                    }
+                }
+
+                button[mat-fab] {
+                    width: 56px;
+                    height: 56px;
+
+                    box-shadow: none;
+                    background-color: white;
+                    color: black;
                 }
             }
-            &.solo {
-                bottom: 0;
+
+            .volume {
+                /* Level - TimeLine */
+                width: 92px;
+                height: 16px;
+
+                /* Inside auto layout */
+                flex: none;
+                order: 1;
+                align-self: stretch;
+                flex-grow: 0;
+
+                .volume-container {
+                    position: relative;
+                    width: 100%;
+                    height: 8px;
+                    margin-top: 4px;
+                    border-radius: 10px;
+                    background-color: black;
+
+                    &.muted {
+                        background-color: grey;
+                    }
+
+                    .volume-progress {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        height: 100%;
+                        width: 0;
+                        background-color: #5D5FEF;
+                        border-radius: 10px;
+
+                        &.dragged {
+                            background-color: blue;
+                        }
+                    }
+
+                    .volume-button {
+                        position: absolute;
+                        height: 16px;
+                        width: 16px;
+                        top: -4px;
+                        left: -4px;
+                        border-radius: 32px;
+                        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+                        background-color: white;
+                    }
+                }
             }
         }
 
         .progress-container {
+            width: 100px;
             height: 80px;
-            position: relative;
-            top: 8px;
-            left: 48px;
-            width: calc(100% - 72px);
-            background-color: white;
+            background: #FFFFFF;
             border-radius: 8px;
+            position: relative;
 
-            canvas, svg {
-                width: 100%;
-                height: 100%;
+            /* Auto layout */
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0;
+            gap: 16px;
+
+            /* Inside auto layout */
+            flex: none;
+            order: 1;
+            align-self: stretch;
+            flex-grow: 1;
+
+            svg {
+                width: 100px;
+                height: 32px;
+
+                /* Inside auto layout */
+                flex: none;
+                order: 0;
+                flex-grow: 1;
+
                 path {
                     stroke: black;
                 }
             }
 
             .progress-bar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
                 width: 0;
-                background-color: white;
-                border-right: solid 1px red;
+                height: 100%;
                 border-top-left-radius: 8px;
                 border-bottom-left-radius: 8px;
+                position: absolute;
                 overflow: hidden;
+                background-color: white;
+                display: flex;
+                align-items: center;
 
                 &.loading {
                     background-color: yellow;
-                    opacity: 50%;
+                    opacity: 10%;
                 }
 
                 canvas, svg {
-                    height: 100%;
+                    height: 32px;
+                    margin: auto 0;
+
                     path {
-                        stroke: red;
+                        stroke: url(#MyGradient);
 
                         &.dragged {
                             stroke: blue;
@@ -75,47 +257,5 @@
                 }
             }
         }
-    }
-
-    .bottom {
-        height: 22px;
-    }
-}
-
-.volume-container {
-    position: relative;
-    height: 8px;
-    width: 100px;
-    margin: 8px 0;
-    border-radius: 10px;
-    background-color: black;
-
-    &.muted {
-        background-color: grey;
-    }
-
-    .volume-progress {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 0;
-        background-color: #5D5FEF;
-        border-radius: 10px;
-
-        &.dragged {
-            background-color: blue;
-        }
-    }
-
-    .volume-button {
-        position: absolute;
-        height: 16px;
-        width: 16px;
-        top: -4px;
-        left: -4px;
-        border-radius: 32px;
-        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
-        background-color: white;
     }
 }

@@ -12,11 +12,8 @@ import { Subject } from 'rxjs';
 import { HowledTrackComponent } from './howled-track/howled-track.component';
 import { DragData } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
-import { Howl } from 'howler';
 
 declare var Howler: HowlerGlobal;
-
-declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
 
 @Component({
   selector: 'app-player',

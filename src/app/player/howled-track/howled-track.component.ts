@@ -113,7 +113,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                                         .then(arrayBuffer => new AudioContext().decodeAudioData(arrayBuffer))
                                         .then(audioBuffer => {
                                             const newPath = linearPath(audioBuffer,
-                                                {samples:150, type: 'mirror', normalize: true, width: 1250, height: 100, paths: [
+                                                {samples:150, type: 'mirror', minshow: 0.8, maxshow: 1, normalize: true, width: 377, height: 32, paths: [
                                                     {d:'V', sy: 0, x:50, ey:100 }
                                                 ]});
                                             this.pathRef?.nativeElement?.setAttribute('d', newPath);
