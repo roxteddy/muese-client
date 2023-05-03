@@ -1,52 +1,227 @@
 :host {
-    width: 640px;
-    display: block;
+    width: 636px;
     background-color: #F2F2F2;
-    padding: 24px;
 
-    app-howled-track {
-        display: block;
-        margin-bottom: 24px;
+    /* Auto layout */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 24px;
+
+
+
+    .info {
+        width: 636px;
+        height: 180px;
+
+        /* Auto layout */
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 0;
+        gap: 20px;
+
+        /* Inside auto layout */
+        flex: none;
+        order: 0;
+        align-self: stretch;
+        flex-grow: 0;
+
+        .cover {
+            width: 160px;
+            height: 180px;
+
+            background: url(https://thumb.canalplus.pro/http/unsafe/414x/smart/creativemedia-image.canalplus.pro/content/0001/41/3b0571e4ca45fccdda6f787496f721435a03464d.jpeg);
+            background-size: cover;
+
+            /* Inside auto layout */
+            flex: none;
+            order: 0;
+            flex-grow: 0;
+        }
+
+        .content {
+            width: 456px;
+            height: 180px;
+
+            /* Auto layout */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 16px 0 0;
+            gap: 4px;
+
+            /* Inside auto layout */
+            flex: none;
+            order: 1;
+            flex-grow: 1;
+
+            .main {
+                width: 456px;
+                height: 80px;
+                font-family: 'Noah', serif;
+                color: #0D0D0D;
+
+                /* Auto layout */
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0px 20px 0px 0px;
+                gap: 4px;
+
+                /* Inside auto layout */
+                flex: none;
+                order: 0;
+                align-self: stretch;
+                flex-grow: 1;
+
+                .title {
+                    width: 100%;
+                    height: 25px;
+
+                    font-weight: 700;
+                    font-size: 20px;
+                    line-height: 25px;
+                    /* identical to box height */
+
+                    /* Inside auto layout */
+                    flex: none;
+                    order: 0;
+                    align-self: stretch;
+                    flex-grow: 0;
+                }
+
+                .artist {
+                    width: 100%;
+                    height: 22px;
+
+                    font-weight: 700;
+                    font-size: 16px;
+                    line-height: 20px;
+
+                    /* Inside auto layout */
+                    flex: none;
+                    order: 1;
+                    align-self: stretch;
+                    flex-grow: 0;
+                }
+
+                .album {
+                    width: 100%;
+                    height: 22px;
+
+                    font-weight: 400;
+                    font-size: 16px;
+                    line-height: 20px;
+
+                    /* Inside auto layout */
+                    flex: none;
+                    order: 2;
+                    align-self: stretch;
+                    flex-grow: 0;
+                }
+            }
+
+            .detail {
+                width: 456px;
+                height: 80px;
+
+                /* Auto layout */
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
+                padding: 0px;
+                gap: 24px;
+
+                /* Inside auto layout */
+                flex: none;
+                order: 1;
+                align-self: stretch;
+                flex-grow: 1;
+            }
+        }
     }
-}
 
-#play-button {
-    background-color: black;
-    color: red;
-}
+    .commands {
+        width: 100%;
+        height: 76px;
 
-.volume-container {
-    position: relative;
-    height: 25px;
-    width: 100px;
-    background-color: black;
+        /* Auto layout */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 16px;
+        gap: 12px;
 
-    &.muted {
-        background-color: grey;
+        /* Inside auto layout */
+        flex: none;
+        order: 1;
+        align-self: stretch;
+        flex-grow: 0;
+
+        #play-button {
+            background-color: black;
+            color: red;
+        }
+
+        .volume-container {
+            position: relative;
+            height: 25px;
+            width: 100px;
+            background-color: black;
+
+            &.muted {
+                background-color: grey;
+            }
+
+            .filler {
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 100%;
+                width: 25%;
+                background-color: yellow;
+                opacity: 0.66;
+            }
+
+            .volume-progress {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 0;
+                background-color: red;
+                opacity: 0.66;
+                border-right: solid 1px yellow;
+
+                &.dragged {
+                    background-color: blue;
+                }
+            }
+        }
     }
 
-    .filler {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: 25%;
-        background-color: yellow;
-        opacity: 0.66;
-    }
+    .tracks {
+        width: 100%;
 
-    .volume-progress {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 0;
-        background-color: red;
-        opacity: 0.66;
-        border-right: solid 1px yellow;
+        /* Auto layout */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 16px;
+        gap: 24px;
+        box-sizing: border-box;
 
-        &.dragged {
-            background-color: blue;
+        /* Inside auto layout */
+        flex: none;
+        order: 2;
+        align-self: stretch;
+        flex-grow: 0;
+
+        app-howled-track {
+            display: block;
+            width: 100%;
         }
     }
 }
@@ -56,6 +231,12 @@
     height: 25px;
     width: 400px;
     background-color: grey;
+
+    /* Inside auto layout */
+    flex: none;
+    order: 3;
+    align-self: stretch;
+    flex-grow: 0;
 
     .filler-1 {
         position: absolute;

@@ -1,85 +1,111 @@
-<app-howled-track
-    [dragData]="dragData"
-    [newTime]="newTime"
-    [pauseSubject]="pauseSubject"
-    [playSubject]="playSubject"
-    [speedSubject]="speedSubject"
-    [title]="'Drums'"
-    [url]="getDrumsUrl()"
-    (ended)="onSongEnd()"
-    (timeProgress)="timeProgress = $event"
-    (dragStatus)="onDragEvent($event)"
-    (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)"
-    (solo)="onSolo($event)">
-</app-howled-track>
-<app-howled-track
-    [dragData]="dragData"
-    [newTime]="newTime"
-    [pauseSubject]="pauseSubject"
-    [playSubject]="playSubject"
-    [speedSubject]="speedSubject"
-    [title]="'Piano'"
-    [url]="getPianoUrl()"
-    (dragStatus)="onDragEvent($event)"
-    (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)"
-    (solo)="onSolo($event)">
-</app-howled-track>
-<app-howled-track
-    [dragData]="dragData"
-    [newTime]="newTime"
-    [pauseSubject]="pauseSubject"
-    [playSubject]="playSubject"
-    [speedSubject]="speedSubject"
-    [title]="'Bass'"
-    [url]="getBassUrl()"
-    (dragStatus)="onDragEvent($event)"
-    (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)"
-    (solo)="onSolo($event)">
-</app-howled-track>
-<app-howled-track
-    [dragData]="dragData"
-    [newTime]="newTime"
-    [pauseSubject]="pauseSubject"
-    [playSubject]="playSubject"
-    [speedSubject]="speedSubject"
-    [title]="'Vocals'"
-    [url]="getVocalsUrl()"
-    (dragStatus)="onDragEvent($event)"
-    (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)"
-    (solo)="onSolo($event)">
-</app-howled-track>
-<app-howled-track
-    [dragData]="dragData"
-    [newTime]="newTime"
-    [pauseSubject]="pauseSubject"
-    [playSubject]="playSubject"
-    [speedSubject]="speedSubject"
-    [title]="'Other'"
-    [url]="getOtherUrl()"
-    (dragStatus)="onDragEvent($event)"
-    (loaded)="onTrackLoaded()"
-    (timeChange)="onTimeChange($event)"
-    (solo)="onSolo($event)">
-</app-howled-track>
+<div class="player">
+    <div class="info">
+        <div class="cover"></div>
+        <div class="content">
+            <div class="main">
+                <div class="title">Title</div>
+                <div class="artist">Artist</div>
+                <div class="album">Album</div>
+            </div>
+            <div class="detail">
+                <div class="sign">
 
-<button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>
+                </div>
+                <div class="bpm">
 
-Volume
-<div #volumeContainer
-     class="volume-container"
-     (mousedown)="onVolumeMouseDown($event, volumeContainer)">
-    <div class="filler"></div>
-    <div class="volume-progress"
-         [ngClass]="{dragged: !!volumeStatus.rect}"
-         [style.width.%]="volumeStatus.volume * 100">
+                </div>
+                <div class="key">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="commands">
+        <button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>
+
+        Volume
+        <div #volumeContainer
+             class="volume-container"
+             (mousedown)="onVolumeMouseDown($event, volumeContainer)">
+            <div class="filler"></div>
+            <div class="volume-progress"
+                 [ngClass]="{dragged: !!volumeStatus.rect}"
+                 [style.width.%]="volumeStatus.volume * 100">
+            </div>
+        </div>
     </div>
 </div>
+<div class="tracks">
+    <app-howled-track
+        [dragData]="dragData"
+        [newTime]="newTime"
+        [pauseSubject]="pauseSubject"
+        [playSubject]="playSubject"
+        [speedSubject]="speedSubject"
+        [title]="'Drums'"
+        [url]="getDrumsUrl()"
+        (ended)="onSongEnd()"
+        (timeProgress)="timeProgress = $event"
+        (dragStatus)="onDragEvent($event)"
+        (loaded)="onTrackLoaded()"
+        (timeChange)="onTimeChange($event)"
+        (solo)="onSolo($event)">
+    </app-howled-track>
+    <app-howled-track
+        [dragData]="dragData"
+        [newTime]="newTime"
+        [pauseSubject]="pauseSubject"
+        [playSubject]="playSubject"
+        [speedSubject]="speedSubject"
+        [title]="'Piano'"
+        [url]="getPianoUrl()"
+        (dragStatus)="onDragEvent($event)"
+        (loaded)="onTrackLoaded()"
+        (timeChange)="onTimeChange($event)"
+        (solo)="onSolo($event)">
+    </app-howled-track>
+    <app-howled-track
+        [dragData]="dragData"
+        [newTime]="newTime"
+        [pauseSubject]="pauseSubject"
+        [playSubject]="playSubject"
+        [speedSubject]="speedSubject"
+        [title]="'Bass'"
+        [url]="getBassUrl()"
+        (dragStatus)="onDragEvent($event)"
+        (loaded)="onTrackLoaded()"
+        (timeChange)="onTimeChange($event)"
+        (solo)="onSolo($event)">
+    </app-howled-track>
+    <app-howled-track
+        [dragData]="dragData"
+        [newTime]="newTime"
+        [pauseSubject]="pauseSubject"
+        [playSubject]="playSubject"
+        [speedSubject]="speedSubject"
+        [title]="'Vocals'"
+        [url]="getVocalsUrl()"
+        (dragStatus)="onDragEvent($event)"
+        (loaded)="onTrackLoaded()"
+        (timeChange)="onTimeChange($event)"
+        (solo)="onSolo($event)">
+    </app-howled-track>
+    <app-howled-track
+        [dragData]="dragData"
+        [newTime]="newTime"
+        [pauseSubject]="pauseSubject"
+        [playSubject]="playSubject"
+        [speedSubject]="speedSubject"
+        [title]="'Other'"
+        [url]="getOtherUrl()"
+        (dragStatus)="onDragEvent($event)"
+        (loaded)="onTrackLoaded()"
+        (timeChange)="onTimeChange($event)"
+        (solo)="onSolo($event)">
+    </app-howled-track>
+</div>
 
-Speed
+
 <div #speedContainer
      class="speed-container"
      (mousedown)="onSpeedMouseDown($event, speedContainer)">
@@ -90,6 +116,3 @@ Speed
          [style.width.%]="(speedStatus.speed / 4) * 100">
     </div>
 </div>
-{{speedStatus.speed}}
-
-<svg><path #livePath></path></svg>
