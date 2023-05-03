@@ -24,19 +24,11 @@
         <button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>
         volume
         <app-ui-progress-bar
-            class="volume-bar"
             [hasButton]="true"
             [seek]="volume"
             [seekOnDrag]="true"
             (progress)="onVolumeProgress($event)"
         ></app-ui-progress-bar>
-
-        progress
-        <app-ui-progress-bar
-            class="progress-bar"
-            [seek]="dragData ? dragData.progress : timeProgress"
-            (progress)="onProgressBarDrag($event)"></app-ui-progress-bar>
-
 
     </div>
 </div>
