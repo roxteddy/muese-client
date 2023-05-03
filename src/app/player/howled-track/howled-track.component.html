@@ -39,7 +39,7 @@
             <div #progressBar
                  class="progress-bar"
                  [ngClass]="{loading: loading}"
-                 [style.width.%]="dragData ? dragData.newWidth / dragData.offsetWidth * 100 : progressWidth">
+                 [style.width.%]="dragData ? dragData.newWidth / dragData.rect.width * 100 : progressWidth">
 <!--                <canvas #progressCanvas2 class="progress-canvas-2" [style.width.px]="progressContainer.offsetWidth"></canvas>-->
                 <svg viewBox="0 0 377 32" preserveAspectRatio="none"
                      [style.width.px]="progressContainer.offsetWidth">

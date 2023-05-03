@@ -27,9 +27,6 @@ declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
   styleUrls: ['./howled-track.component.scss']
 })
 export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy, OnInit {
-    @ViewChild('progressCanvas') progressCanvasElementRef?: ElementRef;
-    @ViewChild('progressCanvas2') progressCanvas2ElementRef?: ElementRef;
-    @ViewChild('progressContainer') progressContainerRef?: ElementRef;
     @ViewChild('path') pathRef?: ElementRef;
     @ViewChild('path2') path2Ref?: ElementRef;
 
@@ -158,7 +155,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         let rect = container.getBoundingClientRect();
         this.dragStatus.emit({
             rect,
-            offsetWidth: container.offsetWidth,
             newWidth: e.clientX - rect.left,
             origin: this
         });
@@ -176,8 +172,8 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
             let newWidth = e.clientX - this.dragData.rect.left;
             if (newWidth < 0) {
                 newWidth = 0;
-            } else if (newWidth > this.dragData.offsetWidth) {
-                newWidth = this.dragData.offsetWidth;
+            } else if (newWidth > this.dragData.rect.width) {
+                newWidth = this.dragData.rect.width;
             }
             this.dragStatus.emit({
                 ...this.dragData,
@@ -189,7 +185,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @HostListener('window:mouseup', ['$event'])
     public windowMouseUp(e: MouseEvent) {
         if (this.dragData?.origin == this && this.audio) {
-            const time = this.dragData.newWidth / this.dragData.offsetWidth * this.audio.duration();
+            const time = this.dragData.newWidth / this.dragData.rect.width * this.audio.duration();
             this.timeChange.emit(time);
             this.dragStatus.emit(null);
         }

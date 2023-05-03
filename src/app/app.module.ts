@@ -16,7 +16,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 export interface DragData {
     rect: DOMRect
-    offsetWidth: number
     newWidth: number
     origin: HowledTrackComponent
 }
