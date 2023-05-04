@@ -139,6 +139,126 @@
                 order: 1;
                 align-self: stretch;
                 flex-grow: 1;
+
+                .sign {
+                    width: 50px;
+                    height: 80px;
+
+                    /* Auto layout */
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    align-items: flex-start;
+                    padding: 0px;
+                    gap: 2px;
+
+                    /* Inside auto layout */
+                    flex: none;
+                    order: 0;
+                    align-self: stretch;
+                    flex-grow: 0;
+
+                    .label {
+                        width: 50px;
+                        height: 15px;
+
+                        font-family: 'Noah', serif;
+                        font-style: normal;
+                        font-weight: 700;
+                        font-size: 12px;
+                        line-height: 15px;
+                        /* identical to box height */
+
+                        /* Inside auto layout */
+                        flex: none;
+                        order: 0;
+                        flex-grow: 0;
+                    }
+
+                    .value {
+                        width: 47px;
+                        height: 44px;
+                        box-sizing: border-box;
+                        background: #FFFFFF;
+                        border-radius: 8px;
+
+                        /* Auto layout */
+                        display: flex;
+                        flex-direction: row;
+                        align-items: flex-start;
+                        padding: 12px;
+                        gap: 10px;
+
+                        /* Inside auto layout */
+                        flex: none;
+                        order: 1;
+                        flex-grow: 0;
+
+                        .text {
+                            width: 23px;
+                            height: 20px;
+
+                            font-family: 'Noah';
+                            font-style: normal;
+                            font-weight: 400;
+                            font-size: 16px;
+                            line-height: 20px;
+                            /* identical to box height */
+
+                            text-align: center;
+
+                            /* Back to Black */
+
+                            color: #0D0D0D;
+
+
+                            /* Inside auto layout */
+
+                            flex: none;
+                            order: 0;
+                            flex-grow: 0;
+                        }
+                    }
+
+                }
+
+                .bpm {
+                    width: 103px;
+                    height: 80px;
+
+                    /* Auto layout */
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    align-items: flex-start;
+                    padding: 0px;
+                    gap: 2px;
+
+                    /* Inside auto layout */
+                    flex: none;
+                    order: 1;
+                    align-self: stretch;
+                    flex-grow: 0;
+                }
+
+                .key {
+                    width: 99px;
+                    height: 80px;
+
+                    /* Auto layout */
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    align-items: flex-start;
+                    padding: 0px;
+                    gap: 2px;
+
+                    /* Inside auto layout */
+                    flex: none;
+                    order: 2;
+                    align-self: stretch;
+                    flex-grow: 0;
+                }
             }
         }
     }
@@ -168,42 +288,6 @@
         app-ui-progress-bar {
             display: block;
             width: 100px;
-        }
-
-        .progress-container {
-            position: relative;
-            height: 25px;
-            width: 100px;
-            background-color: black;
-
-            &.muted {
-                background-color: grey;
-            }
-
-            .filler {
-                position: absolute;
-                top: 0;
-                right: 0;
-                height: 100%;
-                width: 25%;
-                background-color: yellow;
-                opacity: 0.66;
-            }
-
-            .progress {
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 0;
-                background-color: red;
-                opacity: 0.66;
-                border-right: solid 1px yellow;
-
-                &.dragged {
-                    background-color: blue;
-                }
-            }
         }
     }
 
