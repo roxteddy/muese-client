@@ -80,6 +80,19 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.dragData = dragData;
     }
 
+    public onProgress(progressStatus: ProgressStatus) {
+        if (progressStatus.rect) {
+            this.dragData = {
+                rect: progressStatus.rect,
+                progress: progressStatus.progress,
+                origin: null
+            }
+        } else {
+            this.newTime = this.duration * progressStatus.progress;
+        }
+    }
+
+
     public onSolo(track: HowledTrackComponent) {
         if (this.trackComponents) {
             for (let trackComponent of this.trackComponents) {

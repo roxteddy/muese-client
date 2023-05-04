@@ -63,9 +63,9 @@
                 <mat-icon>speaker</mat-icon>
 
                 <app-ui-progress-bar
+                    [emitSeekOnDrag]="true"
                     [hasButton]="true"
                     [seek]="volume"
-                    [emitSeekOnDrag]="true"
                     (progress)="onVolumeProgress($event)"
                 ></app-ui-progress-bar>
             </div>
@@ -73,7 +73,9 @@
         <div class="progress">
             <div class="timer">1:56</div>
             <app-ui-progress-bar
+                [emitSeekOnDrag]="true"
                 [seek]="dragData ? dragData.progress : timeProgress / (duration || 1)"
+                (progress)="onProgress($event)"
             ></app-ui-progress-bar>
             <div class="timer">2:00</div>
         </div>
