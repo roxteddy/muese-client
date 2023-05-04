@@ -71,13 +71,13 @@
             </div>
         </div>
         <div class="progress">
-            <div class="timer">1:56</div>
+            <div class="timer">{{timeProgress * 1000 | date: 'mm:ss'}}</div>
             <app-ui-progress-bar
                 [emitSeekOnDrag]="true"
                 [seek]="dragData ? dragData.progress : timeProgress / (duration || 1)"
                 (progress)="onProgress($event)"
             ></app-ui-progress-bar>
-            <div class="timer">2:00</div>
+            <div class="timer">{{duration * 1000 | date:'mm:ss'}}</div>
         </div>
 
     </div>

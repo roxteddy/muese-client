@@ -85,6 +85,7 @@ export class PlayerComponent implements OnChanges {
                 origin: null
             }
         } else {
+            this.dragData = null;
             this.newTime = this.duration * progressStatus.progress;
         }
     }

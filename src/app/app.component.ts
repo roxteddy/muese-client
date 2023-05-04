@@ -25,7 +25,7 @@ export class AppComponent implements OnInit {
     loading: boolean = false;
     songs: Song[] = [];
     selectedSong?: Song;
-    SERVER_URL = SERVER_URL;
+
     constructor(private readonly dialog: MatDialog,
                 private readonly domSanitizer: DomSanitizer,
                 private readonly matIconRegistry: MatIconRegistry,
