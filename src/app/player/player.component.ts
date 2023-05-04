@@ -5,7 +5,7 @@ import {
     HostListener,
     Input,
     OnChanges,
-    SimpleChanges, ViewChild, ViewChildren
+    SimpleChanges, ViewChildren
 } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
 import { Subject } from 'rxjs';
@@ -21,7 +21,7 @@ declare var Howler: HowlerGlobal;
   templateUrl: './player.component.html',
   styleUrls: ['./player.component.scss']
 })
-export class PlayerComponent implements AfterViewInit, OnChanges {
+export class PlayerComponent implements OnChanges {
     @ViewChildren(HowledTrackComponent) trackComponents?: HowledTrackComponent[];
 
     @Input() song?: Song;
@@ -44,9 +44,6 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     constructor(private readonly elementRef: ElementRef,
                 private readonly matDialog: MatDialog) {
         this.setVolume(this.volume);
-    }
-
-    ngAfterViewInit() {
     }
 
     ngOnChanges(changes: SimpleChanges) {
