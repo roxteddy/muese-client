@@ -65,14 +65,16 @@
                 <app-ui-progress-bar
                     [hasButton]="true"
                     [seek]="volume"
-                    [seekOnDrag]="true"
+                    [emitSeekOnDrag]="true"
                     (progress)="onVolumeProgress($event)"
                 ></app-ui-progress-bar>
             </div>
         </div>
         <div class="progress">
             <div class="timer">1:56</div>
-            <app-ui-progress-bar></app-ui-progress-bar>
+            <app-ui-progress-bar
+                [seek]="dragData ? dragData.progress : timeProgress / (duration || 1)"
+            ></app-ui-progress-bar>
             <div class="timer">2:00</div>
         </div>
 
@@ -90,7 +92,7 @@
         (ended)="onSongEnd()"
         (timeProgress)="timeProgress = $event"
         (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded()"
+        (loaded)="onTrackLoaded($event)"
         (timeChange)="onTimeChange($event)"
         (solo)="onSolo($event)">
     </app-howled-track>

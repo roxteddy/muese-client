@@ -16,6 +16,7 @@ import { Howl as HowlObject } from 'howler';
 import { Subject } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { DragData } from '../../app.module';
+import { ProgressStatus } from '../../../app-ui/progress-bar/progress-bar.component';
 
 declare var Howl: any;
 
@@ -39,7 +40,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() url?: string;
 
     @Output() dragStatus: EventEmitter<DragData | null> = new EventEmitter<DragData | null>();
-    @Output() loaded: EventEmitter<void> = new EventEmitter<void>();
+    @Output() loaded: EventEmitter<number> = new EventEmitter<number>();
     @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
     @Output() timeProgress: EventEmitter<number> = new EventEmitter<number>();
     @Output() ended: EventEmitter<void> = new EventEmitter<void>();
@@ -92,7 +93,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                             this.audio = new Howl({src: url, format: 'mp3'});
                             this.audio?.volume(this.volume);
                             this.audio?.on('load', () => {
-                                this.loaded.emit();
+                                this.loaded.emit(this.audio?.duration());
                                 this.loading = false;
 
                                 if (blob) {
@@ -160,9 +161,9 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         });
     }
 
-    public onVolumeProgress(volume: number) {
-        this.volume = volume;
-        this.audio?.volume(volume);
+    public onVolumeProgress(volumeStatus: ProgressStatus) {
+        this.volume = volumeStatus.progress;
+        this.audio?.volume(this.volume);
     }
 
     @HostListener('document:mousemove', ['$event'])

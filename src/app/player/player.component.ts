@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 import { HowledTrackComponent } from './howled-track/howled-track.component';
 import { DragData } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
+import { ProgressStatus } from '../../app-ui/progress-bar/progress-bar.component';
 
 declare var Howler: HowlerGlobal;
 
@@ -26,6 +27,7 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
     @Input() song?: Song;
 
     dragData: DragData | null = null;
+    duration: number = 0;
     newTime?: number;
     paused: boolean = true;
     playSubject: Subject<number> = new Subject<number>();
@@ -98,8 +100,11 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.newTime = time;
     }
 
-    public onTrackLoaded() {
+    public onTrackLoaded(duration?: number) {
         this.tracksReady += 1;
+        if (typeof duration !== 'undefined') {
+            this.duration = duration;
+        }
     }
 
     public onSpeedMouseDown(e: MouseEvent, container: HTMLDivElement) {
@@ -109,8 +114,8 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         this.setSpeed(speed);
     }
 
-    public onVolumeProgress(volume: number) {
-        this.setVolume(volume);
+    public onVolumeProgress(volumeStatus: ProgressStatus) {
+        this.setVolume(volumeStatus.progress);
     }
 
     @HostListener('document:mousemove', ['$event'])

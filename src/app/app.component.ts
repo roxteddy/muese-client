@@ -85,7 +85,7 @@ export class AppComponent implements OnInit {
             this.loading = false;
 
             if (!this.selectedSong && songs.length) {
-                this.selectedSong = songs[0];
+                this.selectedSong = songs[Math.floor(Math.random()*songs.length)];
             }
         });
     }

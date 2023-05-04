@@ -1,23 +1,26 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 
+export interface ProgressStatus {
+    rect: DOMRect | null,
+    progress: number
+};
+
 @Component({
     selector: 'app-ui-progress-bar',
     templateUrl: './progress-bar.component.html',
     styleUrls: ['./progress-bar.component.scss']
 })
 export class ProgressBarComponent implements OnChanges {
+    @Input() dragged: boolean = false;
     @Input() faded: boolean = false;
     @Input() hasButton: boolean = false;
     //TODO test if ok or need a subject
     @Input() seek?: number;
-    @Input() seekOnDrag: boolean = false;
+    @Input() emitSeekOnDrag: boolean = false;
 
-    @Output() progress: EventEmitter<number> = new EventEmitter<number>();
+    @Output() progress: EventEmitter<ProgressStatus> = new EventEmitter<ProgressStatus>();
 
-    progressStatus: {
-        rect: DOMRect | null,
-        progress: number
-    } = {
+    progressStatus: ProgressStatus = {
         rect: null,
         progress : 0
     };
@@ -26,25 +29,36 @@ export class ProgressBarComponent implements OnChanges {
         if (changes['seek']) {
             const progress = changes['seek'].currentValue;
             if (typeof progress !== 'undefined') {
-                this.progressStatus.progress = progress;
-                this.progress.emit(progress);
+                this.progressStatus = {
+                    ...this.progressStatus,
+                    progress
+                }
+                //this.progress.emit(progress);
             }
         }
     }
 
     public onMouseDown(e: MouseEvent, container: HTMLDivElement) {
         const rect = container.getBoundingClientRect();
-        this.progressStatus.rect = rect;
-        this.progressStatus.progress = this.calcProgress(e, rect);
+        this.progressStatus = {
+            rect,
+            progress: this.calcProgress(e, rect)
+        }
+        if (this.emitSeekOnDrag) {
+            this.progress.emit(this.progressStatus);
+        }
     }
 
     @HostListener('document:mousemove', ['$event'])
     public documentMouseMove(e: MouseEvent) {
         if (this.progressStatus.rect) {
             e.preventDefault();
-            this.progressStatus.progress = this.calcProgress(e, this.progressStatus.rect);
-            if (this.seekOnDrag) {
-                this.progress.emit(this.progressStatus.progress);
+            this.progressStatus = {
+                ...this.progressStatus,
+                progress: this.calcProgress(e, this.progressStatus.rect)
+            }
+            if (this.emitSeekOnDrag) {
+                this.progress.emit(this.progressStatus);
             };
         }
     }
@@ -53,11 +67,12 @@ export class ProgressBarComponent implements OnChanges {
     public windowMouseUp(e: MouseEvent) {
         if (this.progressStatus.rect) {
             e.preventDefault();
-            this.progressStatus.rect = null;
-
-            if (this.seekOnDrag) {
-                this.progress.emit(this.progressStatus.progress);
+            this.progressStatus = {
+                ...this.progressStatus,
+                rect: null
             }
+
+            this.progress.emit(this.progressStatus);
         }
     }
 
