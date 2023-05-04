@@ -50,6 +50,10 @@ export class AppComponent implements OnInit {
             .subscribe((songs) => {
             this.songs = songs;
             this.loading = false;
+
+            if (!this.selectedSong && songs.length) {
+                this.selectedSong = songs[0];
+            }
         });
     }
 }

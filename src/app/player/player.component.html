@@ -8,30 +8,70 @@
                 <div class="album">Album</div>
             </div>
             <div class="detail">
-                <div class="sign">
-                    <div class="label">Signature</div>
-                    <div class="value"><div class="text">4/4</div></div>
-                </div>
-                <div class="bpm">
-                    <div class="text">BPM</div>
-                    <div class="value">120</div>
-                </div>
-                <div class="key">
-                    <div class="text">Key</div>
-                    <div class="value">B♯</div>
-                </div>
+                <ng-template #songDetail let-label="label" let-showButtons="showButtons" let-value="value">
+                    <div class="song-detail">
+                        <div class="label">{{label}}</div>
+                        <div class="value-wrapper">
+                            <div *ngIf="showButtons" class="btn-min">-</div>
+                            <div class="value"><div class="text">{{value}}</div></div>
+                            <div *ngIf="showButtons" class="btn-plus">+</div>
+                        </div>
+                    </div>
+                </ng-template>
+                <ng-container  [ngTemplateOutlet]="songDetail"
+                               [ngTemplateOutletContext]="{label: 'Signature', showButtons: false, value: '4/4'}">
+                </ng-container>
+                <ng-container  [ngTemplateOutlet]="songDetail"
+                               [ngTemplateOutletContext]="{label: 'BPM', showButtons: true, value: '120'}">
+                </ng-container>
+                <ng-container  [ngTemplateOutlet]="songDetail"
+                               [ngTemplateOutletContext]="{label: 'Key', showButtons: true, value: 'B♯'}">
+                </ng-container>
             </div>
         </div>
     </div>
+
     <div class="commands">
-        <button id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">{{getPlayButtonText()}}</button>
-        volume
-        <app-ui-progress-bar
-            [hasButton]="true"
-            [seek]="volume"
-            [seekOnDrag]="true"
-            (progress)="onVolumeProgress($event)"
-        ></app-ui-progress-bar>
+        <div class="buttons">
+            <div class="activable">
+                <button mat-icon-button>
+                    <mat-icon>text_fields</mat-icon>
+                </button>
+                <button mat-icon-button>
+                    <mat-icon>loop</mat-icon>
+                </button>
+                <button mat-icon-button>
+                    <mat-icon>shuffle</mat-icon>
+                </button>
+            </div>
+            <div class="clickable">
+                <button mat-icon-button>
+                    <mat-icon>skip_previous</mat-icon>
+                </button>
+                <button mat-fab id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">
+                    <mat-icon>{{paused ? 'play_arrow' : 'pause'}}</mat-icon>
+                </button>
+                <button mat-icon-button>
+                    <mat-icon>skip_next</mat-icon>
+                </button>
+            </div>
+            <div class="volume">
+                <button mat-icon-button>
+                    <mat-icon>speaker</mat-icon>
+                </button>
+                <app-ui-progress-bar
+                    [hasButton]="true"
+                    [seek]="volume"
+                    [seekOnDrag]="true"
+                    (progress)="onVolumeProgress($event)"
+                ></app-ui-progress-bar>
+            </div>
+        </div>
+        <div class="progress">
+            <div class="timer">1:56</div>
+            <app-ui-progress-bar></app-ui-progress-bar>
+            <div class="timer">2:00F</div>
+        </div>
 
     </div>
 </div>

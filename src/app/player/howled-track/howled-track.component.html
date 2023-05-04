@@ -7,14 +7,12 @@
             <div class="top-left">
                 <div class="small-buttons">
                     <button mat-mini-fab
-                            matTooltip="Mute/Unmute"
                             class="mute"
                             [class.muted]="muted"
                             (click)="mute()">
                         <mat-icon>{{muted ? 'volume_mute' : 'volume_down'}}</mat-icon>
                     </button>
                     <button mat-mini-fab
-                            matTooltip="Solo"
                             class="solo"
                             (click)="onSolo()">
                         <mat-icon>volume_up</mat-icon>

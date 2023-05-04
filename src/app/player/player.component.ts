@@ -74,13 +74,6 @@ export class PlayerComponent implements AfterViewInit, OnChanges {
         return `${SERVER_URL}/music/output/${this.song?.filename}/other.mp3`;
     }
 
-    public getPlayButtonText(): string {
-        if (this.tracksReady < 5) {
-            return 'LOADING';
-        }
-        return this.paused ? 'PLAY' : 'PAUSE';
-    }
-
     public onDragEvent(dragData: DragData | null) {
         this.dragData = dragData;
     }
