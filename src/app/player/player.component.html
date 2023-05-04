@@ -3,18 +3,22 @@
         <div class="cover"></div>
         <div class="content">
             <div class="main">
-                <div class="title">Title</div>
-                <div class="artist">Artist</div>
+                <div class="title">{{song?.title}}</div>
+                <div class="artist">{{song?.artist}}</div>
                 <div class="album">Album</div>
             </div>
             <div class="detail">
-                <ng-template #songDetail let-label="label" let-showButtons="showButtons" let-value="value">
+                <ng-template #songDetail
+                             let-label="label"
+                             let-showButtons="showButtons"
+                             let-disableButtons="disableButtons"
+                             let-value="value">
                     <div class="song-detail">
                         <div class="label">{{label}}</div>
                         <div class="value-wrapper">
-                            <div *ngIf="showButtons" class="btn-min">-</div>
+                            <div *ngIf="showButtons" class="btn-min" [ngClass]="{disabled :disableButtons}">−</div>
                             <div class="value"><div class="text">{{value}}</div></div>
-                            <div *ngIf="showButtons" class="btn-plus">+</div>
+                            <div *ngIf="showButtons" class="btn-plus" [ngClass]="{disabled :disableButtons}">&#43;</div>
                         </div>
                     </div>
                 </ng-template>
@@ -22,7 +26,7 @@
                                [ngTemplateOutletContext]="{label: 'Signature', showButtons: false, value: '4/4'}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="songDetail"
-                               [ngTemplateOutletContext]="{label: 'BPM', showButtons: true, value: '120'}">
+                               [ngTemplateOutletContext]="{label: 'BPM', showButtons: true, disableButtons: true, value: '120'}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="songDetail"
                                [ngTemplateOutletContext]="{label: 'Key', showButtons: true, value: 'B♯'}">
@@ -37,10 +41,10 @@
                 <button mat-icon-button>
                     <mat-icon>text_fields</mat-icon>
                 </button>
-                <button mat-icon-button>
+                <button mat-icon-button class="active">
                     <mat-icon>loop</mat-icon>
                 </button>
-                <button mat-icon-button>
+                <button mat-icon-button disabled>
                     <mat-icon>shuffle</mat-icon>
                 </button>
             </div>
@@ -56,9 +60,8 @@
                 </button>
             </div>
             <div class="volume">
-                <button mat-icon-button>
-                    <mat-icon>speaker</mat-icon>
-                </button>
+                <mat-icon>speaker</mat-icon>
+
                 <app-ui-progress-bar
                     [hasButton]="true"
                     [seek]="volume"
@@ -70,7 +73,7 @@
         <div class="progress">
             <div class="timer">1:56</div>
             <app-ui-progress-bar></app-ui-progress-bar>
-            <div class="timer">2:00F</div>
+            <div class="timer">2:00</div>
         </div>
 
     </div>
