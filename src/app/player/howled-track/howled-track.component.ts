@@ -35,6 +35,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() newTime: number | undefined;
     @Input() playSubject?: Subject<number>;
     @Input() pauseSubject?: Subject<void>;
+    @Input() seekSubject?: Subject<number>;
     @Input() speedSubject?: Subject<number>;
     @Input() title?: string;
     @Input() url?: string;
@@ -63,13 +64,12 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
             this.audio?.play();
         });
         this.pauseSubject?.subscribe(() => this.audio?.pause());
+        this.seekSubject?.subscribe((time) => this.setCurrentTime(time));
         this.speedSubject?.subscribe((speed) => this.audio?.rate(speed));
+
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['newTime']?.currentValue !== undefined) {
-            this.setCurrentTime(changes['newTime'].currentValue);
-        }
         if (changes['url']) {
             if (this.audio) {
                 this.audio.unload();
@@ -91,6 +91,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                         if (blob) {
                             const url = (window.URL || window.webkitURL ).createObjectURL(blob);
                             this.audio = new Howl({src: url, format: 'mp3'});
+                            console.log(this.audio);
                             this.audio?.volume(this.volume);
                             this.audio?.on('load', () => {
                                 this.loaded.emit(this.audio?.duration());

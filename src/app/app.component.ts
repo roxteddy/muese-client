@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { delay, timeout } from 'rxjs';
+import { delay } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { SongUploadComponent } from './song-upload/song-upload.component';
 import { MatIconRegistry } from '@angular/material/icon';
@@ -70,6 +70,25 @@ export class AppComponent implements OnInit {
 
     public loadSong(song: Song): void {
         this.selectedSong = song;
+    }
+
+    public onNext(shuffle: boolean): void {
+        let currentIndex = this.selectedSong ? (this.songs.indexOf(this.selectedSong)) : 0;
+        let index = currentIndex;
+
+        if (shuffle) {
+            while (index === currentIndex) {
+                index = Math.floor(Math.random() * this.songs.length);
+            }
+        } else {
+            index = (currentIndex + 1) % this.songs.length;
+        }
+        this.selectedSong = this.songs[index];
+    }
+
+    public onPrev(): void {
+        let index = this.selectedSong ? (this.songs.indexOf(this.selectedSong) - 1) % this.songs.length : 0;
+        this.selectedSong = this.songs[index];
     }
 
     public addSong(): void {

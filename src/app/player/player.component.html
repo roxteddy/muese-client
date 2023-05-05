@@ -38,24 +38,30 @@
     <div class="commands">
         <div class="buttons">
             <div class="activable">
-                <button mat-icon-button>
+                <button mat-icon-button disabled>
                     <mat-icon>text_fields</mat-icon>
                 </button>
-                <button mat-icon-button class="active">
+                <button mat-icon-button
+                        [ngClass]="{active: loopActivated}"
+                        (click)="loopActivated = !loopActivated">
                     <mat-icon>loop</mat-icon>
                 </button>
-                <button mat-icon-button disabled>
+                <button mat-icon-button
+                        [ngClass]="{active: shuffleActivated}"
+                        (click)="shuffleActivated = !shuffleActivated">
                     <mat-icon>shuffle</mat-icon>
                 </button>
             </div>
             <div class="clickable">
-                <button mat-icon-button>
+                <button mat-icon-button
+                        (click)="onPrev()">
                     <mat-icon>skip_previous</mat-icon>
                 </button>
                 <button mat-fab id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">
                     <mat-icon>{{paused ? 'play_arrow' : 'pause'}}</mat-icon>
                 </button>
-                <button mat-icon-button>
+                <button mat-icon-button
+                        (click)="onNext()">
                     <mat-icon>skip_next</mat-icon>
                 </button>
             </div>
@@ -85,9 +91,9 @@
 <div class="tracks">
     <app-howled-track
         [dragData]="dragData"
-        [newTime]="newTime"
         [pauseSubject]="pauseSubject"
         [playSubject]="playSubject"
+        [seekSubject]="seekSubject"
         [speedSubject]="speedSubject"
         [title]="'Drums'"
         [url]="getDrumsUrl()"
@@ -100,9 +106,9 @@
     </app-howled-track>
     <app-howled-track
         [dragData]="dragData"
-        [newTime]="newTime"
         [pauseSubject]="pauseSubject"
         [playSubject]="playSubject"
+        [seekSubject]="seekSubject"
         [speedSubject]="speedSubject"
         [title]="'Piano'"
         [url]="getPianoUrl()"
@@ -113,9 +119,9 @@
     </app-howled-track>
     <app-howled-track
         [dragData]="dragData"
-        [newTime]="newTime"
         [pauseSubject]="pauseSubject"
         [playSubject]="playSubject"
+        [seekSubject]="seekSubject"
         [speedSubject]="speedSubject"
         [title]="'Bass'"
         [url]="getBassUrl()"
@@ -126,9 +132,9 @@
     </app-howled-track>
     <app-howled-track
         [dragData]="dragData"
-        [newTime]="newTime"
         [pauseSubject]="pauseSubject"
         [playSubject]="playSubject"
+        [seekSubject]="seekSubject"
         [speedSubject]="speedSubject"
         [title]="'Vocals'"
         [url]="getVocalsUrl()"
@@ -139,9 +145,9 @@
     </app-howled-track>
     <app-howled-track
         [dragData]="dragData"
-        [newTime]="newTime"
         [pauseSubject]="pauseSubject"
         [playSubject]="playSubject"
+        [seekSubject]="seekSubject"
         [speedSubject]="speedSubject"
         [title]="'Other'"
         [url]="getOtherUrl()"

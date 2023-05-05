@@ -1,6 +1,6 @@
 <div #list>
     <ul *ngIf="!loading">
-        <li *ngFor="let song of songs">
+        <li *ngFor="let song of songs" [ngClass]="{active: song === selectedSong}">
             {{song.artist}} - {{song.title}}
             <button *ngIf="song.processed" (click)="loadSong(song)">Load</button>
             <ng-container *ngIf="!song.processed"> (...processing...)</ng-container>
@@ -10,4 +10,8 @@
     </ul>
     <p *ngIf="loading">loading...</p>
 </div>
-<app-player *ngIf="selectedSong" [song]="selectedSong"></app-player>
+<app-player *ngIf="selectedSong"
+            [song]="selectedSong"
+            (next)="onNext($event)"
+            (prev)="onPrev()"
+></app-player>

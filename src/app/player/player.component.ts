@@ -1,10 +1,9 @@
 import {
-    AfterViewInit,
     Component,
-    ElementRef,
+    ElementRef, EventEmitter,
     HostListener,
     Input,
-    OnChanges,
+    OnChanges, Output,
     SimpleChanges, ViewChildren
 } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
@@ -26,18 +25,24 @@ export class PlayerComponent implements OnChanges {
 
     @Input() song?: Song;
 
+    @Output() next: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output() prev: EventEmitter<void> = new EventEmitter<void>();
+
+    autoplay: boolean = false;
     dragData: DragData | null = null;
     duration: number = 0;
-    newTime?: number;
+    loopActivated: boolean = false;
     paused: boolean = true;
     playSubject: Subject<number> = new Subject<number>();
     pauseSubject: Subject<void> = new Subject<void>();
+    seekSubject: Subject<number> = new Subject<number>();
     speedSubject: Subject<number> = new Subject<number>();
     tracksReady = 0;
     speedStatus: {
         rect?: DOMRect,
         speed: number
     }  = {speed: 1};
+    shuffleActivated: boolean = false;
     timeProgress: number = 0;
     volume: number = 0.75;
 
@@ -77,6 +82,20 @@ export class PlayerComponent implements OnChanges {
         this.dragData = dragData;
     }
 
+    public onNext() {
+        this.autoplay = !this.paused;
+        this.paused = true;
+        this.next.emit(this.shuffleActivated);
+    }
+
+    public onPrev() {
+        if (this.timeProgress > 1) {
+            this.seekSubject.next(0);
+        } else {
+            this.prev.emit();
+        }
+    }
+
     public onProgress(progressStatus: ProgressStatus) {
         if (progressStatus.rect) {
             this.dragData = {
@@ -86,7 +105,7 @@ export class PlayerComponent implements OnChanges {
             }
         } else {
             this.dragData = null;
-            this.newTime = this.duration * progressStatus.progress;
+            this.seekSubject.next(this.duration * progressStatus.progress);
         }
     }
 
@@ -100,7 +119,14 @@ export class PlayerComponent implements OnChanges {
     }
 
     public onSongEnd() {
-        this.paused = true;
+        if (this.loopActivated) {
+            this.pauseSubject.next();
+            this.play(0);
+
+        } else {
+            this.paused = true;
+            this.next.emit(this.shuffleActivated);
+        }
     }
 
     public onSpeedChange(speed: number) {
@@ -108,13 +134,17 @@ export class PlayerComponent implements OnChanges {
     }
 
     public onTimeChange(time: number) {
-        this.newTime = time;
+        this.seekSubject.next(time);
     }
 
     public onTrackLoaded(duration?: number) {
         this.tracksReady += 1;
         if (typeof duration !== 'undefined') {
             this.duration = duration;
+        }
+        if (this.tracksReady == 5 && this.autoplay) {
+            this.autoplay = false;
+            this.play(0);
         }
     }
 
@@ -148,7 +178,7 @@ export class PlayerComponent implements OnChanges {
 
     public playPause(): void {
         if (this.tracksReady == 5 && !this.matDialog.openDialogs.length)
-        this.paused ? this.play() : this.pause();
+        this.paused ? this.play(this.timeProgress) : this.pause();
     }
 
     // Private
@@ -159,9 +189,9 @@ export class PlayerComponent implements OnChanges {
         }
     }
 
-    private play(): void {
+    private play(time: number): void {
         this.paused = false;
-        this.playSubject.next(this.timeProgress);
+        this.playSubject.next(time);
     }
 
     private pause(): void {
