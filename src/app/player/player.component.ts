@@ -29,6 +29,7 @@ export class PlayerComponent implements OnChanges {
     @Output() prev: EventEmitter<void> = new EventEmitter<void>();
 
     autoplay: boolean = false;
+    bpm: number = -1;
     dragData: DragData | null = null;
     duration: number = 0;
     loopActivated: boolean = false;
@@ -55,6 +56,17 @@ export class PlayerComponent implements OnChanges {
         if (changes['song']) {
             this.paused = true;
             this.tracksReady = 0;
+        }
+    }
+
+    public getBPMValue(bpm: number): string {
+        switch (bpm) {
+            case -2:
+                return '??';
+            case -1:
+                return "--";
+            default:
+                return Math.round(bpm * this.speedStatus.speed).toString();
         }
     }
 
@@ -129,6 +141,21 @@ export class PlayerComponent implements OnChanges {
         }
     }
 
+    public onButtonClick(type: string, direction: -1 | 1): void {
+        switch (type) {
+            case 'bpm':
+                return this.onBPMChange(direction);
+        }
+    }
+
+    private onBPMChange(direction: -1 | 1): void {
+        let bpmMin = this.bpm * 0.5;
+        let bpmMax = this.bpm * 4;
+        let granularity = 3.5 / (bpmMax - bpmMin);
+        let speed = this.speedStatus.speed += granularity * direction;
+        this.setSpeed(speed);
+    }
+
     public onSpeedChange(speed: number) {
         this.speedSubject.next(speed);
     }
@@ -189,6 +216,11 @@ export class PlayerComponent implements OnChanges {
         }
     }
 
+    private setSpeed(speed: number) {
+        this.speedStatus.speed = Math.min(Math.max(speed, 0.5), 4);
+        this.speedSubject.next(this.speedStatus.speed);
+    }
+
     private play(time: number): void {
         this.paused = false;
         this.playSubject.next(time);
@@ -197,16 +229,6 @@ export class PlayerComponent implements OnChanges {
     private pause(): void {
         this.paused = true;
         this.pauseSubject.next();
-    }
-
-    private setSpeed(speed: number) {
-        if (speed < 0.5) {
-            speed = 0.5;
-        } else if (speed > 4) {
-            speed = 4;
-        }
-        this.speedStatus.speed = speed;
-        this.speedSubject.next(speed);
     }
 
     private setVolume(volume: number) {

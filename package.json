@@ -23,6 +23,7 @@
     "@types/howler": "^2.2.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "web-audio-beat-detector": "^8.1.46",
     "zone.js": "~0.12.0"
   },
   "devDependencies": {

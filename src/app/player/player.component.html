@@ -12,13 +12,21 @@
                              let-label="label"
                              let-showButtons="showButtons"
                              let-disableButtons="disableButtons"
+                             let-onButtonMinus="onButtonMinus"
+                             let-onButtonPlus="onButtonPlus"
                              let-value="value">
                     <div class="song-detail">
                         <div class="label">{{label}}</div>
                         <div class="value-wrapper">
-                            <div *ngIf="showButtons" class="btn-min" [ngClass]="{disabled :disableButtons}">−</div>
+                            <div *ngIf="showButtons"
+                                 class="btn-min"
+                                 [ngClass]="{disabled :disableButtons}"
+                                 (click)="onButtonClick('bpm', -1)">−</div>
                             <div class="value"><div class="text">{{value}}</div></div>
-                            <div *ngIf="showButtons" class="btn-plus" [ngClass]="{disabled :disableButtons}">&#43;</div>
+                            <div *ngIf="showButtons"
+                                 class="btn-plus"
+                                 [ngClass]="{disabled :disableButtons}"
+                                 (click)="onButtonClick('bpm', 1)">&#43;</div>
                         </div>
                     </div>
                 </ng-template>
@@ -26,10 +34,13 @@
                                [ngTemplateOutletContext]="{label: 'Signature', showButtons: false, value: '4/4'}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="songDetail"
-                               [ngTemplateOutletContext]="{label: 'BPM', showButtons: true, disableButtons: true, value: '120'}">
+                               [ngTemplateOutletContext]="{
+                                    label: 'BPM',
+                                    showButtons: true,
+                                    value: getBPMValue(bpm)}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="songDetail"
-                               [ngTemplateOutletContext]="{label: 'Key', showButtons: true, value: 'B♯'}">
+                               [ngTemplateOutletContext]="{label: 'Key', showButtons: true, disableButtons: true, value: 'B♯'}">
                 </ng-container>
             </div>
         </div>
@@ -97,6 +108,7 @@
         [speedSubject]="speedSubject"
         [title]="'Drums'"
         [url]="getDrumsUrl()"
+        (bpm)="bpm = $event"
         (ended)="onSongEnd()"
         (timeProgress)="timeProgress = $event"
         (dragStatus)="onDragEvent($event)"

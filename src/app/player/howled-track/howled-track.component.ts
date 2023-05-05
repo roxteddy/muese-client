@@ -17,6 +17,7 @@ import { Subject } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { DragData } from '../../app.module';
 import { ProgressStatus } from '../../../app-ui/progress-bar/progress-bar.component';
+import { guess } from 'web-audio-beat-detector';
 
 declare var Howl: any;
 
@@ -40,6 +41,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() title?: string;
     @Input() url?: string;
 
+    @Output() bpm: EventEmitter<number> = new EventEmitter<number>();
     @Output() dragStatus: EventEmitter<DragData | null> = new EventEmitter<DragData | null>();
     @Output() loaded: EventEmitter<number> = new EventEmitter<number>();
     @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
@@ -99,8 +101,18 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
 
                                 if (blob) {
                                     blob.arrayBuffer()
+
                                         .then(arrayBuffer => new AudioContext().decodeAudioData(arrayBuffer))
                                         .then(audioBuffer => {
+                                            // BPM Detection
+                                            if (this.bpm.observed) {
+                                                this.bpm.emit(-1);
+                                                guess(audioBuffer).then((
+                                                    {bpm, offset}) => this.bpm.emit(bpm),
+                                                    () => this.bpm.emit(-2));
+                                            }
+
+                                            // WaveForm
                                             const newPath = linearPath(audioBuffer,
                                                 {samples:150, type: 'mirror', minshow: 0.8, maxshow: 1, normalize: true, width: 377, height: 32, paths: [
                                                     {d:'V', sy: 0, x:50, ey:100 }
