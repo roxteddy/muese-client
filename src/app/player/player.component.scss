@@ -306,6 +306,10 @@
                         background-color: black;
                         color: white;
                         box-shadow: none;
+
+                        &[disabled] {
+                            color: grey;
+                        }
                     }
                 }
 

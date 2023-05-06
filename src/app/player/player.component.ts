@@ -54,8 +54,13 @@ export class PlayerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['song']) {
+            this.bpm = -1;
+            this.duration = 0;
             this.paused = true;
             this.tracksReady = 0;
+            this.speedStatus.speed = 1;
+            this.timeProgress = 0;
+
         }
     }
 

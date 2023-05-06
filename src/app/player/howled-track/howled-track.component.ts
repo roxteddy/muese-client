@@ -49,6 +49,8 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Output() ended: EventEmitter<void> = new EventEmitter<void>();
     @Output() solo: EventEmitter<HowledTrackComponent> = new EventEmitter<HowledTrackComponent>();
 
+    leftNode?: GainNode;
+    rightNode?: GainNode;
     currentTime: number = 0
     loading: boolean = false;
     intervalId?: number;
@@ -57,7 +59,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     volume: number = 0.75;
 
     private audio?: HowlObject;
-    private audioNode?: MediaStreamAudioDestinationNode;
     constructor(private readonly httpClient: HttpClient) {}
 
     ngOnInit() {
@@ -93,10 +94,22 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                         if (blob) {
                             const url = (window.URL || window.webkitURL ).createObjectURL(blob);
                             this.audio = new Howl({src: url, format: 'mp3'});
-                            console.log(this.audio);
+
+                            let inputNode: GainNode = (this.audio as any)._sounds[0]?._node;
+                            inputNode.disconnect();
+                            let splitter = Howler.ctx.createChannelSplitter();
+                            inputNode.connect(splitter);
+
+                            this.leftNode = Howler.ctx.createGain();
+                            this.rightNode = Howler.ctx.createGain();
+                            splitter.connect(this.leftNode, 0, 0);
+                            splitter.connect(this.rightNode, 1, 0);
+                            let merger = Howler.ctx.createChannelMerger();
+                            this.leftNode.connect(merger, 0, 0);
+                            this.rightNode.connect(merger, 0, 1);
+                            merger.connect(Howler.masterGain);
                             this.audio?.volume(this.volume);
                             this.audio?.on('load', () => {
-                                this.loaded.emit(this.audio?.duration());
                                 this.loading = false;
 
                                 if (blob) {
@@ -106,7 +119,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                                         .then(audioBuffer => {
                                             // BPM Detection
                                             if (this.bpm.observed) {
-                                                this.bpm.emit(-1);
                                                 guess(audioBuffer).then((
                                                     {bpm, offset}) => this.bpm.emit(bpm),
                                                     () => this.bpm.emit(-2));
@@ -119,6 +131,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                                                 ]});
                                             this.pathRef?.nativeElement?.setAttribute('d', newPath);
                                             this.path2Ref?.nativeElement?.setAttribute('d', newPath);
+                                            this.loaded.emit(this.audio?.duration());
                                         });
                                 }
                             });
