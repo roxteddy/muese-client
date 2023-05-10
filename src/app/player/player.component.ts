@@ -29,7 +29,6 @@ export class PlayerComponent implements OnChanges {
     @Output() prev: EventEmitter<void> = new EventEmitter<void>();
 
     autoplay: boolean = false;
-    bpm: number = -1;
     dragData: DragData | null = null;
     duration: number = 0;
     loopActivated: boolean = false;
@@ -54,17 +53,16 @@ export class PlayerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['song']) {
-            this.bpm = -1;
             this.duration = 0;
             this.paused = true;
             this.tracksReady = 0;
             this.speedStatus.speed = 1;
             this.timeProgress = 0;
-
         }
     }
 
-    public getBPMValue(bpm: number): string {
+    public getBPMValue(song?: Song): string {
+        const bpm = this.song ? this.song.bpm : -1;
         switch (bpm) {
             case -2:
                 return '??';
@@ -154,11 +152,13 @@ export class PlayerComponent implements OnChanges {
     }
 
     private onBPMChange(direction: -1 | 1): void {
-        let bpmMin = this.bpm * 0.5;
-        let bpmMax = this.bpm * 4;
-        let granularity = 3.5 / (bpmMax - bpmMin);
-        let speed = this.speedStatus.speed += granularity * direction;
-        this.setSpeed(speed);
+        if (this.song && this.song.bpm >= 0) {
+            let bpmMin = this.song?.bpm * 0.5;
+            let bpmMax = this.song?.bpm * 4;
+            let granularity = 3.5 / (bpmMax - bpmMin);
+            let speed = this.speedStatus.speed += granularity * direction;
+            this.setSpeed(speed);
+        }
     }
 
     public onSpeedChange(speed: number) {

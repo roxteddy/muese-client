@@ -41,7 +41,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() title?: string;
     @Input() url?: string;
 
-    @Output() bpm: EventEmitter<number> = new EventEmitter<number>();
+    // @Output() bpm: EventEmitter<number> = new EventEmitter<number>();
     @Output() dragStatus: EventEmitter<DragData | null> = new EventEmitter<DragData | null>();
     @Output() loaded: EventEmitter<number> = new EventEmitter<number>();
     @Output() timeChange: EventEmitter<number> = new EventEmitter<number>();
@@ -118,11 +118,11 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                                         .then(arrayBuffer => new AudioContext().decodeAudioData(arrayBuffer))
                                         .then(audioBuffer => {
                                             // BPM Detection
-                                            if (this.bpm.observed) {
-                                                guess(audioBuffer).then((
-                                                    {bpm, offset}) => this.bpm.emit(bpm),
-                                                    () => this.bpm.emit(-2));
-                                            }
+                                            // if (this.bpm.observed) {
+                                            //     guess(audioBuffer).then((
+                                            //         {bpm, offset}) => this.bpm.emit(bpm),
+                                            //         () => this.bpm.emit(-2));
+                                            // }
 
                                             // WaveForm
                                             const newPath = linearPath(audioBuffer,

@@ -18,6 +18,8 @@ export interface Song {
     title: string
     artist: string
     filename: string
+    duration: number
+    bpm: number
     status: SongStatus
 }
 
