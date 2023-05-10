@@ -6,12 +6,19 @@ import { SongUploadComponent } from './song-upload/song-upload.component';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
+export enum SongStatus {
+    IDLE,
+    QUEUED,
+    PROCESSING,
+    READY,
+    ERROR,
+}
 export interface Song {
     id: number
     title: string
     artist: string
     filename: string
-    processed: boolean
+    status: SongStatus
 }
 
 export const SERVER_URL = 'http://roxteddy.noip.me:3000';
@@ -73,26 +80,38 @@ export class AppComponent implements OnInit {
     }
 
     public onNext(shuffle: boolean): void {
-        let currentIndex = this.selectedSong ? (this.songs.indexOf(this.selectedSong)) : 0;
-        let index = currentIndex;
+        let availableSongs = this.getAvailableSongs();
+        if (availableSongs.length) {
+            let currentIndex = this.selectedSong ? (availableSongs.indexOf(this.selectedSong)) : -1;
+            let index = currentIndex;
 
-        if (shuffle) {
-            while (index === currentIndex) {
-                index = Math.floor(Math.random() * this.songs.length);
+            if (shuffle) {
+                while (index === currentIndex) {
+                    index = Math.floor(Math.random() * availableSongs.length);
+                }
+            } else {
+                index = (currentIndex + 1) % availableSongs.length;
             }
-        } else {
-            index = (currentIndex + 1) % this.songs.length;
+            this.selectedSong = availableSongs[index];
         }
-        this.selectedSong = this.songs[index];
     }
 
     public onPrev(): void {
-        let index = this.selectedSong ? (this.songs.indexOf(this.selectedSong) - 1) % this.songs.length : 0;
-        this.selectedSong = this.songs[index];
+        let availableSongs = this.getAvailableSongs();
+        if (availableSongs.length) {
+            let index = this.selectedSong
+                ? (availableSongs.indexOf(this.selectedSong) - 1) % availableSongs.length
+                : 0;
+            this.selectedSong = availableSongs[index];
+        }
     }
 
     public addSong(): void {
         this.dialog.open(SongUploadComponent);
+    }
+
+    private getAvailableSongs() : Song[] {
+        return this.songs.filter(song => song.status === SongStatus.READY);
     }
 
     private getSongs(): void {
@@ -103,9 +122,16 @@ export class AppComponent implements OnInit {
             this.songs = songs;
             this.loading = false;
 
-            if (!this.selectedSong && songs.length) {
-                this.selectedSong = songs[Math.floor(Math.random()*songs.length)];
+            if (this.selectedSong) {
+                this.selectedSong = this.songs.find(song => song.id === this.selectedSong?.id);
+            } else {
+                let availableSongs = this.getAvailableSongs();
+                if (availableSongs.length) {
+                    this.selectedSong = availableSongs[Math.floor(Math.random()*availableSongs.length)];
+                }
             }
         });
     }
+
+    protected readonly SongStatus = SongStatus;
 }

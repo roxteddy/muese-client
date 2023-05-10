@@ -2,8 +2,11 @@
     <ul *ngIf="!loading">
         <li *ngFor="let song of songs" [ngClass]="{active: song === selectedSong}">
             {{song.artist}} - {{song.title}}
-            <button *ngIf="song.processed" (click)="loadSong(song)">Load</button>
-            <ng-container *ngIf="!song.processed"> (...processing...)</ng-container>
+            <button *ngIf="song.status === SongStatus.READY" (click)="loadSong(song)">Load</button>
+            <ng-container *ngIf="song.status === SongStatus.PROCESSING"> (.-.processing.-.)</ng-container>
+            <ng-container *ngIf="song.status === SongStatus.IDLE"> (-idle-)</ng-container>
+            <ng-container *ngIf="song.status === SongStatus.QUEUED"> (.-queued-.)</ng-container>
+            <ng-container *ngIf="song.status === SongStatus.ERROR"> (x error x)</ng-container>
         </li>
         <button (click)="addSong()">Add</button>
         <button (click)="refresh()">Refresh</button>
