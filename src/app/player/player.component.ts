@@ -45,6 +45,7 @@ export class PlayerComponent implements OnChanges {
     shuffleActivated: boolean = false;
     timeProgress: number = 0;
     volume: number = 0.75;
+    tone: number = 0;
     pitch: number = 1;
 
     constructor(private readonly elementRef: ElementRef,
@@ -59,6 +60,8 @@ export class PlayerComponent implements OnChanges {
             this.tracksReady = 0;
             this.speedStatus.speed = 1;
             this.timeProgress = 0;
+            this.tone = 0;
+            this.pitch = 1;
         }
     }
 
@@ -68,7 +71,8 @@ export class PlayerComponent implements OnChanges {
             case -2:
                 return '??';
             case -1:
-                return "--";
+                // return "--";
+                return this.speedStatus.speed.toFixed(1) + 'x';
             default:
                 return Math.round(bpm * this.speedStatus.speed).toString();
         }
@@ -147,20 +151,32 @@ export class PlayerComponent implements OnChanges {
 
     public onButtonClick(type: string, direction: -1 | 1): void {
         switch (type) {
-            case 'bpm':
+            case 'BPM':
                 return this.onBPMChange(direction);
+            case 'Key':
+                return this.onPitchChange(direction);
         }
     }
 
     private onBPMChange(direction: -1 | 1): void {
+        let granularity: number;
         if (this.song && this.song.bpm >= 0) {
             let bpmMin = this.song?.bpm * 0.5;
             let bpmMax = this.song?.bpm * 4;
-            let granularity = 3.5 / (bpmMax - bpmMin);
-            let speed = this.speedStatus.speed += granularity * direction;
-            this.setSpeed(speed);
+            granularity = 3.5 / (bpmMax - bpmMin);
+        } else {
+            granularity = 0.1;
         }
+        let speed = this.speedStatus.speed += granularity * direction;
+        this.setSpeed(speed);
     }
+
+    private onPitchChange(direction: -1 | 1): void {
+        this.tone += direction;
+        this.pitch = Math.pow(2, this.tone / 12);
+        this.setPitch(this.pitch);
+    }
+
     public onTimeChange(time: number) {
         this.seekSubject.next(time);
     }
@@ -200,12 +216,23 @@ export class PlayerComponent implements OnChanges {
         }
     }
 
+    private setPitch(pitch: number) {
+        const data = {
+            speed: this.speedStatus.speed,
+            pitch: pitch / this.speedStatus.speed
+        };
+        console.log(data);
+        this.speedSubject.next(data);
+    }
+
     private setSpeed(speed: number) {
         this.speedStatus.speed = Math.min(Math.max(speed, 0.5), 4);
-        this.speedSubject.next({
+        const data = {
             speed: this.speedStatus.speed,
             pitch: this.pitch / this.speedStatus.speed
-        });
+        };
+        console.log(data);
+        this.speedSubject.next(data);
     }
 
     private play(time: number): void {

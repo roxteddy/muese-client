@@ -19,31 +19,32 @@
                             <div *ngIf="showButtons"
                                  class="btn-min"
                                  [ngClass]="{disabled: disableButtons}"
-                                 (click)="onButtonClick('bpm', -1)">−</div>
+                                 (click)="onButtonClick(label, -1)">−</div>
                             <div class="value"><div class="text">{{value}}</div></div>
                             <div *ngIf="showButtons"
                                  class="btn-plus"
                                  [ngClass]="{disabled: disableButtons}"
-                                 (click)="onButtonClick('bpm', 1)">&#43;</div>
+                                 (click)="onButtonClick(label, 1)">&#43;</div>
                         </div>
                     </div>
                 </ng-template>
                 <ng-container  [ngTemplateOutlet]="songDetail"
-                               [ngTemplateOutletContext]="{label: 'Signature', showButtons: false, value: '4/4'}">
+                               [ngTemplateOutletContext]="{
+                                    label: 'Signature',
+                                    showButtons: false,
+                                    value: '4/4'}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="songDetail"
                                [ngTemplateOutletContext]="{
                                     label: 'BPM',
                                     showButtons: true,
-                                    disableButtons: !song || song.bpm < 0,
                                     value: getBPMValue(song)}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="songDetail"
                                [ngTemplateOutletContext]="{
                                     label: 'Key',
                                     showButtons: true,
-                                    disableButtons: true,
-                                    value: 'B♯'}">
+                                    value: tone}">
                 </ng-container>
             </div>
         </div>
