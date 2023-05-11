@@ -37,7 +37,8 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() playSubject?: Subject<number>;
     @Input() pauseSubject?: Subject<void>;
     @Input() seekSubject?: Subject<number>;
-    @Input() speedSubject?: Subject<number>;
+    @Input() speedSubject?: Subject<{speed: number, pitch: number}>;
+    @Input() toneSubject?: Subject<number>;
     @Input() title?: string;
     @Input() url?: string;
 
@@ -69,9 +70,9 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         });
         this.pauseSubject?.subscribe(() => this.audio?.pause());
         this.seekSubject?.subscribe((time) => this.setCurrentTime(time));
-        this.speedSubject?.subscribe((speed) => {
+        this.speedSubject?.subscribe(({speed, pitch}) => {
             if (this.vocoder) {
-                (this.vocoder.parameters as any).get('pitchFactor').value = 1 / speed;
+                (this.vocoder.parameters as any).get('pitchFactor').value = pitch;
             }
             this.audio?.rate(speed);
         });

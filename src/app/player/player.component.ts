@@ -36,7 +36,7 @@ export class PlayerComponent implements OnChanges {
     playSubject: Subject<number> = new Subject<number>();
     pauseSubject: Subject<void> = new Subject<void>();
     seekSubject: Subject<number> = new Subject<number>();
-    speedSubject: Subject<number> = new Subject<number>();
+    speedSubject: Subject<{ speed: number, pitch: number }> = new Subject<{ speed: number, pitch: number }>();
     tracksReady = 0;
     speedStatus: {
         rect?: DOMRect,
@@ -45,6 +45,7 @@ export class PlayerComponent implements OnChanges {
     shuffleActivated: boolean = false;
     timeProgress: number = 0;
     volume: number = 0.75;
+    pitch: number = 1;
 
     constructor(private readonly elementRef: ElementRef,
                 private readonly matDialog: MatDialog) {
@@ -160,11 +161,6 @@ export class PlayerComponent implements OnChanges {
             this.setSpeed(speed);
         }
     }
-
-    public onSpeedChange(speed: number) {
-        this.speedSubject.next(speed);
-    }
-
     public onTimeChange(time: number) {
         this.seekSubject.next(time);
     }
@@ -191,23 +187,6 @@ export class PlayerComponent implements OnChanges {
         this.setVolume(volumeStatus.progress);
     }
 
-    @HostListener('document:mousemove', ['$event'])
-    public documentMouseMove(e: MouseEvent) {
-        if (this.speedStatus.rect) {
-            e.preventDefault();
-            const speed = ((e.clientX - this.speedStatus.rect.left) / this.speedStatus.rect.width) * 4;
-            this.setSpeed(speed);
-        }
-    }
-
-    @HostListener('window:mouseup', ['$event'])
-    public windowMouseUp(e: MouseEvent) {
-        if (this.speedStatus.rect) {
-            e.preventDefault();
-            this.speedStatus.rect = undefined;
-        }
-    }
-
     public playPause(): void {
         if (this.tracksReady == 5 && !this.matDialog.openDialogs.length)
         this.paused ? this.play(this.timeProgress) : this.pause();
@@ -223,7 +202,10 @@ export class PlayerComponent implements OnChanges {
 
     private setSpeed(speed: number) {
         this.speedStatus.speed = Math.min(Math.max(speed, 0.5), 4);
-        this.speedSubject.next(this.speedStatus.speed);
+        this.speedSubject.next({
+            speed: this.speedStatus.speed,
+            pitch: this.pitch / this.speedStatus.speed
+        });
     }
 
     private play(time: number): void {
