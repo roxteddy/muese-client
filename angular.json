@@ -79,6 +79,9 @@
               "browserTarget": "muese-client:build:development"
             }
           },
+          "options": {
+            "ssl": true
+          },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {

@@ -58,6 +58,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     progressWidth: number = 0;
     volume: number = 0.75;
 
+    private vocoder?: AudioWorkletNode;
     private audio?: HowlObject;
     constructor(private readonly httpClient: HttpClient) {}
 
@@ -68,7 +69,12 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         });
         this.pauseSubject?.subscribe(() => this.audio?.pause());
         this.seekSubject?.subscribe((time) => this.setCurrentTime(time));
-        this.speedSubject?.subscribe((speed) => this.audio?.rate(speed));
+        this.speedSubject?.subscribe((speed) => {
+            if (this.vocoder) {
+                (this.vocoder.parameters as any).get('pitchFactor').value = 1 / speed;
+            }
+            this.audio?.rate(speed);
+        });
 
     }
 
@@ -95,19 +101,32 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                             const url = (window.URL || window.webkitURL ).createObjectURL(blob);
                             this.audio = new Howl({src: url, format: 'mp3'});
 
-                            let inputNode: GainNode = (this.audio as any)._sounds[0]?._node;
-                            inputNode.disconnect();
-                            let splitter = Howler.ctx.createChannelSplitter();
-                            inputNode.connect(splitter);
+                            // let inputNode: GainNode = (this.audio as any)._sounds[0]?._node;
+                            // inputNode.disconnect();
 
-                            this.leftNode = Howler.ctx.createGain();
-                            this.rightNode = Howler.ctx.createGain();
-                            splitter.connect(this.leftNode, 0, 0);
-                            splitter.connect(this.rightNode, 1, 0);
-                            let merger = Howler.ctx.createChannelMerger();
-                            this.leftNode.connect(merger, 0, 0);
-                            this.rightNode.connect(merger, 0, 1);
-                            merger.connect(Howler.masterGain);
+                            //TODO make it available from outside
+                            Howler.ctx.audioWorklet?.addModule('assets/scripts/phase-vocoder.min.js').then(() => {
+                                let inputNode: GainNode = (this.audio as any)._sounds[0]?._node;
+                                inputNode.disconnect();
+                                let phaseVocoderNode = new AudioWorkletNode(Howler.ctx, 'phase-vocoder-processor');
+                                console.log('connecting vocoder');
+                                inputNode.connect(phaseVocoderNode);
+                                phaseVocoderNode.connect(Howler.masterGain);
+                                console.log((phaseVocoderNode.parameters as any).get('pitchFactor'));
+                                this.vocoder = phaseVocoderNode;
+                            });
+
+                            // let splitter = Howler.ctx.createChannelSplitter();
+                            // inputNode.connect(splitter);
+
+                            // this.leftNode = Howler.ctx.createGain();
+                            // this.rightNode = Howler.ctx.createGain();
+                            // splitter.connect(this.leftNode, 0, 0);
+                            // splitter.connect(this.rightNode, 1, 0);
+                            // let merger = Howler.ctx.createChannelMerger();
+                            // this.leftNode.connect(merger, 0, 0);
+                            // this.rightNode.connect(merger, 0, 1);
+                            // merger.connect(Howler.masterGain);
                             this.audio?.volume(this.volume);
                             this.audio?.on('load', () => {
                                 this.loading = false;

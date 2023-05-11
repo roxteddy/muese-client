@@ -23,7 +23,7 @@ export interface Song {
     status: SongStatus
 }
 
-export const SERVER_URL = 'http://roxteddy.noip.me:3000';
+export const SERVER_URL = 'https://roxteddy.noip.me:3000';
 
 @Component({
     selector: 'app-root',
