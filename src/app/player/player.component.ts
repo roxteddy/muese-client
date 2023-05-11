@@ -38,11 +38,8 @@ export class PlayerComponent implements OnChanges {
     seekSubject: Subject<number> = new Subject<number>();
     speedSubject: Subject<{ speed: number, pitch: number }> = new Subject<{ speed: number, pitch: number }>();
     tracksReady = 0;
-    speedStatus: {
-        rect?: DOMRect,
-        speed: number
-    }  = {speed: 1};
     shuffleActivated: boolean = false;
+    speed: number = 1;
     timeProgress: number = 0;
     volume: number = 0.75;
     tone: number = 0;
@@ -58,7 +55,7 @@ export class PlayerComponent implements OnChanges {
             this.duration = 0;
             this.paused = true;
             this.tracksReady = 0;
-            this.speedStatus.speed = 1;
+            this.speed = 1;
             this.timeProgress = 0;
             this.tone = 0;
             this.pitch = 1;
@@ -72,9 +69,9 @@ export class PlayerComponent implements OnChanges {
                 return '??';
             case -1:
                 // return "--";
-                return this.speedStatus.speed.toFixed(1) + 'x';
+                return this.speed.toFixed(1) + 'x';
             default:
-                return Math.round(bpm * this.speedStatus.speed).toString();
+                return Math.round(bpm * this.speed).toString();
         }
     }
 
@@ -167,7 +164,7 @@ export class PlayerComponent implements OnChanges {
         } else {
             granularity = 0.1;
         }
-        let speed = this.speedStatus.speed += granularity * direction;
+        let speed = this.speed += granularity * direction;
         this.setSpeed(speed);
     }
 
@@ -192,13 +189,6 @@ export class PlayerComponent implements OnChanges {
         }
     }
 
-    public onSpeedMouseDown(e: MouseEvent, container: HTMLDivElement) {
-        const rect = container.getBoundingClientRect();
-        const speed = ((e.clientX - rect.left) / container.offsetWidth) * 4;
-        this.speedStatus.rect = rect;
-        this.setSpeed(speed);
-    }
-
     public onVolumeProgress(volumeStatus: ProgressStatus) {
         this.setVolume(volumeStatus.progress);
     }
@@ -218,18 +208,18 @@ export class PlayerComponent implements OnChanges {
 
     private setPitch(pitch: number) {
         const data = {
-            speed: this.speedStatus.speed,
-            pitch: pitch / this.speedStatus.speed
+            speed: this.speed,
+            pitch: pitch / this.speed
         };
         console.log(data);
         this.speedSubject.next(data);
     }
 
     private setSpeed(speed: number) {
-        this.speedStatus.speed = Math.min(Math.max(speed, 0.5), 4);
+        this.speed = Math.min(Math.max(speed, 0.5), 4);
         const data = {
-            speed: this.speedStatus.speed,
-            pitch: this.pitch / this.speedStatus.speed
+            speed: this.speed,
+            pitch: this.pitch / this.speed
         };
         console.log(data);
         this.speedSubject.next(data);
