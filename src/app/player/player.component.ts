@@ -36,7 +36,7 @@ export class PlayerComponent implements OnChanges {
     playSubject: Subject<number> = new Subject<number>();
     pauseSubject: Subject<void> = new Subject<void>();
     seekSubject: Subject<number> = new Subject<number>();
-    speedSubject: Subject<{ speed: number, pitch: number }> = new Subject<{ speed: number, pitch: number }>();
+    speedSubject: Subject<number> = new Subject<number>();
     tracksReady = 0;
     shuffleActivated: boolean = false;
     speed: number = 1;
@@ -45,9 +45,15 @@ export class PlayerComponent implements OnChanges {
     tone: number = 0;
     pitch: number = 1;
 
+    firstLoad: boolean = true;
+    vocoder?: AudioWorkletNode;
+
     constructor(private readonly elementRef: ElementRef,
                 private readonly matDialog: MatDialog) {
         this.setVolume(this.volume);
+    }
+
+    ngOnInit() {
     }
 
     ngOnChanges(changes: SimpleChanges) {
@@ -63,7 +69,7 @@ export class PlayerComponent implements OnChanges {
     }
 
     public getBPMValue(song?: Song): string {
-        const bpm = this.song ? this.song.bpm : -1;
+        const bpm = song ? song.bpm : -1;
         switch (bpm) {
             case -2:
                 return '??';
@@ -179,6 +185,18 @@ export class PlayerComponent implements OnChanges {
     }
 
     public onTrackLoaded(duration?: number) {
+        if (this.firstLoad) {
+            this.firstLoad = false;
+            Howler.ctx.audioWorklet?.addModule('assets/scripts/phase-vocoder.min.js').then(() => {
+                let inputNode = Howler.masterGain;
+                inputNode.disconnect();
+                let phaseVocoderNode = new AudioWorkletNode(Howler.ctx, 'phase-vocoder-processor');
+                console.log('connecting vocoder');
+                inputNode.connect(phaseVocoderNode);
+                phaseVocoderNode.connect(Howler.ctx.destination);
+                this.vocoder = phaseVocoderNode;
+            });
+        }
         this.tracksReady += 1;
         if (typeof duration !== 'undefined') {
             this.duration = duration;
@@ -207,22 +225,15 @@ export class PlayerComponent implements OnChanges {
     }
 
     private setPitch(pitch: number) {
-        const data = {
-            speed: this.speed,
-            pitch: pitch / this.speed
-        };
-        console.log(data);
-        this.speedSubject.next(data);
+        if (this.vocoder) {
+            (this.vocoder.parameters as any).get('pitchFactor').value = pitch / this.speed;
+        }
     }
 
     private setSpeed(speed: number) {
         this.speed = Math.min(Math.max(speed, 0.5), 4);
-        const data = {
-            speed: this.speed,
-            pitch: this.pitch / this.speed
-        };
-        console.log(data);
-        this.speedSubject.next(data);
+        this.speedSubject.next(this.speed);
+        this.setPitch(this.pitch / this.speed);
     }
 
     private play(time: number): void {

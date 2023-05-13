@@ -37,7 +37,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     @Input() playSubject?: Subject<number>;
     @Input() pauseSubject?: Subject<void>;
     @Input() seekSubject?: Subject<number>;
-    @Input() speedSubject?: Subject<{speed: number, pitch: number}>;
+    @Input() speedSubject?: Subject<number>;
     @Input() toneSubject?: Subject<number>;
     @Input() title?: string;
     @Input() url?: string;
@@ -59,7 +59,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
     progressWidth: number = 0;
     volume: number = 0.75;
 
-    private vocoder?: AudioWorkletNode;
     private audio?: HowlObject;
     constructor(private readonly httpClient: HttpClient) {}
 
@@ -70,10 +69,7 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
         });
         this.pauseSubject?.subscribe(() => this.audio?.pause());
         this.seekSubject?.subscribe((time) => this.setCurrentTime(time));
-        this.speedSubject?.subscribe(({speed, pitch}) => {
-            if (this.vocoder) {
-                (this.vocoder.parameters as any).get('pitchFactor').value = pitch;
-            }
+        this.speedSubject?.subscribe((speed) => {
             this.audio?.rate(speed);
         });
 
@@ -108,13 +104,6 @@ export class HowledTrackComponent implements AfterViewInit, OnChanges, OnDestroy
                             //TODO make it available from outside
                             Howler.ctx.audioWorklet?.addModule('assets/scripts/phase-vocoder.min.js').then(() => {
                                 let inputNode: GainNode = (this.audio as any)._sounds[0]?._node;
-                                inputNode.disconnect();
-                                let phaseVocoderNode = new AudioWorkletNode(Howler.ctx, 'phase-vocoder-processor');
-                                console.log('connecting vocoder');
-                                inputNode.connect(phaseVocoderNode);
-                                phaseVocoderNode.connect(Howler.masterGain);
-                                console.log((phaseVocoderNode.parameters as any).get('pitchFactor'));
-                                this.vocoder = phaseVocoderNode;
                             });
 
                             // let splitter = Howler.ctx.createChannelSplitter();
