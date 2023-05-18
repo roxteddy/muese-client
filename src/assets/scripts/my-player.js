@@ -34,7 +34,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             this.sendMessageToMainScope({ type: 'create', name, error: "Name is needed" });
             return;
         }
-        var stem = this.stems.find((s) => s.name === name);
+        let stem = this.stems.find((s) => s.name === name);
         if (stem && stem.player) {
             stem.player.destruct();
         }
@@ -56,7 +56,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
     }
 
     destroy(name) {
-        var stem = this.stems.find((s) => s.name === name);
+        let stem = this.stems.find((s) => s.name === name);
         if (stem) {
             if (stem.player) {
                 stem.player.destruct();
@@ -73,7 +73,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         // Notice that we pass in a reference to 'this',
         // which is used to call the onMessageFromMainScope callback within this call instance when loaded.
         // The fetching and decoding of the audio takes place on dedicated workers, spawned from the main thread. This prevents any blocking.
-        var stem = this.stems.find((s) => s.name === name);
+        let stem = this.stems.find((s) => s.name === name);
         if (stem) {
             stem.url = url;
             this.Superpowered.downloadAndDecode(url, this);
@@ -92,7 +92,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 stem.player.play();
             }
         } else {
-            var stem = this.stems.find((s) => s.name == name);
+            let stem = this.stems.find((s) => s.name == name);
             if (stem && stem.player) {
                 stem.player.play();
             }
@@ -111,7 +111,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             });
 
             // Once we have the pointer to the buffer, we pass the decoded audio into the AAP instance.
-            var stem = this.stems.find((s) => s.url === message.SuperpoweredLoaded.url);
+            let stem = this.stems.find((s) => s.url === message.SuperpoweredLoaded.url);
             // todo: free() previous data ?
             if (stem && stem.player)
                 stem.player.openMemory(this.Superpowered.arrayBufferToWASM(buffer), false, false);
@@ -134,14 +134,13 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
     }
 
     processAudio(inputBuffer, outputBuffer, buffersize, parameters) {
-        var progressHandled = false;
+        let progressHandled = false;
 
-        var player = this.stems[0].player;
-        var process;
-        var buffers = [];
+        let player = this.stems[0].player;
+        let buffers = [];
         for (let i = 0; i < this.stems.length; i++) {
             buffers[i] = new this.Superpowered.Int32Buffer(buffersize * 8);
-            var stem = this.stems[i];
+            let stem = this.stems[i];
             let result = 0;
             if (stem?.player) {
                 // Handle progress
