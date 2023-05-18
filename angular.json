@@ -39,7 +39,8 @@
             ],
             "scripts": [
               "src/assets/scripts/drawaudio.js",
-              "src/assets/scripts/waveform-path.js"
+              "src/assets/scripts/waveform-path.js",
+                "src/assets/scripts/Superpowered.js"
             ]
           },
           "configurations": {

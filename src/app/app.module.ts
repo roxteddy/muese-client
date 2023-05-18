@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Renderer2 } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from './app.component';
@@ -13,6 +13,7 @@ import { AppUiModule } from '../app-ui/app-ui.module';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AudioPlayerService } from './audio-player.service';
 
 export interface DragData {
     rect: DOMRect
@@ -38,7 +39,7 @@ export interface DragData {
         MatIconModule,
         MatTooltipModule
     ],
-    providers: [],
+    providers: [AudioPlayerService],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

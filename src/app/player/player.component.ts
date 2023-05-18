@@ -51,6 +51,7 @@ export class PlayerComponent implements OnChanges {
     constructor(private readonly elementRef: ElementRef,
                 private readonly matDialog: MatDialog) {
         this.setVolume(this.volume);
+
     }
 
     ngOnInit() {

@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SongUploadComponent } from './song-upload/song-upload.component';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { AudioPlayerService } from './audio-player.service';
 
 export enum SongStatus {
     IDLE,
@@ -35,7 +36,8 @@ export class AppComponent implements OnInit {
     songs: Song[] = [];
     selectedSong?: Song;
 
-    constructor(private readonly dialog: MatDialog,
+    constructor(private readonly audioPlayerService: AudioPlayerService,
+                private readonly dialog: MatDialog,
                 private readonly domSanitizer: DomSanitizer,
                 private readonly matIconRegistry: MatIconRegistry,
                 private readonly http: HttpClient) {
@@ -70,11 +72,27 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.getSongs();
+        //this.getSongs();
+        // this.audioPlayerService.isInitialized()
+        //     .then(() => this.audioPlayerService.create())
+        //     .then(() => this.audioPlayerService.load('/assets/pop.mp3'))
+        //     .then(() => this.audioPlayerService.play());
+        this.audioPlayerService.progress.subscribe(time => console.log(time));
+
+        this.audioPlayerService.isInitialized()
+            .then(() => this.audioPlayerService.create('drums'))
+            .then(() => this.audioPlayerService.load('drums', '/assets/drums.mp3'))
+            .then(() => this.audioPlayerService.create('other'))
+            .then(() => this.audioPlayerService.load('other', '/assets/other.mp3'))
+            .then(() => this.audioPlayerService.create('bass'))
+            .then(() => this.audioPlayerService.load('bass', '/assets/bass.mp3'))
+            .then(() => this.audioPlayerService.create('vocals'))
+            .then(() => this.audioPlayerService.load('vocals', '/assets/vocals.mp3'))
+            .then(() => this.audioPlayerService.play());
     }
 
     public refresh(): void {
-        this.getSongs();
+        //this.getSongs();
     }
 
     public loadSong(song: Song): void {
