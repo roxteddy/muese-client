@@ -1,6 +1,7 @@
 import './Superpowered.js'
 
 class Stem {
+    buffer;
     name;
     url;
     player;
@@ -15,8 +16,11 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
     lastProgress = -1;
     stems = [];
 
-    //mixers
+    //mixer & buffers
     mixer;
+    mixerBuffer1;
+    mixerBuffer2;
+
 
     onReady() {
         this.mixer = new this.Superpowered.StereoMixer();
@@ -27,7 +31,11 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
     onDestruct() {
         for (let stem of this.stems) {
             stem.player?.desctruct();
+            stem.buffer?.free();
         }
+        this.mixer?.destruct();
+        this.mixerBuffer1?.free();
+        this.mixerBuffer2?.free();
     }
 
     // Creates new player instance
@@ -142,16 +150,14 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
     processAudio(inputBuffer, outputBuffer, buffersize, parameters) {
         let progressHandled = false;
 
-        let player = this.stems[0].player;
-        let buffers = [];
-        for (let i = 0; i < this.stems.length; i++) {
-            buffers[i] = new this.Superpowered.Int32Buffer(buffersize * 8);
-            let stem = this.stems[i];
+        this.allocateBuffers(buffersize);
+
+        for (let stem of this.stems) {
             let result = 0;
             if (stem?.player) {
                 // Handle progress
                 if (!progressHandled) {
-                    const newProgress = player.getDisplayPositionMs();
+                    const newProgress = stem.player.getDisplayPositionMs();
                     if (stem.player.isPlaying()
                         && (this.lastProgress < 0 || Math.abs(newProgress - this.lastProgress) >= 50)) {
                         this.sendMessageToMainScope({
@@ -164,76 +170,75 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
 
                 // Ensure the samplerate is in sync on every audio processing callback.
                 stem.player.outputSamplerate = this.samplerate;
-                result = stem.player.processStereo(buffers[i].pointer, false, buffersize, this.playerGain);
+                result = stem.player.processStereo(stem.buffer.pointer, false, buffersize, this.playerGain);
             }
             if (!result) {
-                this.Superpowered.memorySet(buffers[i].pointer, 0, buffersize * 8); // 8 bytes for each frame (1 channel is 4 bytes, two channels)
+                this.Superpowered.memorySet(stem.buffer.pointer, 0, buffersize * 8); // 8 bytes for each frame (1 channel is 4 bytes, two channels)
             }
         }
 
-        if (this.mixer) {
-            let mixerBuffer1;
-            if (buffers.length > 0) {
-                mixerBuffer1 = new this.Superpowered.Int32Buffer(buffersize * 8);
-                this.mixer.process(
-                    buffers[0]?.pointer || 0,
-                    buffers[1]?.pointer || 0,
-                    buffers[2]?.pointer || 0,
-                    buffers[3]?.pointer || 0,
-                    mixerBuffer1.pointer,
-                    buffersize
-                );
-            }
+        if (this.mixer && this.stems.length > 0) {
+            this.mixer.process(
+                this.stems[0].buffer?.pointer || 0,
+                this.stems[1]?.buffer?.pointer || 0,
+                this.stems[2]?.buffer?.pointer || 0,
+                this.stems[3]?.buffer?.pointer || 0,
+                this.mixerBuffer1.pointer,
+                buffersize
+            );
 
-            let mixerBuffer2;
-            if (buffers.length > 3) {
-                mixerBuffer2 = new this.Superpowered.Int32Buffer(buffersize * 8);
+            if (this.stems.length > 3) {
                 this.mixer.process(
-                    buffers[4]?.pointer || 0,
-                    buffers[5]?.pointer || 0,
-                    buffers[6]?.pointer || 0,
-                    buffers[7]?.pointer || 0,
-                    mixerBuffer2.pointer,
+                    this.stems[4]?.buffer?.pointer || 0,
+                    this.stems[5]?.buffer?.pointer || 0,
+                    this.stems[6]?.buffer?.pointer || 0,
+                    this.stems[7]?.buffer?.pointer || 0,
+                    this.mixerBuffer2.pointer,
                     buffersize
                 );
             }
 
             this.mixer.process(
-                mixerBuffer1?.pointer || 0,
-                mixerBuffer2?.pointer || 0,
+                this.mixerBuffer1?.pointer || 0,
+                this.mixerBuffer2?.pointer || 0,
                 0,
                 0,
                 outputBuffer.pointer,
                 buffersize
             );
-
-            mixerBuffer1?.free();
-            mixerBuffer2?.free();
         } else {
             this.Superpowered.memorySet(outputBuffer.pointer, 0, buffersize * 8);
         }
+    }
 
-        for (let buffer of buffers) {
-            buffer.free();
+    allocateBuffers(bufferSize) {
+        const bufferLength = bufferSize * 8;
+
+        for (let stem of this.stems) {
+            if (stem.buffer && stem.buffer.length !== bufferLength) {
+                stem.buffer.free();
+                stem.buffer = null;
+            }
+            if (!stem.buffer) {
+                stem.buffer = new this.Superpowered.Int32Buffer(bufferLength);
+            }
         }
 
-        // if (player) {
-        //     const newProgress = player.getDisplayPositionMs();
-        //     if (player.isPlaying() && (this.lastProgress < 0 || Math.abs(newProgress - this.lastProgress) >= 50)) {
-        //         this.sendMessageToMainScope({
-        //             type: 'progress',
-        //             time: Math.floor(newProgress) / 1000
-        //         });
-        //         this.lastProgress = newProgress;
-        //     }
-        //     player.outputSamplerate = this.samplerate;
-        //     process = player.processStereo(outputBuffer.pointer, false, buffersize, this.playerGain);
-        // }
-        //     // Render into the output buffer.
-        // if (!player || !process) {
-        //     // If no player output, set output to 0s.
-        //     this.Superpowered.memorySet(outputBuffer.pointer, 0, buffersize * 8); // 8 bytes for each frame (1 channel is 4 bytes, two channels)
-        // }
+        if (this.mixerBuffer1 && this.mixerBuffer1.length !== bufferLength) {
+            this.mixerBuffer1.free();
+            this.mixerBuffer1 = null;
+        }
+        if (!this.mixerBuffer1) {
+            this.mixerBuffer1 = new this.Superpowered.Int32Buffer(bufferLength);
+        }
+
+        if (this.mixerBuffer2 && this.mixerBuffer2.length !== bufferLength) {
+            this.mixerBuffer2.free();
+            this.mixerBuffer2 = null;
+        }
+        if (!this.mixerBuffer2) {
+            this.mixerBuffer2 = new this.Superpowered.Int32Buffer(bufferLength);
+        }
     }
 }
 
