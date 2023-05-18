@@ -38,6 +38,8 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         this.mixerBuffer2?.free();
     }
 
+    /* COMMANDS */
+
     // Creates new player instance
     create(name = 'pop') {
         if (!name) {
@@ -113,6 +115,26 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         }
     }
 
+    // Set pitch by cents of half-tone (1 Octave = 1200) {-2400:2400}
+    setPitch(pitch) {
+        for (let stem of this.stems) {
+            if (stem.player) {
+                stem.player.pitchShiftCents = pitch;
+            }
+        }
+    }
+
+    // The playback rate. Must be positive and above 0.00001. Default: 1.
+    setSpeed(speed) {
+        for (let stem of this.stems) {
+            if (stem.player) {
+                stem.player.playbackRate = speed;
+            }
+        }
+    }
+
+    /* COMMUNICATION */
+
     // SuperpoweredTrackLoader calls this when its finished loading and decoding audio.
     onMessageFromMainScope(message) {
         console.log(message);
@@ -144,8 +166,16 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             case 'play':
                 this.play(message.name);
                 break;
+            case 'setPitch':
+                this.setPitch(message.pitch);
+                break;
+            case 'setSpeed':
+                this.setSpeed(message.speed);
+                break;
         }
     }
+
+    /* PROCESS */
 
     processAudio(inputBuffer, outputBuffer, buffersize, parameters) {
         let progressHandled = false;
@@ -210,6 +240,8 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             this.Superpowered.memorySet(outputBuffer.pointer, 0, buffersize * 8);
         }
     }
+
+    /* HELPERS */
 
     allocateBuffers(bufferSize) {
         const bufferLength = bufferSize * 8;

@@ -83,6 +83,27 @@ export class AudioPlayerService {
         });
     }
 
+    // Set pitch by cents of half-tone (1 Octave = 1200) {-2400:2400}
+    // Multiple of 100 for better performance
+    setPitch(pitch: number) {
+        if (pitch > 2400)
+            pitch = 2400
+        if (pitch < -2400)
+            pitch = 2400
+
+        this.playerProcessor?.sendMessageToAudioScope({
+           type: 'setPitch',
+           pitch
+        });
+    }
+
+    setSpeed(speed: number) {
+        this.playerProcessor?.sendMessageToAudioScope({
+            type: 'setSpeed',
+            speed: speed > 0.00001 ? speed : 0.00001
+        })
+    }
+
     private async loadSuperPowered() {
 
         // @ts-ignored
@@ -98,7 +119,7 @@ export class AudioPlayerService {
                 'https://muese.servehttp.com:4200/assets/scripts/my-player.js',
                 'MyPlayer',
                 (msg: any) => {
-                    console.log(msg);
+                    //console.log(msg);
                     this.messageSubject.next(msg);
                 }
             );
