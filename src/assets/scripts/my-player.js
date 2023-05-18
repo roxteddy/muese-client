@@ -4,7 +4,6 @@ class Stem {
     name;
     url;
     player;
-    mixer;
 
     constructor(config = {}) {
         Object.assign(this, config);
@@ -15,6 +14,9 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
 
     lastProgress = -1;
     stems = [];
+
+    //mixers
+    mixer;
 
     onReady() {
         this.mixer = new this.Superpowered.StereoMixer();
@@ -35,10 +37,14 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             return;
         }
         let stem = this.stems.find((s) => s.name === name);
-        if (stem && stem.player) {
+        if (stem?.player) {
             stem.player.destruct();
         }
         if (!stem) {
+            if (this.stems.length > 7) {
+                this.sendMessageToMainScope({ type: 'create', name, error: "Too much stems" });
+            }
+
             stem = new Stem({name});
             this.stems.push(stem);
         }
@@ -166,14 +172,43 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         }
 
         if (this.mixer) {
+            let mixerBuffer1;
+            if (buffers.length > 0) {
+                mixerBuffer1 = new this.Superpowered.Int32Buffer(buffersize * 8);
+                this.mixer.process(
+                    buffers[0]?.pointer || 0,
+                    buffers[1]?.pointer || 0,
+                    buffers[2]?.pointer || 0,
+                    buffers[3]?.pointer || 0,
+                    mixerBuffer1.pointer,
+                    buffersize
+                );
+            }
+
+            let mixerBuffer2;
+            if (buffers.length > 3) {
+                mixerBuffer2 = new this.Superpowered.Int32Buffer(buffersize * 8);
+                this.mixer.process(
+                    buffers[4]?.pointer || 0,
+                    buffers[5]?.pointer || 0,
+                    buffers[6]?.pointer || 0,
+                    buffers[7]?.pointer || 0,
+                    mixerBuffer2.pointer,
+                    buffersize
+                );
+            }
+
             this.mixer.process(
-                buffers[0]?.pointer || 0,
-                buffers[1]?.pointer || 0,
-                buffers[2]?.pointer || 0,
-                buffers[3]?.pointer || 0,
+                mixerBuffer1?.pointer || 0,
+                mixerBuffer2?.pointer || 0,
+                0,
+                0,
                 outputBuffer.pointer,
                 buffersize
             );
+
+            mixerBuffer1?.free();
+            mixerBuffer2?.free();
         } else {
             this.Superpowered.memorySet(outputBuffer.pointer, 0, buffersize * 8);
         }

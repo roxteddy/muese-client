@@ -82,12 +82,14 @@ export class AppComponent implements OnInit {
         this.audioPlayerService.isInitialized()
             .then(() => this.audioPlayerService.create('drums'))
             .then(() => this.audioPlayerService.load('drums', '/assets/drums.mp3'))
-            .then(() => this.audioPlayerService.create('other'))
-            .then(() => this.audioPlayerService.load('other', '/assets/other.mp3'))
+            .then(() => this.audioPlayerService.create('piano'))
+            .then(() => this.audioPlayerService.load('piano', '/assets/piano.mp3'))
             .then(() => this.audioPlayerService.create('bass'))
             .then(() => this.audioPlayerService.load('bass', '/assets/bass.mp3'))
             .then(() => this.audioPlayerService.create('vocals'))
             .then(() => this.audioPlayerService.load('vocals', '/assets/vocals.mp3'))
+            .then(() => this.audioPlayerService.create('other'))
+            .then(() => this.audioPlayerService.load('other', '/assets/other.mp3'))
             .then(() => this.audioPlayerService.play());
     }
 
