@@ -140,7 +140,7 @@
                     align-self: stretch;
                     flex-grow: 1;
 
-                    .song-detail {
+                    .track-detail {
                         height: 80px;
 
                         /* Auto layout */
@@ -352,6 +352,7 @@
                 flex-grow: 0;
 
                 .timer {
+                    width: 37px;
                     font-weight: 700;
                 }
 
@@ -365,7 +366,6 @@
             }
         }
     }
-
 
     .tracks {
         width: 100%;

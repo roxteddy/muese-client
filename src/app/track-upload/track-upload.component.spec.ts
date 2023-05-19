@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SongUploadComponent } from './song-upload.component';
+import { TrackUploadComponent } from './track-upload.component';
 
 describe('SongUploadComponent', () => {
-  let component: SongUploadComponent;
-  let fixture: ComponentFixture<SongUploadComponent>;
+  let component: TrackUploadComponent;
+  let fixture: ComponentFixture<TrackUploadComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SongUploadComponent ]
+      declarations: [ TrackUploadComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SongUploadComponent);
+    fixture = TestBed.createComponent(TrackUploadComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

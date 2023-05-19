@@ -2,26 +2,26 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { delay } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { SongUploadComponent } from './song-upload/song-upload.component';
+import { TrackUploadComponent } from './track-upload/track-upload.component';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AudioPlayerService } from './audio-player.service';
 
-export enum SongStatus {
+export enum TrackStatus {
     IDLE,
     QUEUED,
     PROCESSING,
     READY,
     ERROR,
 }
-export interface Song {
+export interface Track {
     id: number
     title: string
     artist: string
     filename: string
     duration: number
     bpm: number
-    status: SongStatus
+    status: TrackStatus
 }
 
 export const SERVER_URL = 'https://roxteddy.noip.me:3000';
@@ -33,8 +33,8 @@ export const SERVER_URL = 'https://roxteddy.noip.me:3000';
 })
 export class AppComponent implements OnInit {
     loading: boolean = false;
-    songs: Song[] = [];
-    selectedSong?: Song;
+    tracks: Track[] = [];
+    selectedTrack?: Track;
 
     constructor(private readonly audioPlayerService: AudioPlayerService,
                 private readonly dialog: MatDialog,
@@ -72,93 +72,70 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.getSongs();
-        // this.audioPlayerService.isInitialized()
-        //     .then(() => this.audioPlayerService.create())
-        //     .then(() => this.audioPlayerService.load('/assets/pop.mp3'))
-        //     .then(() => this.audioPlayerService.play());
-
-        //this.audioPlayerService.progress.subscribe(time => console.log(time));
-
-        // this.audioPlayerService.isInitialized()
-        //     .then(() => this.audioPlayerService.create('drums'))
-        //     .then(() => this.audioPlayerService.load('drums', '/assets/drums.mp3'))
-        //     .then(() => this.audioPlayerService.create('piano'))
-        //     .then(() => this.audioPlayerService.load('piano', '/assets/piano.mp3'))
-        //     .then(() => this.audioPlayerService.create('bass'))
-        //     .then(() => this.audioPlayerService.load('bass', '/assets/bass.mp3'))
-        //     .then(() => this.audioPlayerService.create('vocals'))
-        //     .then(() => this.audioPlayerService.load('vocals', '/assets/vocals.mp3'))
-        //     .then(() => this.audioPlayerService.create('other'))
-        //     .then(() => this.audioPlayerService.load('other', '/assets/other.mp3'))
-        //     .then(() => {
-        //         this.audioPlayerService.play();
-        //         //this.audioPlayerService.setPitch(-600);
-        //         //this.audioPlayerService.setSpeed(2);
-        //     });
+        this.getTracks();
     }
 
     public refresh(): void {
-        this.getSongs();
+        this.getTracks();
     }
 
-    public loadSong(song: Song): void {
-        this.selectedSong = song;
+    public loadTrack(track: Track): void {
+        this.selectedTrack = track;
     }
 
     public onNext(shuffle: boolean): void {
-        let availableSongs = this.getAvailableSongs();
-        if (availableSongs.length) {
-            let currentIndex = this.selectedSong ? (availableSongs.indexOf(this.selectedSong)) : -1;
+        let availableTracks = this.getAvailableTracks();
+        if (availableTracks.length) {
+            let currentIndex = this.selectedTrack ? (availableTracks.indexOf(this.selectedTrack)) : -1;
             let index = currentIndex;
 
             if (shuffle) {
                 while (index === currentIndex) {
-                    index = Math.floor(Math.random() * availableSongs.length);
+                    index = Math.floor(Math.random() * availableTracks.length);
                 }
             } else {
-                index = (currentIndex + 1) % availableSongs.length;
+                index = (currentIndex + 1) % availableTracks.length;
             }
-            this.selectedSong = availableSongs[index];
+            this.selectedTrack = availableTracks[index];
         }
     }
 
     public onPrev(): void {
-        let availableSongs = this.getAvailableSongs();
-        if (availableSongs.length) {
-            let index = this.selectedSong
-                ? (availableSongs.indexOf(this.selectedSong) - 1) % availableSongs.length
+        let availableTracks = this.getAvailableTracks();
+        if (availableTracks.length) {
+            let index = this.selectedTrack
+                ? (availableTracks.indexOf(this.selectedTrack) - 1) % availableTracks.length
                 : 0;
-            this.selectedSong = availableSongs[index];
+            this.selectedTrack = availableTracks[index];
         }
     }
 
-    public addSong(): void {
-        this.dialog.open(SongUploadComponent);
+    public addTrack(): void {
+        this.dialog.open(TrackUploadComponent);
     }
 
-    private getAvailableSongs() : Song[] {
-        return this.songs.filter(song => song.status === SongStatus.READY);
+    private getAvailableTracks() : Track[] {
+        return this.tracks.filter(track => track.status === TrackStatus.READY);
     }
 
-    private getSongs(): void {
+    private getTracks(): void {
         this.loading = true;
-        this.http.get<Song[]>(`${SERVER_URL}/song`)
+        this.http.get<Track[]>(`${SERVER_URL}/song`)
             .pipe(delay(1000))
-            .subscribe((songs) => {
-            this.songs = songs;
+            .subscribe((tracks) => {
+            this.tracks = tracks;
             this.loading = false;
 
-            if (this.selectedSong) {
-                this.selectedSong = this.songs.find(song => song.id === this.selectedSong?.id);
+            if (this.selectedTrack) {
+                this.selectedTrack = this.tracks.find(track => track.id === this.selectedTrack?.id);
             } else {
-                let availableSongs = this.getAvailableSongs();
-                if (availableSongs.length) {
-                    this.selectedSong = availableSongs[Math.floor(Math.random()*availableSongs.length)];
+                let availableTracks = this.getAvailableTracks();
+                if (availableTracks.length) {
+                    this.selectedTrack = availableTracks[Math.floor(Math.random()*availableTracks.length)];
                 }
             }
         });
     }
 
-    protected readonly SongStatus = SongStatus;
+    protected readonly TrackStatus = TrackStatus;
 }

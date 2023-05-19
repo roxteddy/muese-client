@@ -4,16 +4,16 @@ import { NgForm } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-song-upload',
-  templateUrl: './song-upload.component.html',
-  styleUrls: ['./song-upload.component.scss']
+  selector: 'app-track-upload',
+  templateUrl: './track-upload.component.html',
+  styleUrls: ['./track-upload.component.scss']
 })
-export class SongUploadComponent {
+export class TrackUploadComponent {
     @ViewChild('fileUpload') fileUploadElementRef?: ElementRef;
 
     submittable: boolean = true;
 
-    constructor(private readonly dialogRef: MatDialogRef<SongUploadComponent>,
+    constructor(private readonly dialogRef: MatDialogRef<TrackUploadComponent>,
                 private readonly httpClient: HttpClient) {
     }
     public onSubmit(form: NgForm) {

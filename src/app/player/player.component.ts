@@ -7,7 +7,7 @@ import {
     OnChanges, Output,
     SimpleChanges, ViewChildren
 } from '@angular/core';
-import { SERVER_URL, Song } from '../app.component';
+import { SERVER_URL, Track } from '../app.component';
 import { StemPlayerComponent } from './stem-player/stem-player.component';
 import { DragData } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
@@ -22,7 +22,7 @@ import { AudioPlayerService } from '../audio-player.service';
 export class PlayerComponent implements OnChanges {
     @ViewChildren(StemPlayerComponent) trackComponents?: StemPlayerComponent[];
 
-    @Input() song?: Song;
+    @Input() track?: Track;
 
     @Output() next: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Output() prev: EventEmitter<void> = new EventEmitter<void>();
@@ -71,7 +71,7 @@ export class PlayerComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['song']) {
+        if (changes['track']) {
             this.duration = 0;
             this.paused = true;
             this.progress = 0;
@@ -82,8 +82,8 @@ export class PlayerComponent implements OnChanges {
         }
     }
 
-    public getBPMValue(song?: Song): string {
-        const bpm = song ? song.bpm : -1;
+    public getBPMValue(track?: Track): string {
+        const bpm = track ? track.bpm : -1;
         switch (bpm) {
             case -2:
                 return '??';
@@ -96,23 +96,23 @@ export class PlayerComponent implements OnChanges {
     }
 
     public getDrumsUrl(): string {
-        return `${SERVER_URL}/music/output/${this.song?.filename}/drums.mp3`;
+        return `${SERVER_URL}/music/output/${this.track?.filename}/drums.mp3`;
     }
 
     public getPianoUrl(): string {
-        return `${SERVER_URL}/music/output/${this.song?.filename}/piano.mp3`;
+        return `${SERVER_URL}/music/output/${this.track?.filename}/piano.mp3`;
     }
 
     public getBassUrl(): string {
-        return `${SERVER_URL}/music/output/${this.song?.filename}/bass.mp3`;
+        return `${SERVER_URL}/music/output/${this.track?.filename}/bass.mp3`;
     }
 
     public getVocalsUrl(): string {
-        return `${SERVER_URL}/music/output/${this.song?.filename}/vocals.mp3`;
+        return `${SERVER_URL}/music/output/${this.track?.filename}/vocals.mp3`;
     }
 
     public getOtherUrl(): string {
-        return `${SERVER_URL}/music/output/${this.song?.filename}/other.mp3`;
+        return `${SERVER_URL}/music/output/${this.track?.filename}/other.mp3`;
     }
 
     public onDragEvent(dragData: DragData | null) {
@@ -166,9 +166,9 @@ export class PlayerComponent implements OnChanges {
 
     private onBPMChange(direction: -1 | 1): void {
         let granularity: number;
-        if (this.song && this.song.bpm >= 0) {
-            let bpmMin = this.song?.bpm * 0.5;
-            let bpmMax = this.song?.bpm * 4;
+        if (this.track && this.track.bpm >= 0) {
+            let bpmMin = this.track?.bpm * 0.5;
+            let bpmMax = this.track?.bpm * 4;
             granularity = 3.5 / (bpmMax - bpmMin);
         } else {
             granularity = 0.1;

@@ -3,17 +3,17 @@
         <div class="cover"></div>
         <div class="content">
             <div class="main">
-                <div class="title">{{song?.title}}</div>
-                <div class="artist">{{song?.artist}}</div>
+                <div class="title">{{track?.title}}</div>
+                <div class="artist">{{track?.artist}}</div>
                 <div class="album">Album</div>
             </div>
             <div class="detail">
-                <ng-template #songDetail
+                <ng-template #trackDetail
                              let-label="label"
                              let-showButtons="showButtons"
                              let-disableButtons="disableButtons"
                              let-value="value">
-                    <div class="song-detail">
+                    <div class="track-detail">
                         <div class="label">{{label}}</div>
                         <div class="value-wrapper">
                             <div *ngIf="showButtons"
@@ -28,19 +28,19 @@
                         </div>
                     </div>
                 </ng-template>
-                <ng-container  [ngTemplateOutlet]="songDetail"
+                <ng-container  [ngTemplateOutlet]="trackDetail"
                                [ngTemplateOutletContext]="{
                                     label: 'Signature',
                                     showButtons: false,
                                     value: '4/4'}">
                 </ng-container>
-                <ng-container  [ngTemplateOutlet]="songDetail"
+                <ng-container  [ngTemplateOutlet]="trackDetail"
                                [ngTemplateOutletContext]="{
                                     label: 'BPM',
                                     showButtons: true,
-                                    value: getBPMValue(song)}">
+                                    value: getBPMValue(track)}">
                 </ng-container>
-                <ng-container  [ngTemplateOutlet]="songDetail"
+                <ng-container  [ngTemplateOutlet]="trackDetail"
                                [ngTemplateOutletContext]="{
                                     label: 'Key',
                                     showButtons: true,
