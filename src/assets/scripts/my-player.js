@@ -269,6 +269,11 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             }
         }
 
+        /* Mixing
+        ** We could actually write directly all stem process in the same buffer using 'mix' parameter
+        ** but we may need mixer for individual balances
+         */
+
         if (this.mixer && this.stems.length > 0) {
             this.mixer.process(
                 this.stems[0].buffer?.pointer || 0,
