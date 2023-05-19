@@ -93,6 +93,8 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         this.pause();
         this.duration = 0;
         this.seek(0);
+        this.setPitch(0);
+        this.setSpeed(1);
     }
 
     load(name, arrayBuffer) {
