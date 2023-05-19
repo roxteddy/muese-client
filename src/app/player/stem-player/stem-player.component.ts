@@ -100,11 +100,21 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
                                                     //         () => this.bpm.emit(-2));
                                                     // }
 
+                                                    const left = audioBuffer.getChannelData(0);
+                                                    const right = audioBuffer.getChannelData(1);
+                                                    for (let i = 0; i < audioBuffer.length; i++)
+                                                        left[i] = (left[i] + right[i]) / 2;
+                                                    audioBuffer.copyToChannel(left, 0);
+
                                                     // WaveForm
-                                                    const newPath = linearPath(audioBuffer,
-                                                        {samples:150, type: 'mirror', minshow: 0.8, maxshow: 1, normalize: true, width: 377, height: 32, paths: [
-                                                                {d:'V', sy: 0, x:50, ey:100 }
-                                                            ]});
+                                                    const newPath = linearPath(audioBuffer, {
+                                                        normalize: true,
+                                                        samples: 150,
+                                                        type: 'mirror',
+                                                        width: 377,
+                                                        height: 32,
+                                                        paths: [{d:'V', sx: 1, sy: 0, x:50, ey:100 }]
+                                                    });
                                                     this.pathRef?.nativeElement?.setAttribute('d', newPath);
                                                     this.path2Ref?.nativeElement?.setAttribute('d', newPath);
                                                 });
