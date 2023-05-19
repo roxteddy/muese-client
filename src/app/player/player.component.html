@@ -44,7 +44,7 @@
                                [ngTemplateOutletContext]="{
                                     label: 'Key',
                                     showButtons: true,
-                                    value: tone}">
+                                    value: pitch}">
                 </ng-container>
             </div>
         </div>
@@ -92,95 +92,66 @@
             </div>
         </div>
         <div class="progress">
-            <div class="timer">{{timeProgress * 1000 / speed | date: 'mm:ss'}}</div>
+            <div class="timer">{{duration * progress / speed | date: 'mm:ss'}}</div>
             <app-ui-progress-bar
                 [emitSeekOnDrag]="true"
-                [seek]="dragData ? dragData.progress : timeProgress / (duration || 1)"
-                (progress)="onProgress($event)"
+                [seek]="dragData ? dragData.progress : progress"
+                (progress)="onProgressBarChange($event)"
             ></app-ui-progress-bar>
-            <div class="timer">{{duration * 1000 /speed | date:'mm:ss'}}</div>
+            <div class="timer">{{duration / speed | date:'mm:ss'}}</div>
         </div>
 
     </div>
 </div>
 <div class="tracks">
-    <app-howled-track
+    <app-stem-player
         [dragData]="dragData"
-        [pauseSubject]="pauseSubject"
-        [playSubject]="playSubject"
-        [seekSubject]="seekSubject"
-        [speedSubject]="speedSubject"
+        [progress]="progress"
         [title]="'Drums'"
         [url]="getDrumsUrl()"
-        (ended)="onSongEnd()"
-        (timeProgress)="timeProgress = $event"
         (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded($event)"
-        (timeChange)="onTimeChange($event)"
+        (loaded)="onTrackLoaded()"
+        (progressChange)="onProgressChange($event)"
         (solo)="onSolo($event)">
-    </app-howled-track>
-    <app-howled-track
+    </app-stem-player>
+    <app-stem-player
         [dragData]="dragData"
-        [pauseSubject]="pauseSubject"
-        [playSubject]="playSubject"
-        [seekSubject]="seekSubject"
-        [speedSubject]="speedSubject"
+        [progress]="progress"
         [title]="'Piano'"
         [url]="getPianoUrl()"
         (dragStatus)="onDragEvent($event)"
         (loaded)="onTrackLoaded()"
-        (timeChange)="onTimeChange($event)"
+        (progressChange)="onProgressChange($event)"
         (solo)="onSolo($event)">
-    </app-howled-track>
-    <app-howled-track
+    </app-stem-player>
+    <app-stem-player
         [dragData]="dragData"
-        [pauseSubject]="pauseSubject"
-        [playSubject]="playSubject"
-        [seekSubject]="seekSubject"
-        [speedSubject]="speedSubject"
+        [progress]="progress"
         [title]="'Bass'"
         [url]="getBassUrl()"
         (dragStatus)="onDragEvent($event)"
         (loaded)="onTrackLoaded()"
-        (timeChange)="onTimeChange($event)"
+        (progressChange)="onProgressChange($event)"
         (solo)="onSolo($event)">
-    </app-howled-track>
-    <app-howled-track
+    </app-stem-player>
+    <app-stem-player
         [dragData]="dragData"
-        [pauseSubject]="pauseSubject"
-        [playSubject]="playSubject"
-        [seekSubject]="seekSubject"
-        [speedSubject]="speedSubject"
+        [progress]="progress"
         [title]="'Vocals'"
         [url]="getVocalsUrl()"
         (dragStatus)="onDragEvent($event)"
         (loaded)="onTrackLoaded()"
-        (timeChange)="onTimeChange($event)"
+        (progressChange)="onProgressChange($event)"
         (solo)="onSolo($event)">
-    </app-howled-track>
-    <app-howled-track
+    </app-stem-player>
+    <app-stem-player
         [dragData]="dragData"
-        [pauseSubject]="pauseSubject"
-        [playSubject]="playSubject"
-        [seekSubject]="seekSubject"
-        [speedSubject]="speedSubject"
+        [progress]="progress"
         [title]="'Other'"
         [url]="getOtherUrl()"
         (dragStatus)="onDragEvent($event)"
         (loaded)="onTrackLoaded()"
-        (timeChange)="onTimeChange($event)"
+        (progressChange)="onProgressChange($event)"
         (solo)="onSolo($event)">
-    </app-howled-track>
+    </app-stem-player>
 </div>
-
-
-<!--<div #speedContainer-->
-<!--     class="speed-container"-->
-<!--     (mousedown)="onSpeedMouseDown($event, speedContainer)">-->
-<!--    <div class="filler-1"></div>-->
-<!--    <div class="filler-2"></div>-->
-<!--    <div class="speed-progress"-->
-<!--         [ngClass]="{dragged: !!speedStatus.rect}"-->
-<!--         [style.width.%]="(speedStatus.speed / 4) * 100">-->
-<!--    </div>-->
-<!--</div>-->

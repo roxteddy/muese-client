@@ -1,4 +1,5 @@
 import {
+    ChangeDetectorRef,
     Component,
     ElementRef, EventEmitter,
     HostListener,
@@ -7,13 +8,11 @@ import {
     SimpleChanges, ViewChildren
 } from '@angular/core';
 import { SERVER_URL, Song } from '../app.component';
-import { Subject } from 'rxjs';
-import { HowledTrackComponent } from './howled-track/howled-track.component';
+import { StemPlayerComponent } from './stem-player/stem-player.component';
 import { DragData } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressStatus } from '../../app-ui/progress-bar/progress-bar.component';
-
-declare var Howler: HowlerGlobal;
+import { AudioPlayerService } from '../audio-player.service';
 
 @Component({
   selector: 'app-player',
@@ -21,51 +20,64 @@ declare var Howler: HowlerGlobal;
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent implements OnChanges {
-    @ViewChildren(HowledTrackComponent) trackComponents?: HowledTrackComponent[];
+    @ViewChildren(StemPlayerComponent) trackComponents?: StemPlayerComponent[];
 
     @Input() song?: Song;
 
     @Output() next: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Output() prev: EventEmitter<void> = new EventEmitter<void>();
 
-    autoplay: boolean = false;
+    autoplay = false;
     dragData: DragData | null = null;
-    duration: number = 0;
-    loopActivated: boolean = false;
-    paused: boolean = true;
-    playSubject: Subject<number> = new Subject<number>();
-    pauseSubject: Subject<void> = new Subject<void>();
-    seekSubject: Subject<number> = new Subject<number>();
-    speedSubject: Subject<number> = new Subject<number>();
+    duration = 0;
+    loopActivated = false;
+    paused = true;
+    progress = 0;
     tracksReady = 0;
     shuffleActivated: boolean = false;
     speed: number = 1;
-    timeProgress: number = 0;
     volume: number = 0.75;
-    tone: number = 0;
-    pitch: number = 1;
+    pitch: number = 0;
 
     firstLoad: boolean = true;
-    vocoder?: AudioWorkletNode;
 
-    constructor(private readonly elementRef: ElementRef,
+    constructor(private readonly audioPlayer: AudioPlayerService,
+                private readonly changeDetectorRef: ChangeDetectorRef,
+                private readonly elementRef: ElementRef,
                 private readonly matDialog: MatDialog) {
         this.setVolume(this.volume);
+        this.audioPlayer.duration.subscribe(duration => this.duration = duration);
+        this.audioPlayer.progress.subscribe((progress) => {
+            this.progress = progress;
+            this.changeDetectorRef.detectChanges();
+        });
+        this.audioPlayer.end.subscribe(() => {
+            //TODO should be handled directly
+            if (this.loopActivated) {
+                this.play(0);
 
-    }
-
-    ngOnInit() {
+            } else {
+                this.paused = true;
+                this.next.emit(this.shuffleActivated);
+            }
+        });
+        this.audioPlayer.isInitialized().then(() => {
+            this.audioPlayer.create("Drums");
+            this.audioPlayer.create("Piano");
+            this.audioPlayer.create("Bass");
+            this.audioPlayer.create("Vocals");
+            this.audioPlayer.create("Other");
+        });
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['song']) {
             this.duration = 0;
             this.paused = true;
+            this.progress = 0;
             this.tracksReady = 0;
             this.speed = 1;
-            this.timeProgress = 0;
-            this.tone = 0;
-            this.pitch = 1;
+            this.pitch = 0;
         }
     }
 
@@ -113,14 +125,14 @@ export class PlayerComponent implements OnChanges {
     }
 
     public onPrev() {
-        if (this.timeProgress > 1) {
-            this.seekSubject.next(0);
+        if (this.duration / this.progress > 1) {
+            this.seek(0);
         } else {
             this.prev.emit();
         }
     }
 
-    public onProgress(progressStatus: ProgressStatus) {
+    public onProgressBarChange(progressStatus: ProgressStatus) {
         if (progressStatus.rect) {
             this.dragData = {
                 rect: progressStatus.rect,
@@ -129,27 +141,16 @@ export class PlayerComponent implements OnChanges {
             }
         } else {
             this.dragData = null;
-            this.seekSubject.next(this.duration * progressStatus.progress);
+            this.seek(progressStatus.progress);
         }
     }
 
 
-    public onSolo(track: HowledTrackComponent) {
+    public onSolo(track: StemPlayerComponent) {
         if (this.trackComponents) {
             for (let trackComponent of this.trackComponents) {
                 trackComponent.mute(track != trackComponent);
             }
-        }
-    }
-
-    public onSongEnd() {
-        if (this.loopActivated) {
-            this.pauseSubject.next();
-            this.play(0);
-
-        } else {
-            this.paused = true;
-            this.next.emit(this.shuffleActivated);
         }
     }
 
@@ -176,32 +177,19 @@ export class PlayerComponent implements OnChanges {
     }
 
     private onPitchChange(direction: -1 | 1): void {
-        this.tone += direction;
-        this.pitch = Math.pow(2, this.tone / 12);
-        this.setPitch(this.pitch);
+        this.pitch += direction;
+        this.setPitch(this.pitch * 100);
     }
 
-    public onTimeChange(time: number) {
-        this.seekSubject.next(time);
+    public onProgressChange(progress: number) {
+        this.seek(progress);
     }
 
-    public onTrackLoaded(duration?: number) {
+    public onTrackLoaded() {
         if (this.firstLoad) {
             this.firstLoad = false;
-            Howler.ctx.audioWorklet?.addModule('assets/scripts/phase-vocoder.min.js').then(() => {
-                let inputNode = Howler.masterGain;
-                inputNode.disconnect();
-                let phaseVocoderNode = new AudioWorkletNode(Howler.ctx, 'phase-vocoder-processor');
-                console.log('connecting vocoder');
-                inputNode.connect(phaseVocoderNode);
-                phaseVocoderNode.connect(Howler.ctx.destination);
-                this.vocoder = phaseVocoderNode;
-            });
         }
         this.tracksReady += 1;
-        if (typeof duration !== 'undefined') {
-            this.duration = duration;
-        }
         if (this.tracksReady == 5 && this.autoplay) {
             this.autoplay = false;
             this.play(0);
@@ -214,7 +202,8 @@ export class PlayerComponent implements OnChanges {
 
     public playPause(): void {
         if (this.tracksReady == 5 && !this.matDialog.openDialogs.length)
-        this.paused ? this.play(this.timeProgress) : this.pause();
+            //TODO we could used a timed play if sync issues
+            this.paused ? this.play() : this.pause();
     }
 
     // Private
@@ -225,30 +214,30 @@ export class PlayerComponent implements OnChanges {
         }
     }
 
+    private seek(progress: number) {
+        this.audioPlayer.seek(progress);
+    }
+
     private setPitch(pitch: number) {
-        if (this.vocoder) {
-            (this.vocoder.parameters as any).get('pitchFactor').value = pitch / this.speed;
-        }
+        this.audioPlayer.setPitch(pitch);
     }
 
     private setSpeed(speed: number) {
-        this.speed = Math.min(Math.max(speed, 0.5), 4);
-        this.speedSubject.next(this.speed);
-        this.setPitch(this.pitch / this.speed);
+        this.audioPlayer.setSpeed(speed);
     }
 
-    private play(time: number): void {
+    private play(progress?: number): void {
         this.paused = false;
-        this.playSubject.next(time);
+        this.audioPlayer.play(progress);
     }
 
     private pause(): void {
         this.paused = true;
-        this.pauseSubject.next();
+        this.audioPlayer.pause();
     }
 
     private setVolume(volume: number) {
         this.volume = volume;
-        Howler.volume(volume);
+        this.audioPlayer.setVolume(volume);
     }
 }

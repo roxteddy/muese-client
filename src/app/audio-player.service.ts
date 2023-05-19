@@ -16,8 +16,11 @@ import { filter, map, Subject } from 'rxjs';
 })
 export class AudioPlayerService {
 
+    public duration = new Subject<number>();
     public progress = new Subject<number>();
+    public end = new Subject<void>();
 
+    private isInit = false;
     private initSubject = new Subject<void>();
     private messageSubject = new Subject<any>();
 
@@ -31,15 +34,29 @@ export class AudioPlayerService {
         this.renderer = this.rendererFactory.createRenderer(null, null);
         let listener = this.renderer.listen('document', "click", event =>{
             listener();
-            this.loadSuperPowered().then(() => this.initSubject.next());
+            this.loadSuperPowered().then(() => {
+                this.isInit = true;
+                this.initSubject.next();
+            });
         });
-        this.messageSubject.pipe(filter((value) => value.type === 'progress')).subscribe(
-            (value) => this.progress.next(value.time)
+        this.messageSubject.pipe(filter((message) => message.type === 'progress')).subscribe(
+            (message) => this.progress.next(message.progress));
+        this.messageSubject.pipe(filter(message => message.type === 'end')).subscribe(
+            () => this.end.next()
+        );
+        this.messageSubject.pipe(filter((message) => message.type === 'duration')).subscribe(
+            (message) => this.duration.next(message.duration)
         );
     }
 
     isInitialized(): Promise<void> {
-        return new Promise(resolve => this.initSubject.subscribe(() => resolve()));
+        return new Promise(resolve => {
+            if (this.isInit) {
+                resolve();
+            } else {
+                this.initSubject.subscribe(() => resolve());
+            }
+        });
     }
 
     create(name = 'pop'): Promise<void> {
@@ -59,6 +76,7 @@ export class AudioPlayerService {
 
     }
 
+    //returns duration in ms
     load(name: string, url: string): Promise<void> {
         const type = 'load';
         return new Promise((resolve, reject) => {
@@ -67,7 +85,9 @@ export class AudioPlayerService {
                 type,
                 url
             });
-            const sub = this.messageSubject.pipe(filter(value => value.type === type && value.url === url)).subscribe(
+            const sub = this.messageSubject
+                .pipe(filter(msg => msg.type === type && msg.url === url))
+                .subscribe(
                 (msg) => {
                     sub.unsubscribe();
                     msg.success ? resolve() : reject();
@@ -76,10 +96,30 @@ export class AudioPlayerService {
         });
     }
 
-    play(name?: string) {
+    mute(name: string) {
         this.playerProcessor?.sendMessageToAudioScope({
-                type: 'play',
-                name
+            type: 'mute',
+            name
+        });
+    }
+
+    pause() {
+        this.playerProcessor?.sendMessageToAudioScope({
+            type: 'pause'
+        });
+    }
+
+    play(progress: number | null = null) {
+        this.playerProcessor?.sendMessageToAudioScope({
+            type: 'play',
+            progress: progress
+        });
+    }
+
+    seek(progress: number) {
+        this.playerProcessor?.sendMessageToAudioScope({
+            type: 'seek',
+            progress
         });
     }
 
@@ -101,6 +141,14 @@ export class AudioPlayerService {
         this.playerProcessor?.sendMessageToAudioScope({
             type: 'setSpeed',
             speed: speed > 0.00001 ? speed : 0.00001
+        })
+    }
+
+    setVolume(volume: number, name?: string) {
+        this.playerProcessor?.sendMessageToAudioScope({
+            type: 'setVolume',
+            name,
+            volume
         })
     }
 

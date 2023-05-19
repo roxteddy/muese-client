@@ -36,7 +36,7 @@
             <svg viewBox="0 0 377 32" preserveAspectRatio="none"><path #path></path></svg>
             <div class="progress-bar"
                  [ngClass]="{loading: loading}"
-                 [style.width.%]="dragData ? dragData.progress * 100 : progressWidth">
+                 [style.width.%]="dragData ? dragData.progress * 100 : progress * 100">
                 <svg viewBox="0 0 377 32" preserveAspectRatio="none"
                      [style.width.px]="progressContainer.offsetWidth">
                     <path #path2 [ngClass]="{dragged: !!dragData}"></path>

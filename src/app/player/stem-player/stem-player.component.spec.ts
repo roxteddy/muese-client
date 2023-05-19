@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HowledTrackComponent } from './howled-track.component';
+import { StemPlayerComponent } from './stem-player.component';
 
 describe('HowledTrackComponent', () => {
-  let component: HowledTrackComponent;
-  let fixture: ComponentFixture<HowledTrackComponent>;
+  let component: StemPlayerComponent;
+  let fixture: ComponentFixture<StemPlayerComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ HowledTrackComponent ]
+      declarations: [ StemPlayerComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(HowledTrackComponent);
+    fixture = TestBed.createComponent(StemPlayerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        //this.getSongs();
+        this.getSongs();
         // this.audioPlayerService.isInitialized()
         //     .then(() => this.audioPlayerService.create())
         //     .then(() => this.audioPlayerService.load('/assets/pop.mp3'))
@@ -80,26 +80,26 @@ export class AppComponent implements OnInit {
 
         //this.audioPlayerService.progress.subscribe(time => console.log(time));
 
-        this.audioPlayerService.isInitialized()
-            .then(() => this.audioPlayerService.create('drums'))
-            .then(() => this.audioPlayerService.load('drums', '/assets/drums.mp3'))
-            .then(() => this.audioPlayerService.create('piano'))
-            .then(() => this.audioPlayerService.load('piano', '/assets/piano.mp3'))
-            .then(() => this.audioPlayerService.create('bass'))
-            .then(() => this.audioPlayerService.load('bass', '/assets/bass.mp3'))
-            .then(() => this.audioPlayerService.create('vocals'))
-            .then(() => this.audioPlayerService.load('vocals', '/assets/vocals.mp3'))
-            .then(() => this.audioPlayerService.create('other'))
-            .then(() => this.audioPlayerService.load('other', '/assets/other.mp3'))
-            .then(() => {
-                this.audioPlayerService.play();
-                this.audioPlayerService.setPitch(-600);
-                this.audioPlayerService.setSpeed(2);
-            });
+        // this.audioPlayerService.isInitialized()
+        //     .then(() => this.audioPlayerService.create('drums'))
+        //     .then(() => this.audioPlayerService.load('drums', '/assets/drums.mp3'))
+        //     .then(() => this.audioPlayerService.create('piano'))
+        //     .then(() => this.audioPlayerService.load('piano', '/assets/piano.mp3'))
+        //     .then(() => this.audioPlayerService.create('bass'))
+        //     .then(() => this.audioPlayerService.load('bass', '/assets/bass.mp3'))
+        //     .then(() => this.audioPlayerService.create('vocals'))
+        //     .then(() => this.audioPlayerService.load('vocals', '/assets/vocals.mp3'))
+        //     .then(() => this.audioPlayerService.create('other'))
+        //     .then(() => this.audioPlayerService.load('other', '/assets/other.mp3'))
+        //     .then(() => {
+        //         this.audioPlayerService.play();
+        //         //this.audioPlayerService.setPitch(-600);
+        //         //this.audioPlayerService.setSpeed(2);
+        //     });
     }
 
     public refresh(): void {
-        //this.getSongs();
+        this.getSongs();
     }
 
     public loadSong(song: Song): void {

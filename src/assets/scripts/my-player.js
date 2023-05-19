@@ -2,9 +2,11 @@ import './Superpowered.js'
 
 class Stem {
     buffer;
+    muted = false;
     name;
     url;
     player;
+    volume = 1;
 
     constructor(config = {}) {
         Object.assign(this, config);
@@ -13,8 +15,11 @@ class Stem {
 
 class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
 
+    //reset it on track change
+    duration = 0;
     lastProgress = -1;
     stems = [];
+    volume = 1;
 
     //mixer & buffers
     mixer;
@@ -30,7 +35,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
     // Clean up memory and objects here (such as free allocated linear memory or destruct Superpowered objects).
     onDestruct() {
         for (let stem of this.stems) {
-            stem.player?.desctruct();
+            stem.player?.destruct();
             stem.buffer?.free();
         }
         this.mixer?.destruct();
@@ -66,8 +71,8 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             0.501, // minimum time stretching playback rate
             2, // maximum time stretching playback rate
             false); // enable stems
-        stem.player.loopOnEOF = true;
-        this.playerGain = 1;
+        stem.player.loopOnEOF = false;
+        this.volume = 1;
         this.sendMessageToMainScope({ type: 'create', name });
     }
 
@@ -100,19 +105,36 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 error: 'Stem player not found'
             });
         }
+        this.lastProgress = -1;
     }
 
-    play(name) {
-        if (!name) {
-            for (let stem of this.stems) {
-                stem.player.play();
-            }
-        } else {
-            let stem = this.stems.find((s) => s.name == name);
-            if (stem && stem.player) {
-                stem.player.play();
-            }
+    mute(name) {
+        const stem = this.stems.find((stem => stem.name === name));
+        if (stem) {
+            stem.muted = !stem.muted;
         }
+    }
+
+    pause() {
+        for (let stem of this.stems) {
+            stem.player?.pause(0, 0);
+        }
+    }
+
+    play(progress) {
+        if (progress !== null) {
+            this.seek(progress);
+        }
+        for (let stem of this.stems) {
+            stem.player?.play();
+        }
+    }
+
+    seek(progress) {
+        for (let stem of this.stems) {
+            stem.player?.seek(progress);
+        }
+        this.lastProgress = -1;
     }
 
     // Set pitch by cents of half-tone (1 Octave = 1200) {-2400:2400}
@@ -133,24 +155,34 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         }
     }
 
+    setVolume(name, volume) {
+        if (name) {
+            const stem = this.stems.find((stem => stem.name === name));
+            if (stem)
+                stem.volume = volume;
+        } else {
+            this.volume = volume;
+        }
+    }
+
     /* COMMUNICATION */
 
     // SuperpoweredTrackLoader calls this when its finished loading and decoding audio.
     onMessageFromMainScope(message) {
         console.log(message);
         if (message.SuperpoweredLoaded) {
-            const buffer = message.SuperpoweredLoaded.buffer; // ArrayBuffer with the downloaded and decoded audio in AudioInMemory format.
+            let stem = this.stems.find((s) => s.url === message.SuperpoweredLoaded.url);
+            // todo: free() previous data ?
+            stem?.player?.openMemory(
+                this.Superpowered.arrayBufferToWASM(message.SuperpoweredLoaded.buffer),
+                false,
+                false
+            );
             this.sendMessageToMainScope({
                 type: 'load',
                 url: message.SuperpoweredLoaded.url,
-                success: !buffer?.length
+                success: !message.SuperpoweredLoaded.buffer?.length
             });
-
-            // Once we have the pointer to the buffer, we pass the decoded audio into the AAP instance.
-            let stem = this.stems.find((s) => s.url === message.SuperpoweredLoaded.url);
-            // todo: free() previous data ?
-            if (stem && stem.player)
-                stem.player.openMemory(this.Superpowered.arrayBufferToWASM(buffer), false, false);
         }
 
         switch (message.type) {
@@ -163,14 +195,26 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             case 'load':
                 this.load(message.name, message.url);
                 break;
+            case 'mute':
+                this.mute(message.name);
+                break;
+            case 'pause':
+                this.pause();
+                break;
             case 'play':
-                this.play(message.name);
+                this.play(message.progress);
+                break;
+            case 'seek':
+                this.seek(message.progress);
                 break;
             case 'setPitch':
                 this.setPitch(message.pitch);
                 break;
             case 'setSpeed':
                 this.setSpeed(message.speed);
+                break;
+            case 'setVolume':
+                this.setVolume(message.name, message.volume);
                 break;
         }
     }
@@ -185,22 +229,35 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         for (let stem of this.stems) {
             let result = 0;
             if (stem?.player) {
+                // Check for end
+                if (stem.player?.eofRecently()) {
+                    this.sendMessageToMainScope({
+                        type: 'end'
+                    })
+                }
+                if (!this.duration) {
+                    this.sendMessageToMainScope({
+                        type: 'duration',
+                        duration: stem.player.getDurationMs()
+                    });
+                }
                 // Handle progress
                 if (!progressHandled) {
                     const newProgress = stem.player.getDisplayPositionMs();
-                    if (stem.player.isPlaying()
-                        && (this.lastProgress < 0 || Math.abs(newProgress - this.lastProgress) >= 50)) {
+                    if (this.lastProgress < 0 || Math.abs(newProgress - this.lastProgress) >= 50) {
                         this.sendMessageToMainScope({
                             type: 'progress',
+                            progress: stem.player.getDisplayPositionPercent(),
                             time: Math.floor(newProgress) / 1000
-                        })
+                        });
+                        this.lastProgress = newProgress;
                     }
                     progressHandled = true;
                 }
 
                 // Ensure the samplerate is in sync on every audio processing callback.
                 stem.player.outputSamplerate = this.samplerate;
-                result = stem.player.processStereo(stem.buffer.pointer, false, buffersize, this.playerGain);
+                result = stem.player.processStereo(stem.buffer.pointer, false, buffersize, stem.muted ? 0 : stem.volume * this.volume);
             }
             if (!result) {
                 this.Superpowered.memorySet(stem.buffer.pointer, 0, buffersize * 8); // 8 bytes for each frame (1 channel is 4 bytes, two channels)
