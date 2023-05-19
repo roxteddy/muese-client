@@ -78,6 +78,7 @@ export class PlayerComponent implements OnChanges {
             this.tracksReady = 0;
             this.speed = 1;
             this.pitch = 0;
+            this.audioPlayer.finish();
         }
     }
 

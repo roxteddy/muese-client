@@ -64,73 +64,66 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
 
                 //TODO : setVolume?
             this.audioPlayer.isInitialized()
-                .then(() => this.audioPlayer.load(this.title, this.url))
-                .then((duration) => {
-                    this.loading = false;
-                    this.loaded.next();
-                    console.log(this.title + 'has loaded');
-            });
+                // .then(() => this.audioPlayer.load(this.title, this.url))
+                // .then((duration) => {
+                //     this.loading = false;
+                //     this.loaded.next();
+                //     console.log(this.title + 'has loaded');
+                // });
+                .then(() => {
+                    this.httpClient.get(changes['url'].currentValue, {
+                        observe: 'events',
+                        reportProgress: true,
+                        responseType: 'blob'
+                    }).subscribe({
+                        next : (event: HttpEvent<Blob>) => {
+                            if (event.type == HttpEventType.DownloadProgress) {
+                                if (event.total) {
+                                    this.progress = event.loaded / event.total;
+                                }
+                            }
+                            if (event.type == HttpEventType.Response) {
+                                let blob = event.body;
+                                if (blob) {
+                                    blob.arrayBuffer().then((arrayBuffer) => {
+                                       //const wasmPointer = this.audioPlayer.decodeToWasm(arrayBuffer);
+                                        this.audioPlayer.load(this.title, arrayBuffer).then(() => {
+                                            this.progress = 0;
+                                            this.loading = false;
+                                            this.loaded.emit();
+                                            this.audioPlayer.getContext()?.decodeAudioData(arrayBuffer).then(
+                                                (audioBuffer) => {
+                                                    // BPM Detection
+                                                    // if (this.bpm.observed) {
+                                                    //     guess(audioBuffer).then((
+                                                    //         {bpm, offset}) => this.bpm.emit(bpm),
+                                                    //         () => this.bpm.emit(-2));
+                                                    // }
 
+                                                    // WaveForm
+                                                    const newPath = linearPath(audioBuffer,
+                                                        {samples:150, type: 'mirror', minshow: 0.8, maxshow: 1, normalize: true, width: 377, height: 32, paths: [
+                                                                {d:'V', sy: 0, x:50, ey:100 }
+                                                            ]});
+                                                    this.pathRef?.nativeElement?.setAttribute('d', newPath);
+                                                    this.path2Ref?.nativeElement?.setAttribute('d', newPath);
+                                                });
+                                        });
+                                    });
+                                } else {
+                                    // TODO: error case
+                                    this.loaded.emit();
+                                    this.loading = false;
+                                }
+                            }
+                        }, error: (e) => {
+                            // TODO: error case
+                            this.loaded.emit();
+                            this.loading = false;
+                        }
+                    });
+                });
 
-            // this.httpClient.get(changes['url'].currentValue, {
-            //     observe: 'events',
-            //     reportProgress: true,
-            //     responseType: 'blob'
-            // }).subscribe({
-            //     next : (event: HttpEvent<Blob>) => {
-            //         if (event.type == HttpEventType.DownloadProgress) {
-            //             if (event.total) {
-            //                 this.progress = event.loaded / event.total;
-            //             }
-            //         }
-            //         if (event.type == HttpEventType.Response) {
-            //             let blob = event.body;
-            //             if (blob) {
-            //                 const url = (window.URL || window.webkitURL ).createObjectURL(blob);
-            //                 this.audio = new Howl({src: url, format: 'mp3'});
-            //
-            //                 // let inputNode: GainNode = (this.audio as any)._sounds[0]?._node;
-            //                 // inputNode.disconnect();
-            //
-            //                 this.audio?.volume(this.volume);
-            //                 this.audio?.on('load', () => {
-            //                     this.loading = false;
-            //
-            //                     if (blob) {
-            //                         blob.arrayBuffer()
-            //
-            //                             .then(arrayBuffer => new AudioContext().decodeAudioData(arrayBuffer))
-            //                             .then(audioBuffer => {
-            //                                 // BPM Detection
-            //                                 // if (this.bpm.observed) {
-            //                                 //     guess(audioBuffer).then((
-            //                                 //         {bpm, offset}) => this.bpm.emit(bpm),
-            //                                 //         () => this.bpm.emit(-2));
-            //                                 // }
-            //
-            //                                 // WaveForm
-            //                                 const newPath = linearPath(audioBuffer,
-            //                                     {samples:150, type: 'mirror', minshow: 0.8, maxshow: 1, normalize: true, width: 377, height: 32, paths: [
-            //                                         {d:'V', sy: 0, x:50, ey:100 }
-            //                                     ]});
-            //                                 this.pathRef?.nativeElement?.setAttribute('d', newPath);
-            //                                 this.path2Ref?.nativeElement?.setAttribute('d', newPath);
-            //                                 this.loaded.emit(this.audio?.duration());
-            //                             });
-            //                     }
-            //                 });
-            //             } else {
-            //                 // TODO: error case
-            //                 this.loaded.emit();
-            //                 this.loading = false;
-            //             }
-            //         }
-            //     }, error: (e) => {
-            //         // TODO: error case
-            //         this.loaded.emit();
-            //         this.loading = false;
-            //     }
-            // });
 
             if (!changes['url'].firstChange) {
                 this.currentTime = 0;

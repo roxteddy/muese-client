@@ -4,7 +4,6 @@ class Stem {
     buffer;
     muted = false;
     name;
-    url;
     player;
     volume = 1;
 
@@ -89,15 +88,28 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         }
     }
 
-    // Called from within this class.
-    load(name, url) {
-        // Notice that we pass in a reference to 'this',
-        // which is used to call the onMessageFromMainScope callback within this call instance when loaded.
-        // The fetching and decoding of the audio takes place on dedicated workers, spawned from the main thread. This prevents any blocking.
+    finish() {
+        //todo: unload tracks ?
+        this.pause();
+        this.duration = 0;
+        this.seek(0);
+    }
+
+    load(name, arrayBuffer) {
         let stem = this.stems.find((s) => s.name === name);
         if (stem) {
-            stem.url = url;
-            this.Superpowered.downloadAndDecode(url, this);
+            let audiofileInWASMHeap = this.Superpowered.arrayBufferToWASM(arrayBuffer);
+            let decodedAudio = this.Superpowered.Decoder.decodeToAudioInMemory(audiofileInWASMHeap, arrayBuffer.byteLength);
+            stem.player?.openMemory(
+                decodedAudio,
+                false,
+                false
+            );
+            this.sendMessageToMainScope({
+                type: 'load',
+                name,
+                success: true
+            });
         } else {
             this.sendMessageToMainScope({
                 type: 'load',
@@ -170,20 +182,6 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
     // SuperpoweredTrackLoader calls this when its finished loading and decoding audio.
     onMessageFromMainScope(message) {
         console.log(message);
-        if (message.SuperpoweredLoaded) {
-            let stem = this.stems.find((s) => s.url === message.SuperpoweredLoaded.url);
-            // todo: free() previous data ?
-            stem?.player?.openMemory(
-                this.Superpowered.arrayBufferToWASM(message.SuperpoweredLoaded.buffer),
-                false,
-                false
-            );
-            this.sendMessageToMainScope({
-                type: 'load',
-                url: message.SuperpoweredLoaded.url,
-                success: !message.SuperpoweredLoaded.buffer?.length
-            });
-        }
 
         switch (message.type) {
             case 'create':
@@ -192,8 +190,11 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             case 'destroy':
                 this.create(message.name);
                 break;
+            case 'finish':
+                this.finish();
+                break;
             case 'load':
-                this.load(message.name, message.url);
+                this.load(message.name, message.arrayBuffer);
                 break;
             case 'mute':
                 this.mute(message.name);
@@ -256,8 +257,10 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 }
 
                 // Ensure the samplerate is in sync on every audio processing callback.
-                stem.player.outputSamplerate = this.samplerate;
-                result = stem.player.processStereo(stem.buffer.pointer, false, buffersize, stem.muted ? 0 : stem.volume * this.volume);
+                if (stem.player) {
+                    stem.player.outputSamplerate = this.samplerate;
+                    result = stem.player.processStereo(stem.buffer.pointer, false, buffersize, stem.muted ? 0 : stem.volume * this.volume);
+                }
             }
             if (!result) {
                 this.Superpowered.memorySet(stem.buffer.pointer, 0, buffersize * 8); // 8 bytes for each frame (1 channel is 4 bytes, two channels)

@@ -76,17 +76,35 @@ export class AudioPlayerService {
 
     }
 
+    decodeToWasm(arrayBuffer: ArrayBuffer) {
+        const audiofileInWASMHeap = this.superpowered?.arrayBufferToWASM(arrayBuffer);
+        return this.superpowered?.Decoder.decodeToAudioInMemory(
+            audiofileInWASMHeap,
+            arrayBuffer.byteLength
+        );
+    }
+
+    finish() {
+        this.playerProcessor?.sendMessageToAudioScope({
+            type: 'finish'
+        });
+    }
+
+    getContext(): AudioContext {
+        return this.webaudioManager?.audioContext;
+    }
+
     //returns duration in ms
-    load(name: string, url: string): Promise<void> {
+    load(name: string, arrayBuffer: ArrayBuffer): Promise<void> {
         const type = 'load';
         return new Promise((resolve, reject) => {
             this.playerProcessor?.sendMessageToAudioScope({
                 name,
                 type,
-                url
+                arrayBuffer
             });
             const sub = this.messageSubject
-                .pipe(filter(msg => msg.type === type && msg.url === url))
+                .pipe(filter(msg => msg.type === type && msg.name === name))
                 .subscribe(
                 (msg) => {
                     sub.unsubscribe();
