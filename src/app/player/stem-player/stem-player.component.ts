@@ -13,7 +13,7 @@ import {
     ViewChild
 } from '@angular/core';
 import { Howl as HowlObject } from 'howler';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { DragData } from '../../app.module';
 import { ProgressStatus } from '../../../app-ui/progress-bar/progress-bar.component';
@@ -44,6 +44,7 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
 
     currentTime: number = 0
     loading: boolean = false;
+    loadingSubscription?: Subscription;
     intervalId?: number;
     muted: boolean = false;
     volume: number = 0.75;
@@ -60,7 +61,9 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
             //     this.audio.unload();
             // }
             this.loading = true;
-
+            if(this.loadingSubscription) {
+                this.loadingSubscription.unsubscribe();
+            }
 
                 //TODO : setVolume?
             this.audioPlayer.isInitialized()
@@ -71,7 +74,7 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
                 //     console.log(this.title + 'has loaded');
                 // });
                 .then(() => {
-                    this.httpClient.get(changes['url'].currentValue, {
+                    this.loadingSubscription = this.httpClient.get(changes['url'].currentValue, {
                         observe: 'events',
                         reportProgress: true,
                         responseType: 'blob'

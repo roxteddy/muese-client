@@ -47,7 +47,7 @@ export class PlayerComponent implements OnChanges {
                 private readonly matDialog: MatDialog) {
         this.setVolume(this.volume);
         this.audioPlayer.duration.subscribe(duration => this.duration = duration);
-        this.audioPlayer.progress.subscribe((progress) => {
+        this.audioPlayer.progress.subscribe(progress => {
             this.progress = progress;
             this.changeDetectorRef.detectChanges();
         });
@@ -191,7 +191,7 @@ export class PlayerComponent implements OnChanges {
             this.firstLoad = false;
         }
         this.tracksReady += 1;
-        if (this.tracksReady == 5 && this.autoplay) {
+        if (this.tracksReady >= 5 && this.autoplay) {
             this.autoplay = false;
             this.play(0);
         }
@@ -202,7 +202,7 @@ export class PlayerComponent implements OnChanges {
     }
 
     public playPause(): void {
-        if (this.tracksReady == 5 && !this.matDialog.openDialogs.length)
+        if (this.tracksReady >= 5)
             //TODO we could used a timed play if sync issues
             this.paused ? this.play() : this.pause();
     }
@@ -210,7 +210,7 @@ export class PlayerComponent implements OnChanges {
     // Private
     @HostListener('document:keypress', ['$event'])
     private handleKeyPress(e: KeyboardEvent): void {
-        if (e.code == 'Space') {
+        if (e.code == 'Space' && !this.matDialog.openDialogs.length) {
             this.playPause();
         }
     }
