@@ -122,10 +122,10 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         this.lastProgress = -1;
     }
 
-    mute(name) {
+    mute(name, muted) {
         const stem = this.stems.find((stem => stem.name === name));
         if (stem) {
-            stem.muted = !stem.muted;
+            stem.muted = muted;
         }
     }
 
@@ -199,7 +199,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 this.load(message.name, message.arrayBuffer);
                 break;
             case 'mute':
-                this.mute(message.name);
+                this.mute(message.name, message.muted);
                 break;
             case 'pause':
                 this.pause();

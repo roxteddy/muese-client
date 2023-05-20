@@ -1,15 +1,19 @@
-import {
-    EventEmitter,
-    HostBinding,
-    HostListener,
-    Injectable,
-    Output,
-    Renderer2,
-    RendererFactory2
-} from '@angular/core';
+import { Injectable, RendererFactory2 } from '@angular/core';
 // @ts-ignored
 import { SuperpoweredWebAudio } from '../assets/scripts/Superpowered.js';
-import { filter, map, Subject } from 'rxjs';
+import {
+    first,
+    firstValueFrom,
+    map,
+    mergeMap,
+    Observable,
+    of,
+    ReplaySubject,
+    Subject,
+    Subscription,
+    switchMap
+} from 'rxjs';
+import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -20,68 +24,60 @@ export class AudioPlayerService {
     public progress = new Subject<number>();
     public end = new Subject<void>();
 
-    private isInit = false;
-    private initSubject = new Subject<void>();
+    private initSubject = new ReplaySubject<void>();
     private messageSubject = new Subject<any>();
-
     private playerProcessor?: SuperpoweredWebAudio.AudioWorkletProcessor;
-    private renderer: Renderer2;
     // @ts-ignored
     private superpowered?: Superpowered;
     private webaudioManager: SuperpoweredWebAudio;
 
-    constructor(private readonly rendererFactory: RendererFactory2) {
-        this.renderer = this.rendererFactory.createRenderer(null, null);
-        let listener = this.renderer.listen('document', "click", event =>{
-            listener();
-            this.loadSuperPowered().then(() => {
-                this.isInit = true;
-                this.initSubject.next();
-            });
+    constructor(private readonly httpClient: HttpClient,
+                private readonly rendererFactory: RendererFactory2) {
+        const renderer = this.rendererFactory.createRenderer(null, null);
+        const unlisten = renderer.listen('document', "click", () => {
+            unlisten();
+            this.loadSuperPowered().then(() => this.initSubject.next());
         });
-        this.messageSubject.pipe(filter((message) => message.type === 'progress')).subscribe(
-            (message) => this.progress.next(message.progress));
-        this.messageSubject.pipe(filter(message => message.type === 'end')).subscribe(
-            () => this.end.next()
-        );
-        this.messageSubject.pipe(filter((message) => message.type === 'duration')).subscribe(
-            (message) => this.duration.next(message.duration)
-        );
-    }
-
-    isInitialized(): Promise<void> {
-        return new Promise(resolve => {
-            if (this.isInit) {
-                resolve();
-            } else {
-                this.initSubject.subscribe(() => resolve());
+        this.messageSubject.subscribe((message) => {
+            switch (message.type) {
+                case 'duration':
+                    this.duration.next(message.duration);
+                    break;
+                case 'end':
+                    this.end.next();
+                    break;
+                case'progress':
+                    this.progress.next(message.progress);
+                    break;
             }
         });
     }
 
-    create(name = 'pop'): Promise<void> {
-        const type = 'create';
-        return new Promise((resolve, reject) => {
-            this.playerProcessor?.sendMessageToAudioScope({
-                type,
-                name
-            });
-            const sub = this.messageSubject.pipe(filter(value => value.type === type && value.name === name)).subscribe(
-                (msg) => {
-                    sub.unsubscribe();
-                    !msg.error ? resolve() : reject();
-                }
-            )
-        });
-
+    /*
+    ** Service methods
+    */
+    getContext(): AudioContext {
+        return this.webaudioManager?.audioContext;
     }
 
-    decodeToWasm(arrayBuffer: ArrayBuffer) {
-        const audiofileInWASMHeap = this.superpowered?.arrayBufferToWASM(arrayBuffer);
-        return this.superpowered?.Decoder.decodeToAudioInMemory(
-            audiofileInWASMHeap,
-            arrayBuffer.byteLength
-        );
+    isInitialized(): Promise<void> {
+        return firstValueFrom(this.initSubject);
+    }
+
+    /*
+    ** Player Commands
+    */
+    create(name = 'pop'): Promise<void> {
+        const type = 'create';
+        this.playerProcessor?.sendMessageToAudioScope({
+            type,
+            name
+        });
+        return new Promise((resolve, reject) => {
+            this.messageSubject
+                .pipe(first(value => value.type === type && value.name === name))
+                .subscribe((msg) => !msg.error ? resolve() : reject());
+        });
     }
 
     finish() {
@@ -90,11 +86,40 @@ export class AudioPlayerService {
         });
     }
 
-    getContext(): AudioContext {
-        return this.webaudioManager?.audioContext;
+    loadFromUrl(name: string, url: string): Observable<{
+        type: HttpEventType,
+        progress?: number,
+        arrayBuffer?: ArrayBuffer }> {
+        return this.httpClient.get(url, {
+            observe: 'events',
+            reportProgress: true,
+            responseType: 'blob'
+        }).pipe(switchMap(async (event: HttpEvent<Blob>) => {
+            if (event.type == HttpEventType.DownloadProgress) {
+                return {
+                    type: event.type,
+                    progress: event.total ? (event.loaded / event.total) : 0
+                }
+            } else if (event.type == HttpEventType.Response) {
+                let blob = event.body;
+                if (blob) {
+                    const arrayBuffer = await blob.arrayBuffer();
+                    await this.load(name, arrayBuffer);this.progress.next(0);
+                    return {
+                        type: HttpEventType.Response,
+                        arrayBuffer
+                    }
+                } else {
+                    throw new Error('File is empty');
+                }
+            } else {
+                return {
+                    type: event.type
+                }
+            }
+        }));
     }
 
-    //returns duration in ms
     load(name: string, arrayBuffer: ArrayBuffer): Promise<void> {
         const type = 'load';
         return new Promise((resolve, reject) => {
@@ -103,21 +128,17 @@ export class AudioPlayerService {
                 type,
                 arrayBuffer
             });
-            const sub = this.messageSubject
-                .pipe(filter(msg => msg.type === type && msg.name === name))
-                .subscribe(
-                (msg) => {
-                    sub.unsubscribe();
-                    msg.success ? resolve() : reject();
-                }
-            )
+            this.messageSubject
+                .pipe(first(msg => msg.type === type && msg.name === name))
+                .subscribe((msg) => msg.success ? resolve() : reject());
         });
     }
 
-    mute(name: string) {
+    mute(name: string, muted: boolean) {
         this.playerProcessor?.sendMessageToAudioScope({
             type: 'mute',
-            name
+            name,
+            muted
         });
     }
 
@@ -141,8 +162,10 @@ export class AudioPlayerService {
         });
     }
 
-    // Set pitch by cents of half-tone (1 Octave = 1200) {-2400:2400}
-    // Multiple of 100 for better performance
+    /*
+    ** setPitch
+    ** pitch: cents of half-tone (1 Octave = 1200) {-2400:2400} - use multiple of 100 for better performance
+    */
     setPitch(pitch: number) {
         if (pitch > 2400)
             pitch = 2400
@@ -170,8 +193,11 @@ export class AudioPlayerService {
         })
     }
 
-    private async loadSuperPowered() {
+    /*
+    ** Private
+    */
 
+    private async loadSuperPowered() {
         // @ts-ignored
         this.superpowered = await SuperpoweredGlue.Instantiate(
             'ExampleLicenseKey-WillExpire-OnNextUpdate',
@@ -184,11 +210,7 @@ export class AudioPlayerService {
         this.playerProcessor = await this.webaudioManager.createAudioNodeAsync(
                 'https://muese.servehttp.com:4200/assets/scripts/my-player.js',
                 'MyPlayer',
-                (msg: any) => {
-                    //console.log(msg);
-                    this.messageSubject.next(msg);
-                }
-            );
+                (msg: any) => this.messageSubject.next(msg));
         this.playerProcessor.connect(this.webaudioManager.audioContext.destination);
     }
 }

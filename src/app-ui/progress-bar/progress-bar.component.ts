@@ -33,19 +33,20 @@ export class ProgressBarComponent implements OnChanges {
                     ...this.progressStatus,
                     progress
                 }
-                //this.progress.emit(progress);
             }
         }
     }
 
     public onMouseDown(e: MouseEvent, container: HTMLDivElement) {
-        const rect = container.getBoundingClientRect();
-        this.progressStatus = {
-            rect,
-            progress: this.calcProgress(e, rect)
-        }
-        if (this.emitSeekOnDrag) {
-            this.progress.emit(this.progressStatus);
+        if (e.button === 0) {
+            const rect = container.getBoundingClientRect();
+            this.progressStatus = {
+                rect,
+                progress: this.calcProgress(e, rect)
+            }
+            if (this.emitSeekOnDrag) {
+                this.progress.emit(this.progressStatus);
+            }
         }
     }
 

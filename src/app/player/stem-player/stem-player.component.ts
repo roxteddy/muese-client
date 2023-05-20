@@ -1,5 +1,4 @@
 import {
-    AfterViewInit,
     Component,
     ElementRef,
     EventEmitter,
@@ -7,18 +6,16 @@ import {
     Input,
     OnChanges,
     OnDestroy,
-    OnInit,
     Output,
     SimpleChanges,
     ViewChild
 } from '@angular/core';
-import { Howl as HowlObject } from 'howler';
-import { Subject, Subscription } from 'rxjs';
-import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { HttpEventType } from '@angular/common/http';
 import { DragData } from '../../app.module';
 import { ProgressStatus } from '../../../app-ui/progress-bar/progress-bar.component';
-import { guess } from 'web-audio-beat-detector';
 import { AudioPlayerService } from '../../audio-player.service';
+import { PlayerComponent } from '../player.component';
 
 declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
 
@@ -27,7 +24,7 @@ declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
   templateUrl: './stem-player.component.html',
   styleUrls: ['./stem-player.component.scss']
 })
-export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy, OnInit {
+export class StemPlayerComponent implements OnChanges, OnDestroy {
     @ViewChild('path') pathRef?: ElementRef;
     @ViewChild('path2') path2Ref?: ElementRef;
 
@@ -36,7 +33,6 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
     @Input() title = '';
     @Input() url: string = '';
 
-    // @Output() bpm: EventEmitter<number> = new EventEmitter<number>();
     @Output() dragStatus = new EventEmitter<DragData | null>();
     @Output() loaded = new EventEmitter<void>();
     @Output() progressChange = new EventEmitter<number>();
@@ -45,115 +41,29 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
     currentTime: number = 0
     loading: boolean = false;
     loadingSubscription?: Subscription;
-    intervalId?: number;
     muted: boolean = false;
-    volume: number = 0.75;
+    volume: number = PlayerComponent.DEFAULT_STEM_VOLUME;
 
-    constructor(private audioPlayer: AudioPlayerService,
-                private readonly httpClient: HttpClient) {}
-
-    ngOnInit() {
+    constructor(private audioPlayer: AudioPlayerService) {
+        console.log(this.volume);
     }
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['url']) {
-            // if (this.audio) {
-            //     this.audio.unload();
-            // }
             this.loading = true;
-            if(this.loadingSubscription) {
-                this.loadingSubscription.unsubscribe();
-            }
+            this.currentTime = 0;
+            this.muted = false;
+            this.progress = 0;
+            this.pathRef?.nativeElement?.setAttribute('d', '');
+            this.path2Ref?.nativeElement?.setAttribute('d', '');
+            this.loadingSubscription?.unsubscribe();
 
-                //TODO : setVolume?
-            this.audioPlayer.isInitialized()
-                // .then(() => this.audioPlayer.load(this.title, this.url))
-                // .then((duration) => {
-                //     this.loading = false;
-                //     this.loaded.next();
-                //     console.log(this.title + 'has loaded');
-                // });
-                .then(() => {
-                    this.loadingSubscription = this.httpClient.get(changes['url'].currentValue, {
-                        observe: 'events',
-                        reportProgress: true,
-                        responseType: 'blob'
-                    }).subscribe({
-                        next : (event: HttpEvent<Blob>) => {
-                            if (event.type == HttpEventType.DownloadProgress) {
-                                if (event.total) {
-                                    this.progress = event.loaded / event.total;
-                                }
-                            }
-                            if (event.type == HttpEventType.Response) {
-                                let blob = event.body;
-                                if (blob) {
-                                    blob.arrayBuffer().then((arrayBuffer) => {
-                                       //const wasmPointer = this.audioPlayer.decodeToWasm(arrayBuffer);
-                                        this.audioPlayer.load(this.title, arrayBuffer).then(() => {
-                                            this.progress = 0;
-                                            this.loading = false;
-                                            this.loaded.emit();
-                                            this.audioPlayer.getContext()?.decodeAudioData(arrayBuffer).then(
-                                                (audioBuffer) => {
-                                                    // BPM Detection
-                                                    // if (this.bpm.observed) {
-                                                    //     guess(audioBuffer).then((
-                                                    //         {bpm, offset}) => this.bpm.emit(bpm),
-                                                    //         () => this.bpm.emit(-2));
-                                                    // }
-
-                                                    const left = audioBuffer.getChannelData(0);
-                                                    const right = audioBuffer.getChannelData(1);
-                                                    for (let i = 0; i < audioBuffer.length; i++)
-                                                        left[i] = (left[i] + right[i]) / 2;
-                                                    audioBuffer.copyToChannel(left, 0);
-
-                                                    // WaveForm
-                                                    const newPath = linearPath(audioBuffer, {
-                                                        normalize: true,
-                                                        samples: 150,
-                                                        type: 'mirror',
-                                                        width: 377,
-                                                        height: 32,
-                                                        paths: [{d:'V', sx: 1, sy: 0, x:50, ey:100 }]
-                                                    });
-                                                    this.pathRef?.nativeElement?.setAttribute('d', newPath);
-                                                    this.path2Ref?.nativeElement?.setAttribute('d', newPath);
-                                                });
-                                        });
-                                    });
-                                } else {
-                                    // TODO: error case
-                                    this.loaded.emit();
-                                    this.loading = false;
-                                }
-                            }
-                        }, error: (e) => {
-                            // TODO: error case
-                            this.loaded.emit();
-                            this.loading = false;
-                        }
-                    });
-                });
-
-
-            if (!changes['url'].firstChange) {
-                this.currentTime = 0;
-                this.muted = false;
-                this.progress = 0;
-                this.pathRef?.nativeElement?.setAttribute('d', '');
-                this.path2Ref?.nativeElement?.setAttribute('d', '');
-            }
+            this.loadTrack(changes['url'].currentValue);
         }
     }
 
-    ngAfterViewInit() {}
-
     ngOnDestroy() {
-        if (this.intervalId) {
-            clearInterval(this.intervalId);
-        }
+        this.loadingSubscription?.unsubscribe();
     }
 
     public mute(muted?: boolean) {
@@ -162,20 +72,22 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
         } else {
             this.muted = muted;
         }
-        this.audioPlayer.mute(this.title);
+        this.audioPlayer.mute(this.title, this.muted);
     }
 
     public onCanvasMouseDown(e: MouseEvent, container: HTMLDivElement) {
-        let rect = container.getBoundingClientRect();
-        this.dragStatus.emit({
-            rect,
-            progress: (e.clientX - rect.left) / rect.width,
-            origin: this
-        });
+        if (e.button === 0) {
+            let rect = container.getBoundingClientRect();
+            this.dragStatus.emit({
+                rect,
+                progress: (e.clientX - rect.left) / rect.width,
+                origin: this
+            });
+        }
     }
 
     public onVolumeProgress(volumeStatus: ProgressStatus) {
-        this.audioPlayer.setVolume(volumeStatus.progress, this.title);
+        this.setVolume(volumeStatus.progress);
     }
 
     @HostListener('document:mousemove', ['$event'])
@@ -205,5 +117,61 @@ export class StemPlayerComponent implements AfterViewInit, OnChanges, OnDestroy,
 
     public onSolo() {
         this.solo.emit(this);
+    }
+
+    private analyzeTrack(arrayBuffer: ArrayBuffer, currentUrl: string) {
+        this.audioPlayer.getContext()?.decodeAudioData(arrayBuffer).then(
+            (audioBuffer) => {
+                if (currentUrl !== this.url)
+                    return;
+
+                const left = audioBuffer.getChannelData(0);
+                const right = audioBuffer.getChannelData(1);
+                for (let i = 0; i < audioBuffer.length; i++)
+                    left[i] = (left[i] + right[i]) / 2;
+                audioBuffer.copyToChannel(left, 0);
+
+                // WaveForm
+                const newPath = linearPath(audioBuffer, {
+                    normalize: true,
+                    samples: 150,
+                    type: 'mirror',
+                    width: 377,
+                    height: 32,
+                    paths: [{d:'V', sx: 1, sy: 0, x:50, ey:100 }]
+                });
+                this.pathRef?.nativeElement?.setAttribute('d', newPath);
+                this.path2Ref?.nativeElement?.setAttribute('d', newPath);
+            });
+    }
+
+    private loadTrack(currentUrl: string) {
+        this.audioPlayer.isInitialized().then(() => {
+            if (currentUrl === this.url) {
+                this.setVolume(PlayerComponent.DEFAULT_STEM_VOLUME);
+                this.loadingSubscription = this.audioPlayer.loadFromUrl(this.title, this.url).subscribe({
+                    next: (v) => {
+                        if (v.type === HttpEventType.DownloadProgress && typeof v.progress !== 'undefined') {
+                            this.progress = v.progress;
+                        } else if (v.type === HttpEventType.Response && typeof  v.arrayBuffer !== 'undefined') {
+                            this.loadingSubscription?.unsubscribe();
+                            this.loading = false;
+                            this.loaded.emit();
+                            this.progress = 0;
+
+                            this.analyzeTrack(v.arrayBuffer, currentUrl);
+                        }
+                    },error: (e) => {
+                        this.loading = false;
+                        this.loaded.emit();
+                        this.loadingSubscription?.unsubscribe();
+                    }});
+            }
+        });
+    }
+
+    private setVolume(volume: number) {
+        this.volume = volume;
+        this.audioPlayer.setVolume(volume, this.title);
     }
 }

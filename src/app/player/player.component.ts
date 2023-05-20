@@ -20,7 +20,9 @@ import { AudioPlayerService } from '../audio-player.service';
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent implements OnChanges {
-    @ViewChildren(StemPlayerComponent) trackComponents?: StemPlayerComponent[];
+    static DEFAULT_STEM_VOLUME = 0.75;
+
+    @ViewChildren(StemPlayerComponent) stemPlayerComponents: StemPlayerComponent[] = [];
 
     @Input() track?: Track;
 
@@ -52,7 +54,6 @@ export class PlayerComponent implements OnChanges {
             this.changeDetectorRef.detectChanges();
         });
         this.audioPlayer.end.subscribe(() => {
-            //TODO should be handled directly
             if (this.loopActivated) {
                 this.play(0);
 
@@ -147,11 +148,9 @@ export class PlayerComponent implements OnChanges {
     }
 
 
-    public onSolo(track: StemPlayerComponent) {
-        if (this.trackComponents) {
-            for (let trackComponent of this.trackComponents) {
-                trackComponent.mute(track != trackComponent);
-            }
+    public onSolo(stem: StemPlayerComponent) {
+        for (let stemPlayerComponent of this.stemPlayerComponents) {
+            stemPlayerComponent.mute(stem !== stemPlayerComponent);
         }
     }
 
