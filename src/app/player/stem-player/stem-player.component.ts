@@ -44,9 +44,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     muted: boolean = false;
     volume: number = PlayerComponent.DEFAULT_STEM_VOLUME;
 
-    constructor(private audioPlayer: AudioPlayerService) {
-        console.log(this.volume);
-    }
+    constructor(private audioPlayer: AudioPlayerService) {}
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['url']) {

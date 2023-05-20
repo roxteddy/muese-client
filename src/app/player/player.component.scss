@@ -221,12 +221,12 @@
                                 display: flex;
                                 flex-direction: row;
                                 align-items: flex-start;
-                                padding: 12px;
+                                padding: 12px 0;
                                 gap: 10px;
 
                                 .text {
-                                    width: 23px;
                                     height: 20px;
+                                    margin: 0 auto;
 
                                     font-style: normal;
                                     font-weight: 400;

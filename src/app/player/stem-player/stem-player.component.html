@@ -23,10 +23,11 @@
                 </button>
             </div>
             <app-ui-progress-bar
+                [emitSeekOnDrag]="true"
+                [emitSeekOnWheel]="true"
                 [faded]="muted"
                 [hasButton]="true"
                 [seek]="volume"
-                [emitSeekOnDrag]="true"
                 (progress)="onVolumeProgress($event)"
             ></app-ui-progress-bar>
         </div>

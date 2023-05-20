@@ -90,7 +90,7 @@ export class PlayerComponent implements OnChanges {
                 return '??';
             case -1:
                 // return "--";
-                return this.speed.toFixed(1) + 'x';
+                return this.speed.toFixed(2) + 'x';
             default:
                 return Math.round(bpm * this.speed).toString();
         }
@@ -170,7 +170,7 @@ export class PlayerComponent implements OnChanges {
             let bpmMax = this.track?.bpm * 4;
             granularity = 3.5 / (bpmMax - bpmMin);
         } else {
-            granularity = 0.1;
+            granularity = 0.05;
         }
         let speed = this.speed += granularity * direction;
         this.setSpeed(speed);

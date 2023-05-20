@@ -85,6 +85,7 @@
 
                 <app-ui-progress-bar
                     [emitSeekOnDrag]="true"
+                    [emitSeekOnWheel]="true"
                     [hasButton]="true"
                     [seek]="volume"
                     (progress)="onVolumeProgress($event)"
@@ -95,6 +96,7 @@
             <div class="timer">{{duration * progress / speed | date: 'mm:ss'}}</div>
             <app-ui-progress-bar
                 [emitSeekOnDrag]="true"
+                [scrollGranularity]="duration ? (1000 / duration * 5) : 0"
                 [seek]="dragData ? dragData.progress : progress"
                 (progress)="onProgressBarChange($event)"
             ></app-ui-progress-bar>

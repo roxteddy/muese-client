@@ -11,12 +11,14 @@ export interface ProgressStatus {
     styleUrls: ['./progress-bar.component.scss']
 })
 export class ProgressBarComponent implements OnChanges {
-    @Input() dragged: boolean = false;
-    @Input() faded: boolean = false;
-    @Input() hasButton: boolean = false;
+    @Input() dragged = false;
+    @Input() emitSeekOnWheel = false;
+    @Input() emitSeekOnDrag = false;
+    @Input() faded = false;
+    @Input() hasButton = false;
     //TODO test if ok or need a subject
+    @Input() scrollGranularity = 0.05;
     @Input() seek?: number;
-    @Input() emitSeekOnDrag: boolean = false;
 
     @Output() progress: EventEmitter<ProgressStatus> = new EventEmitter<ProgressStatus>();
 
@@ -24,6 +26,7 @@ export class ProgressBarComponent implements OnChanges {
         rect: null,
         progress : 0
     };
+    wheeling = -1;
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['seek']) {
@@ -49,6 +52,41 @@ export class ProgressBarComponent implements OnChanges {
             }
         }
     }
+
+    @HostListener('wheel', ['$event'])
+    public onWheel(e: WheelEvent) {
+        e.preventDefault();
+        if (this.wheeling > -1) {
+            clearTimeout(this.wheeling);
+            this.wheeling = -1;
+        }
+        let progress = this.progressStatus.progress - e.deltaY * 0.01 * this.scrollGranularity;
+        if (progress < 0) {
+            progress = 0;
+        } else if (progress > 1) {
+            progress = 1;
+        }
+        this.progressStatus = {
+            ...this.progressStatus,
+            progress
+        }
+
+        if (!this.emitSeekOnWheel) {
+            this.wheeling = setTimeout(() => {
+                this.progressStatus = {
+                    ...this.progressStatus,
+                    rect: null
+                }
+                this.progress.emit(this.progressStatus);
+                this.wheeling = -1;
+            }, 150);
+            this.progressStatus.rect = (e.target as HTMLDivElement).getBoundingClientRect();
+        }
+
+        this.progress.emit(this.progressStatus);
+    }
+
+    @HostListener('wheelend')
 
     @HostListener('document:mousemove', ['$event'])
     public documentMouseMove(e: MouseEvent) {
