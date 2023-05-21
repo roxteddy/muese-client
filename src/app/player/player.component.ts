@@ -215,6 +215,7 @@ export class PlayerComponent implements OnChanges {
     }
 
     private seek(progress: number) {
+        this.progress = progress;
         this.audioPlayer.seek(progress);
     }
 
