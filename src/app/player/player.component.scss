@@ -329,6 +329,7 @@
                     app-ui-progress-bar {
                         display: block;
                         width: 100px;
+                        --drag-color: yellow;
                     }
                 }
             }
@@ -359,6 +360,7 @@
                 app-ui-progress-bar {
                     display: block;
                     height: 100%;
+                    --drag-color: yellow;
 
                     flex: none;
                     flex-grow: 1;

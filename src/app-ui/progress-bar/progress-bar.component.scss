@@ -1,3 +1,9 @@
+:host {
+    --this-color: var(--color, grey);
+    --this-progress-color: var(--progress-color, #5D5FEF);
+    --this-drag-color: var(--drag-color, blue);
+}
+
 .progress-bar {
     /* Level - TimeLine */
     width: 100%;
@@ -15,7 +21,7 @@
         height: 8px;
         margin-top: 4px;
         border-radius: 10px;
-        background-color: black;
+        background-color: var(--this-color);
         cursor: pointer;
 
         &.faded {
@@ -32,11 +38,11 @@
             left: 0;
             height: 100%;
             width: 0;
-            background-color: #5D5FEF;
+            background-color: var(--this-progress-color);
             border-radius: 10px;
 
             &.dragged {
-                background-color: blue;
+                background-color: var(--this-drag-color);
             }
         }
 
