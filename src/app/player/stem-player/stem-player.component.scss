@@ -135,6 +135,11 @@
                             display: block;
                             color: white;
                         }
+
+                        ::ng-deep .mat-mdc-button-touch-target {
+                            width: 24px;
+                            height: 24px;
+                        }
                     }
                 }
 
