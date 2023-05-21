@@ -1,15 +1,18 @@
 <div class="progress-bar">
-    <div #volumeContainer
+    <div #container
          class="progress-container"
          [ngClass]="{faded: faded, dragged: !!progressStatus.rect && !wheeling}"
-         (mousedown)="onMouseDown($event, volumeContainer)">
-        <div class="progress"
+         (mousedown)="onMouseDown($event, container)">
+        <div #progress class="progress"
              [ngClass]="{dragged: !!progressStatus.rect}"
-             [style.width.%]="progressStatus.progress * 100">
+             [style.transform]="'scaleX(' + progressStatus.progress + ')'">
+
         </div>
         <div *ngIf="hasButton"
+             #button
              class="button"
              [ngClass]="{dragged: !!progressStatus.rect && !wheeling}"
-             [style.left.px]="progressStatus.progress * volumeContainer.offsetWidth - 8"></div>
+             [style.transform]="'translateX(' + progressStatus.progress * container.offsetWidth + 'px)'"
+        ></div>
     </div>
 </div>

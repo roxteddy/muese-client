@@ -1,4 +1,12 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnChanges,
+    Output,
+    SimpleChanges
+} from '@angular/core';
 
 export interface ProgressStatus {
     rect: DOMRect | null,
@@ -86,8 +94,6 @@ export class ProgressBarComponent implements OnChanges {
         this.progress.emit(this.progressStatus);
     }
 
-    @HostListener('wheelend')
-
     @HostListener('document:mousemove', ['$event'])
     public documentMouseMove(e: MouseEvent) {
         if (this.progressStatus.rect) {
@@ -110,7 +116,6 @@ export class ProgressBarComponent implements OnChanges {
                 ...this.progressStatus,
                 rect: null
             }
-
             this.progress.emit(this.progressStatus);
         }
     }

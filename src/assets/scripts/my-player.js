@@ -14,7 +14,8 @@ class Stem {
 
 class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
 
-    //reset it on track change
+    PROGRESS_UPDATE_INTERVAL = 50;
+
     duration = 0;
     lastProgress = -1;
     stems = [];
@@ -247,7 +248,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 // Handle progress
                 if (!progressHandled) {
                     const newProgress = stem.player.getDisplayPositionMs();
-                    if (this.lastProgress < 0 || Math.abs(newProgress - this.lastProgress) >= 50) {
+                    if (this.lastProgress < 0 || !this.PROGRESS_UPDATE_INTERVAL || Math.abs(newProgress - this.lastProgress) >= this.PROGRESS_UPDATE_INTERVAL) {
                         this.sendMessageToMainScope({
                             type: 'progress',
                             progress: stem.player.getDisplayPositionPercent(),
