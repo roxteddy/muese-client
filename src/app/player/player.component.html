@@ -96,6 +96,7 @@
             <div class="timer">{{duration * progress / speed | date: 'mm:ss'}}</div>
             <app-ui-progress-bar
                 [emitSeekOnDrag]="true"
+                [hasButton]="true"
                 [scrollGranularity]="duration ? (1000 / duration * 5) : 0"
                 [seek]="dragData ? dragData.progress : progress"
                 (progress)="onProgressBarChange($event)"

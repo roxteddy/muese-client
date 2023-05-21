@@ -360,7 +360,12 @@
                 app-ui-progress-bar {
                     display: block;
                     height: 100%;
-                    --drag-color: yellow;
+                    --color: #DAC4CF;
+                    --drag-color: #f32071;
+                    --button-color: #FA5485;
+                    --button-border-style: solid;
+                    --button-border-color: #EAEEF4;
+                    --button-border-width: 2px;
 
                     flex: none;
                     flex-grow: 1;
