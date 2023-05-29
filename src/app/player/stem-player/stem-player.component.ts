@@ -140,7 +140,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
                 });
                 this.pathRef?.nativeElement?.setAttribute('d', newPath);
                 this.path2Ref?.nativeElement?.setAttribute('d', newPath);
-            });
+        });
     }
 
     private loadTrack(currentUrl: string) {

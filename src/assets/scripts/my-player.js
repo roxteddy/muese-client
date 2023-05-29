@@ -108,10 +108,12 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 false,
                 false
             );
+
             this.sendMessageToMainScope({
                 type: 'load',
                 name,
-                success: true
+                success: true,
+                analysis: this.analyze(decodedAudio)
             });
         } else {
             this.sendMessageToMainScope({
@@ -339,6 +341,47 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         if (!this.mixerBuffer2) {
             this.mixerBuffer2 = new this.Superpowered.Int32Buffer(bufferLength);
         }
+    }
+
+    analyze(pointerToAudioInMemory) {
+        const decoder = new this.Superpowered.Decoder();
+        const openErrorCode = decoder.openMemory(
+            pointerToAudioInMemory, // Pointer to information in Superpowered AudioInMemory format on the WebAssembly Linear Memory.
+            false    // If true, it opens the file for fast metadata reading only, not for decoding audio.
+        );
+        if (openErrorCode === this.Superpowered.Decoder.OpenSuccess) {
+            let analyzer = new this.Superpowered.Analyzer(
+                decoder.getSamplerate(), // The sample rate of the audio input.
+                decoder.getDurationSeconds()     // The length in seconds of the audio input. The analyzer will not be able to process more audio than this. You can change this value in the process() method.
+            );
+
+            const intBuffer = new this.Superpowered.Int16Buffer(
+                decoder.getFramesPerChunk() * 2 * 4 + 16384
+            )
+
+            const floatBuffer = new this.Superpowered.Float32Buffer(
+                decoder.getFramesPerChunk() * 2 * 4 + 16384
+            );
+
+            let framesDecoded = 1;
+            while (framesDecoded) {
+                framesDecoded = decoder.decodeAudio(intBuffer.pointer, decoder.getFramesPerChunk());
+                if (framesDecoded) {
+                    this.Superpowered.ShortIntToFloat(intBuffer.pointer, floatBuffer.pointer, framesDecoded, 2);
+                    analyzer.process(floatBuffer.pointer, framesDecoded);
+                }
+            }
+            // analyzer.process(pointerToAudioInMemory, decoder.getDurationFrames());
+            analyzer.makeResults(100, 200, 0, 0, true, false, false, false, true);
+            return {
+                bpm: analyzer.bpm,
+                keyIndex: analyzer.keyIndex
+            }
+        }
+
+        // return {
+        //     pointer,
+        // }
     }
 }
 

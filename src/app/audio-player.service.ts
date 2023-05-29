@@ -104,7 +104,8 @@ export class AudioPlayerService {
                 let blob = event.body;
                 if (blob) {
                     const arrayBuffer = await blob.arrayBuffer();
-                    await this.load(name, arrayBuffer);this.progress.next(0);
+                    console.log(await this.load(name, arrayBuffer));
+                    this.progress.next(0);
                     return {
                         type: HttpEventType.Response,
                         arrayBuffer
@@ -120,7 +121,7 @@ export class AudioPlayerService {
         }));
     }
 
-    load(name: string, arrayBuffer: ArrayBuffer): Promise<void> {
+    load(name: string, arrayBuffer: ArrayBuffer): Promise<any> {
         const type = 'load';
         return new Promise((resolve, reject) => {
             this.playerProcessor?.sendMessageToAudioScope({
@@ -130,7 +131,7 @@ export class AudioPlayerService {
             });
             this.messageSubject
                 .pipe(first(msg => msg.type === type && msg.name === name))
-                .subscribe((msg) => msg.success ? resolve() : reject());
+                .subscribe((msg) => msg.success ? resolve(msg.analysis) : reject());
         });
     }
 
