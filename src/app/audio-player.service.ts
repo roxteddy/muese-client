@@ -209,7 +209,7 @@ export class AudioPlayerService {
         this.webaudioManager = new SuperpoweredWebAudio(44100, this.superpowered);
         console.log(this.webaudioManager);
         this.playerProcessor = await this.webaudioManager.createAudioNodeAsync(
-                'https://muese.servehttp.com:4200/assets/scripts/my-player.js',
+                'assets/scripts/my-player.js',
                 'MyPlayer',
                 (msg: any) => this.messageSubject.next(msg));
         this.playerProcessor.connect(this.webaudioManager.audioContext.destination);
