@@ -113,7 +113,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 type: 'load',
                 name,
                 success: true,
-                analysis: this.analyze(decodedAudio)
+                //analysis: this.analyze(decodedAudio)
             });
         } else {
             this.sendMessageToMainScope({
