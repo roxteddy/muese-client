@@ -6,23 +6,7 @@ import { TrackUploadComponent } from './track-upload/track-upload.component';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AudioPlayerService } from './audio-player.service';
-
-export enum TrackStatus {
-    IDLE,
-    QUEUED,
-    PROCESSING,
-    READY,
-    ERROR,
-}
-export interface Track {
-    id: number
-    title: string
-    artist: string
-    filename: string
-    duration: number
-    bpm: number
-    status: TrackStatus
-}
+import { Track, TrackStatus } from '../model/track';
 
 export const SERVER_URL = 'https://roxteddy.noip.me:3000';
 
@@ -120,7 +104,7 @@ export class AppComponent implements OnInit {
 
     private getTracks(): void {
         this.loading = true;
-        this.http.get<Track[]>(`${SERVER_URL}/song`)
+        this.http.get<Track[]>(`${SERVER_URL}/track`)
             .pipe(delay(1000))
             .subscribe((tracks) => {
             this.tracks = tracks;

@@ -7,12 +7,18 @@ import {
     OnChanges, Output,
     SimpleChanges, ViewChildren
 } from '@angular/core';
-import { SERVER_URL, Track } from '../app.component';
 import { StemPlayerComponent } from './stem-player/stem-player.component';
 import { DragData } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressStatus } from '../../app-ui/progress-bar/progress-bar.component';
 import { AudioPlayerService } from '../audio-player.service';
+import { Track } from '../../model/track';
+import { Stem, StemType } from '../../model/stem';
+
+export interface StemPlayer {
+    loaded?: boolean
+    stem?: Stem
+}
 
 @Component({
   selector: 'app-player',
@@ -35,13 +41,20 @@ export class PlayerComponent implements OnChanges {
     loopActivated = false;
     paused = true;
     progress = 0;
-    tracksReady = 0;
+    ready = false;
     shuffleActivated: boolean = false;
     speed: number = 1;
     volume: number = 0.75;
     pitch: number = 0;
 
-    firstLoad: boolean = true;
+    stemPlayers: {[key: string]: StemPlayer} = {
+        Drums: {},
+        Piano: {},
+        Bass: {},
+        Vocals: {},
+        Other: {}
+    }
+
 
     constructor(private readonly audioPlayer: AudioPlayerService,
                 private readonly changeDetectorRef: ChangeDetectorRef,
@@ -63,11 +76,9 @@ export class PlayerComponent implements OnChanges {
             }
         });
         this.audioPlayer.isInitialized().then(() => {
-            this.audioPlayer.create("Drums");
-            this.audioPlayer.create("Piano");
-            this.audioPlayer.create("Bass");
-            this.audioPlayer.create("Vocals");
-            this.audioPlayer.create("Other");
+            for (let key of Object.keys(this.stemPlayers)) {
+                this.audioPlayer.create(key);
+            }
         });
     }
 
@@ -76,7 +87,17 @@ export class PlayerComponent implements OnChanges {
             this.duration = 0;
             this.paused = true;
             this.progress = 0;
-            this.tracksReady = 0;
+            this.ready = false;
+            for (let key of Object.keys(this.stemPlayers)) {
+                let stem;
+                if (this.track) {
+                    stem = this.track.stems.find(stem => stem.type === PlayerComponent.getStemType(key));
+                }
+                this.stemPlayers[key] = {
+                    loaded: false,
+                    stem
+                }
+            }
             this.speed = 1;
             this.pitch = 0;
             this.audioPlayer.finish();
@@ -94,26 +115,6 @@ export class PlayerComponent implements OnChanges {
             default:
                 return Math.round(bpm * this.speed).toString();
         }
-    }
-
-    public getDrumsUrl(): string {
-        return `${SERVER_URL}/music/output/${this.track?.filename}/drums.mp3`;
-    }
-
-    public getPianoUrl(): string {
-        return `${SERVER_URL}/music/output/${this.track?.filename}/piano.mp3`;
-    }
-
-    public getBassUrl(): string {
-        return `${SERVER_URL}/music/output/${this.track?.filename}/bass.mp3`;
-    }
-
-    public getVocalsUrl(): string {
-        return `${SERVER_URL}/music/output/${this.track?.filename}/vocals.mp3`;
-    }
-
-    public getOtherUrl(): string {
-        return `${SERVER_URL}/music/output/${this.track?.filename}/other.mp3`;
     }
 
     public onDragEvent(dragData: DragData | null) {
@@ -185,12 +186,11 @@ export class PlayerComponent implements OnChanges {
         this.seek(progress);
     }
 
-    public onTrackLoaded() {
-        if (this.firstLoad) {
-            this.firstLoad = false;
-        }
-        this.tracksReady += 1;
-        if (this.tracksReady >= 5 && this.autoplay) {
+    public onTrackLoaded(stemName: string) {
+        this.stemPlayers[stemName].loaded = true;
+        this.ready = Object.values(this.stemPlayers).every(player => player.loaded);
+
+        if (this.ready && this.autoplay) {
             this.autoplay = false;
             this.play(0);
         }
@@ -201,7 +201,7 @@ export class PlayerComponent implements OnChanges {
     }
 
     public playPause(): void {
-        if (this.tracksReady >= 5)
+        if (this.ready)
             //TODO we could used a timed play if sync issues
             this.paused ? this.play() : this.pause();
     }
@@ -212,6 +212,30 @@ export class PlayerComponent implements OnChanges {
         if (e.code == 'Space' && !this.matDialog.openDialogs.length) {
             this.playPause();
         }
+    }
+
+    private static getStemType(stemName: string): StemType | undefined {
+        let type: StemType;
+        switch (stemName) {
+            case 'Drums':
+                type = StemType.DRUMS;
+                break;
+            case 'Piano':
+                type = StemType.PIANO;
+                break;
+            case 'Bass':
+                type = StemType.BASS;
+                break;
+            case 'Vocals':
+                type = StemType.VOCALS;
+                break;
+            case 'Other':
+                type = StemType.OTHER;
+                break;
+            default:
+                return undefined;
+        }
+        return type;
     }
 
     private seek(progress: number) {
@@ -241,4 +265,7 @@ export class PlayerComponent implements OnChanges {
         this.volume = volume;
         this.audioPlayer.setVolume(volume);
     }
+
+    protected readonly StemType = StemType;
+    protected readonly Object = Object;
 }

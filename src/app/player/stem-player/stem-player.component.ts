@@ -16,6 +16,8 @@ import { DragData } from '../../app.module';
 import { ProgressStatus } from '../../../app-ui/progress-bar/progress-bar.component';
 import { AudioPlayerService } from '../../audio-player.service';
 import { PlayerComponent } from '../player.component';
+import { Stem } from '../../../model/stem';
+import { SERVER_URL } from '../../app.component';
 
 declare function linearPath(audioBuffer: AudioBuffer, options: {}): any;
 
@@ -30,8 +32,9 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
 
     @Input() dragData: DragData | null = null;
     @Input() progress = 0;
+    @Input() stem: Stem | undefined;
     @Input() title = '';
-    @Input() url: string = '';
+    @Input() trackFilename: string = '';
 
     @Output() dragStatus = new EventEmitter<DragData | null>();
     @Output() loaded = new EventEmitter<void>();
@@ -47,7 +50,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     constructor(private audioPlayer: AudioPlayerService) {}
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['url']) {
+        if (changes['stem']) {
             this.loading = true;
             this.currentTime = 0;
             this.muted = false;
@@ -56,7 +59,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
             this.path2Ref?.nativeElement?.setAttribute('d', '');
             this.loadingSubscription?.unsubscribe();
 
-            this.loadTrack(changes['url'].currentValue);
+            this.loadTrack(changes['stem'].currentValue);
         }
     }
 
@@ -117,10 +120,10 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
         this.solo.emit(this);
     }
 
-    private analyzeTrack(arrayBuffer: ArrayBuffer, currentUrl: string) {
+    private analyzeTrack(arrayBuffer: ArrayBuffer, currentStem: Stem) {
         this.audioPlayer.getContext()?.decodeAudioData(arrayBuffer).then(
             (audioBuffer) => {
-                if (currentUrl !== this.url)
+                if (currentStem !== this.stem)
                     return;
 
                 const left = audioBuffer.getChannelData(0);
@@ -143,11 +146,12 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
         });
     }
 
-    private loadTrack(currentUrl: string) {
+    private loadTrack(currentStem: Stem) {
         this.audioPlayer.isInitialized().then(() => {
-            if (currentUrl === this.url) {
+            if (currentStem === this.stem && this.stem) {
+                const url = `${SERVER_URL}/music/output/${this.trackFilename}/${this.stem.filename}`
                 this.setVolume(PlayerComponent.DEFAULT_STEM_VOLUME);
-                this.loadingSubscription = this.audioPlayer.loadFromUrl(this.title, this.url).subscribe({
+                this.loadingSubscription = this.audioPlayer.loadFromUrl(this.title, url).subscribe({
                     next: (v) => {
                         if (v.type === HttpEventType.DownloadProgress && typeof v.progress !== 'undefined') {
                             this.progress = v.progress;
@@ -157,7 +161,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
                             this.loaded.emit();
                             this.progress = 0;
 
-                            this.analyzeTrack(v.arrayBuffer, currentUrl);
+                            this.analyzeTrack(v.arrayBuffer, currentStem);
                         }
                     },error: (e) => {
                         this.loading = false;

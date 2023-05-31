@@ -72,7 +72,7 @@
                         (click)="onPrev()">
                     <mat-icon>skip_previous</mat-icon>
                 </button>
-                <button mat-fab id="play-button" (click)="playPause()" [disabled]="tracksReady < 5">
+                <button mat-fab id="play-button" (click)="playPause()" [disabled]="!ready">
                     <mat-icon>{{paused ? 'play_arrow' : 'pause'}}</mat-icon>
                 </button>
                 <button mat-icon-button
@@ -107,54 +107,16 @@
     </div>
 </div>
 <div class="tracks">
-    <app-stem-player
+    <app-stem-player *ngFor="let key of Object.keys(stemPlayers)"
         [dragData]="dragData"
         [progress]="progress"
-        [title]="'Drums'"
-        [url]="getDrumsUrl()"
+        [stem]="stemPlayers[key].stem"
+        [title]="key"
+        [trackFilename]="track?.filename || ''"
         (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded()"
+        (loaded)="onTrackLoaded(key)"
         (progressChange)="onProgressChange($event)"
-        (solo)="onSolo($event)">
-    </app-stem-player>
-    <app-stem-player
-        [dragData]="dragData"
-        [progress]="progress"
-        [title]="'Piano'"
-        [url]="getPianoUrl()"
-        (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded()"
-        (progressChange)="onProgressChange($event)"
-        (solo)="onSolo($event)">
-    </app-stem-player>
-    <app-stem-player
-        [dragData]="dragData"
-        [progress]="progress"
-        [title]="'Bass'"
-        [url]="getBassUrl()"
-        (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded()"
-        (progressChange)="onProgressChange($event)"
-        (solo)="onSolo($event)">
-    </app-stem-player>
-    <app-stem-player
-        [dragData]="dragData"
-        [progress]="progress"
-        [title]="'Vocals'"
-        [url]="getVocalsUrl()"
-        (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded()"
-        (progressChange)="onProgressChange($event)"
-        (solo)="onSolo($event)">
-    </app-stem-player>
-    <app-stem-player
-        [dragData]="dragData"
-        [progress]="progress"
-        [title]="'Other'"
-        [url]="getOtherUrl()"
-        (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded()"
-        (progressChange)="onProgressChange($event)"
-        (solo)="onSolo($event)">
+        (solo)="onSolo($event)"
+    >
     </app-stem-player>
 </div>
