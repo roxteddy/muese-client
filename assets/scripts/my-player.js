@@ -113,7 +113,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 type: 'load',
                 name,
                 success: true,
-                analysis: this.analyze(decodedAudio)
+                //analysis: this.analyze(decodedAudio)
             });
         } else {
             this.sendMessageToMainScope({
@@ -287,7 +287,7 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 buffersize
             );
 
-            if (this.stems.length > 3) {
+            if (this.stems.length > 4) {
                 this.mixer.process(
                     this.stems[4]?.buffer?.pointer || 0,
                     this.stems[5]?.buffer?.pointer || 0,
