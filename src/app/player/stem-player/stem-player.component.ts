@@ -31,6 +31,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     @ViewChild('path2') path2Ref?: ElementRef;
 
     @Input() dragData: DragData | null = null;
+    @Input() iconName = '';
     @Input() progress = 0;
     @Input() stem: Stem | undefined;
     @Input() title = '';

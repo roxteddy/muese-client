@@ -109,6 +109,7 @@
 <div class="tracks">
     <app-stem-player *ngFor="let key of Object.keys(stemPlayers)"
         [dragData]="dragData"
+        [iconName]="stemPlayers[key].iconName"
         [progress]="progress"
         [stem]="stemPlayers[key].stem"
         [title]="key"

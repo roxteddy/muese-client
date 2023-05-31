@@ -16,6 +16,7 @@ import { Track } from '../../model/track';
 import { Stem, StemType } from '../../model/stem';
 
 export interface StemPlayer {
+    iconName: string
     loaded?: boolean
     stem?: Stem
 }
@@ -48,11 +49,21 @@ export class PlayerComponent implements OnChanges {
     pitch: number = 0;
 
     stemPlayers: {[key: string]: StemPlayer} = {
-        Drums: {},
-        Piano: {},
-        Bass: {},
-        Vocals: {},
-        Other: {}
+        Drums: {
+            iconName: 'drums'
+        },
+        Piano: {
+            iconName: 'piano'
+        },
+        Bass: {
+            iconName: 'bass'
+        },
+        Vocals: {
+            iconName: 'vocals'
+        },
+        Other: {
+            iconName: 'other'
+        }
     }
 
 
@@ -94,6 +105,7 @@ export class PlayerComponent implements OnChanges {
                     stem = this.track.stems.find(stem => stem.type === PlayerComponent.getStemType(key));
                 }
                 this.stemPlayers[key] = {
+                    ...this.stemPlayers[key],
                     loaded: false,
                     stem
                 }
