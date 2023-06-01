@@ -338,17 +338,16 @@
                     flex-direction: row;
                     justify-content: flex-end;
                     align-items: center;
-                    padding: 0px;
+                    padding: 0;
                     gap: 8px;
-
-                    mat-icon {
-
-                    }
 
                     app-ui-progress-bar {
                         display: block;
                         width: 100px;
-                        --drag-color: yellow;
+                        --color: #A5A6F6;
+                        --button-color: #5D5FEF;
+                        --drag-color: #5D5FEF;
+                        --progress-color: #5D5FEF;
                     }
                 }
             }
