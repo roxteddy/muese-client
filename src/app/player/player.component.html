@@ -107,17 +107,19 @@
     </div>
 </div>
 <div class="tracks">
-    <app-stem-player *ngFor="let key of Object.keys(stemPlayers)"
+    <app-stem-player
+        *ngFor="let key of Object.keys(stemPlayers)"
         [dragData]="dragData"
         [iconName]="stemPlayers[key].iconName"
         [progress]="progress"
+        [soloMode]="soloMode"
         [stem]="stemPlayers[key].stem"
         [title]="key"
         [trackFilename]="track?.filename || ''"
         (dragStatus)="onDragEvent($event)"
         (loaded)="onTrackLoaded(key)"
         (progressChange)="onProgressChange($event)"
-        (solo)="onSolo($event)"
+        (clickSolo)="onSolo($event)"
     >
     </app-stem-player>
 </div>

@@ -43,6 +43,7 @@ export class PlayerComponent implements OnChanges {
     paused = true;
     progress = 0;
     ready = false;
+    soloMode: StemPlayerComponent[] = [];
     shuffleActivated: boolean = false;
     speed: number = 1;
     volume: number = 0.75;
@@ -99,6 +100,7 @@ export class PlayerComponent implements OnChanges {
             this.paused = true;
             this.progress = 0;
             this.ready = false;
+            this.soloMode = [];
             for (let key of Object.keys(this.stemPlayers)) {
                 let stem;
                 if (this.track) {
@@ -162,8 +164,13 @@ export class PlayerComponent implements OnChanges {
 
 
     public onSolo(stem: StemPlayerComponent) {
-        for (let stemPlayerComponent of this.stemPlayerComponents) {
-            stemPlayerComponent.mute(stem !== stemPlayerComponent);
+        // for (let stemPlayerComponent of this.stemPlayerComponents) {
+        //     stemPlayerComponent.mute(stem !== stemPlayerComponent);
+        // }
+        if (this.soloMode.find(s => s === stem)) {
+            this.soloMode = this.soloMode.filter(s => s != stem);
+        } else {
+            this.soloMode = [...this.soloMode, stem];
         }
     }
 

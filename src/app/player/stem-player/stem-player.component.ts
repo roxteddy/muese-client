@@ -33,6 +33,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     @Input() dragData: DragData | null = null;
     @Input() iconName = '';
     @Input() progress = 0;
+    @Input() soloMode: StemPlayerComponent[] = [];
     @Input() stem: Stem | undefined;
     @Input() title = '';
     @Input() trackFilename: string = '';
@@ -40,13 +41,14 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     @Output() dragStatus = new EventEmitter<DragData | null>();
     @Output() loaded = new EventEmitter<void>();
     @Output() progressChange = new EventEmitter<number>();
-    @Output() solo = new EventEmitter<StemPlayerComponent>();
+    @Output() clickSolo = new EventEmitter<StemPlayerComponent>();
 
     currentTime: number = 0
-    loading: boolean = false;
+    loading = false;
     loadingSubscription?: Subscription;
-    muted: boolean = false;
-    volume: number = PlayerComponent.DEFAULT_STEM_VOLUME;
+    muted = false;
+    solo = false;
+    volume = PlayerComponent.DEFAULT_STEM_VOLUME;
 
     constructor(private audioPlayer: AudioPlayerService) {}
 
@@ -62,19 +64,27 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
 
             this.loadTrack(changes['stem'].currentValue);
         }
+        if (changes['soloMode']) {
+            this.solo = this.soloMode.includes(this);
+            this.mute(this.muted);
+        }
     }
 
     ngOnDestroy() {
         this.loadingSubscription?.unsubscribe();
     }
 
-    public mute(muted?: boolean) {
+    public onMute(muted?: boolean) {
         if (typeof muted === 'undefined') {
             this.muted = !this.muted;
         } else {
             this.muted = muted;
         }
-        this.audioPlayer.mute(this.title, this.muted);
+        if (this.muted && this.solo) {
+            this.clickSolo.emit(this);
+        } else {
+            this.mute(this.muted);
+        }
     }
 
     public onCanvasMouseDown(e: MouseEvent, container: HTMLDivElement) {
@@ -118,7 +128,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     }
 
     public onSolo() {
-        this.solo.emit(this);
+        this.clickSolo.emit(this);
     }
 
     private analyzeTrack(arrayBuffer: ArrayBuffer, currentStem: Stem) {
@@ -171,6 +181,10 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
                     }});
             }
         });
+    }
+
+    private mute(muted: boolean) {
+        this.audioPlayer.mute(this.title, !this.solo && (muted || this.soloMode.length != 0));
     }
 
     private setVolume(volume: number) {

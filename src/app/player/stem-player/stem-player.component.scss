@@ -116,17 +116,22 @@
                         flex-grow: 0;
 
                         box-shadow: none;
-                        background-color: #5D5FEF;
+                        background-color: black;
                         color: white;
 
                         &.mute {
                             top: 0;
-                            &.muted {
-                                background-color: black;
-                            }
                         }
                         &.solo {
                             bottom: 0;
+                        }
+
+                        &.active {
+                            background-color: red;
+                        }
+
+                        &.dimmed {
+                            background-color: pink;
                         }
 
                         mat-icon {

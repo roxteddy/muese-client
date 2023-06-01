@@ -8,12 +8,14 @@
                 <div class="small-buttons">
                     <button mat-mini-fab
                             class="mute"
-                            [class.muted]="muted"
-                            (click)="mute()">
+                            [class.active]="muted && !solo"
+                            [class.dimmed]="muted && solo"
+                            (click)="onMute()">
                         <mat-icon svgIcon="m"></mat-icon>
                     </button>
                     <button mat-mini-fab
                             class="solo"
+                            [class.active]="solo"
                             (click)="onSolo()">
                         <mat-icon svgIcon="s"></mat-icon>
                     </button>
