@@ -11,40 +11,46 @@
                 <ng-template #trackDetail
                              let-label="label"
                              let-showButtons="showButtons"
-                             let-disableButtons="disableButtons"
+                             let-disableMinButton="disableMinButton"
+                             let-disablePlusButton="disablePlusButton"
                              let-value="value">
                     <div class="track-detail">
                         <div class="label">{{label}}</div>
                         <div class="value-wrapper">
-                            <div *ngIf="showButtons"
-                                 class="btn-min"
-                                 [ngClass]="{disabled: disableButtons}"
-                                 (click)="onButtonClick(label, -1)">−</div>
+                            <button *ngIf="showButtons"
+                                    class="btn-min"
+                                    mat-icon-button
+                                    [disabled]="disableMinButton"
+                                    (click)="onButtonClick(label, -1)">
+                                <mat-icon>remove</mat-icon>
+                            </button>
                             <div class="value"><div class="text">{{value}}</div></div>
-                            <div *ngIf="showButtons"
-                                 class="btn-plus"
-                                 [ngClass]="{disabled: disableButtons}"
-                                 (click)="onButtonClick(label, 1)">&#43;</div>
+                            <button *ngIf="showButtons"
+                                    class="btn-plus"
+                                    mat-icon-button
+                                    [disabled]="disablePlusButton"
+                                    (click)="onButtonClick(label, 1)">
+                                <mat-icon>add</mat-icon>
+                            </button>
                         </div>
+                        <div class="reset" (click)="onReset(label)">reset</div>
                     </div>
                 </ng-template>
                 <ng-container  [ngTemplateOutlet]="trackDetail"
                                [ngTemplateOutletContext]="{
-                                    label: 'Signature',
-                                    showButtons: false,
-                                    value: '4/4'}">
+                                   disableMinButton: speed <= SPEED_MIN,
+                                   disablePlusButton: speed >= SPEED_MAX,
+                                   label: 'BPM',
+                                   showButtons: true,
+                                   value: getBPMValue(track)}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="trackDetail"
                                [ngTemplateOutletContext]="{
-                                    label: 'BPM',
-                                    showButtons: true,
-                                    value: getBPMValue(track)}">
-                </ng-container>
-                <ng-container  [ngTemplateOutlet]="trackDetail"
-                               [ngTemplateOutletContext]="{
-                                    label: 'Key',
-                                    showButtons: true,
-                                    value: pitch}">
+                                   disableMinButton: pitch <= PITCH_MIN,
+                                   disablePlusButton: pitch >= PITCH_MAX,
+                                   label: 'Key',
+                                   showButtons: true,
+                                   value: pitch}">
                 </ng-container>
             </div>
         </div>

@@ -19,7 +19,6 @@ import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
   providedIn: 'root'
 })
 export class AudioPlayerService {
-
     public duration = new Subject<number>();
     public progress = new Subject<number>();
     public end = new Subject<void>();

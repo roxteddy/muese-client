@@ -43,8 +43,7 @@
             }
 
             .content {
-                width: 456px;
-                height: 180px;
+                width: 100%;
 
                 /* Auto layout */
                 display: flex;
@@ -124,8 +123,7 @@
                 }
 
                 .detail {
-                    width: 456px;
-                    height: 80px;
+                    width: 100%;
 
                     /* Auto layout */
                     display: flex;
@@ -141,8 +139,6 @@
                     flex-grow: 1;
 
                     .track-detail {
-                        height: 80px;
-
                         /* Auto layout */
                         display: flex;
                         flex-direction: column;
@@ -157,9 +153,10 @@
                         flex-grow: 0;
 
                         .label {
-                            width: 50px;
+                            width: 100%;
                             height: 15px;
 
+                            text-align: center;
                             font-style: normal;
                             font-weight: 700;
                             font-size: 12px;
@@ -176,7 +173,7 @@
                             display: flex;
                             flex-direction: row;
                             align-items: center;
-                            padding: 0px;
+                            padding: 0;
                             gap: 4px;
 
                             /* Inside auto layout */
@@ -184,45 +181,41 @@
                             flex-grow: 0;
 
                             .btn-min, .btn-plus {
-                                width: 23px;
-                                height: 36px;
-                                box-sizing: border-box;
-                                cursor: pointer;
-
-                                background: #0D0D0D;
+                                width: 24px;
+                                height: 24px;
+                                padding: 0;
+                                background: #5D5FEF;
                                 color: #FFFFFF;
-                                border-radius: 8px;
-
-                                /* Auto layout */
-                                display: flex;
-                                flex-direction: row;
-                                align-items: flex-start;
-                                padding: 8px;
-                                gap: 10px;
 
                                 /* Inside auto layout */
                                 flex: none;
                                 flex-grow: 0;
 
-                                &.disabled {
-                                    background-color: grey;
-                                    cursor: default;
+                                &[disabled] {
+                                    background-color: transparent;
+                                    border: 1px solid #0D0D0D;
+                                    color: #0D0D0D;
+
+                                    .mat-icon {
+                                        margin: -1px 0 0 -1px;
+                                    }
+                                }
+
+                                .mat-icon {
+                                    transform: scale(0.66);
                                 }
                             }
 
                             .value {
                                 width: 47px;
-                                height: 44px;
+                                height: 36px;
                                 box-sizing: border-box;
                                 background: #FFFFFF;
                                 border-radius: 8px;
 
-                                /* Auto layout */
                                 display: flex;
-                                flex-direction: row;
-                                align-items: flex-start;
-                                padding: 12px 0;
-                                gap: 10px;
+                                justify-content: center;
+                                align-items: center;
 
                                 .text {
                                     height: 20px;
@@ -239,15 +232,25 @@
                                     /* Back to Black */
 
                                     color: #0D0D0D;
-
-
-                                    /* Inside auto layout */
-
-                                    flex: none;
-                                    order: 0;
-                                    flex-grow: 0;
                                 }
                             }
+                        }
+
+                        .reset {
+                            width: 100%;
+                            height: 15px;
+                            cursor: pointer;
+
+                            text-align: center;
+                            font-style: normal;
+                            font-weight: 400;
+                            font-size: 12px;
+                            line-height: 15px;
+                            /* identical to box height */
+
+                            /* Inside auto layout */
+                            flex: none;
+                            flex-grow: 0;
                         }
                     }
                 }

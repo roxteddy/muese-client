@@ -27,7 +27,13 @@ export interface StemPlayer {
   styleUrls: ['./player.component.scss']
 })
 export class PlayerComponent implements OnChanges {
-    static DEFAULT_STEM_VOLUME = 0.75;
+    static readonly DEFAULT_PITCH = 0;
+    static readonly DEFAULT_SPEED = 1;
+    static readonly DEFAULT_VOLUME = 0.75;
+    public readonly PITCH_MIN = -12;
+    public readonly PITCH_MAX = 12;
+    public readonly SPEED_MIN = 0.5;
+    public readonly SPEED_MAX = 2;
 
     @ViewChildren(StemPlayerComponent) stemPlayerComponents: StemPlayerComponent[] = [];
 
@@ -45,9 +51,9 @@ export class PlayerComponent implements OnChanges {
     ready = false;
     soloMode: StemPlayerComponent[] = [];
     shuffleActivated: boolean = false;
-    speed: number = 1;
-    volume: number = 0.75;
-    pitch: number = 0;
+    speed: number = PlayerComponent.DEFAULT_SPEED;
+    volume: number = PlayerComponent.DEFAULT_VOLUME;
+    pitch: number = PlayerComponent.DEFAULT_PITCH;
 
     stemPlayers: {[key: string]: StemPlayer} = {
         Drums: {
@@ -112,8 +118,8 @@ export class PlayerComponent implements OnChanges {
                     stem
                 }
             }
-            this.speed = 1;
-            this.pitch = 0;
+            this.speed = PlayerComponent.DEFAULT_SPEED;
+            this.pitch = PlayerComponent.DEFAULT_PITCH;
             this.audioPlayer.finish();
         }
     }
@@ -177,9 +183,10 @@ export class PlayerComponent implements OnChanges {
     public onButtonClick(type: string, direction: -1 | 1): void {
         switch (type) {
             case 'BPM':
-                return this.onBPMChange(direction);
+                this.onBPMChange(direction);
+                break;
             case 'Key':
-                return this.onPitchChange(direction);
+                this.onPitchChange(direction);
         }
     }
 
@@ -192,17 +199,25 @@ export class PlayerComponent implements OnChanges {
         } else {
             granularity = 0.05;
         }
-        let speed = this.speed += granularity * direction;
-        this.setSpeed(speed);
+        this.setSpeed(this.speed + granularity * direction);
     }
 
     private onPitchChange(direction: -1 | 1): void {
-        this.pitch += direction;
-        this.setPitch(this.pitch * 100);
+        this.setPitch(this.pitch + direction);
     }
 
     public onProgressChange(progress: number) {
         this.seek(progress);
+    }
+
+    public onReset(type: string) {
+        switch (type) {
+            case 'BPM':
+                this.setSpeed(PlayerComponent.DEFAULT_SPEED);
+                break;
+            case 'Key':
+                this.setPitch(PlayerComponent.DEFAULT_PITCH);
+        }
     }
 
     public onTrackLoaded(stemName: string) {
@@ -263,10 +278,12 @@ export class PlayerComponent implements OnChanges {
     }
 
     private setPitch(pitch: number) {
-        this.audioPlayer.setPitch(pitch);
+        this.pitch = pitch;
+        this.audioPlayer.setPitch(pitch * 100);
     }
 
     private setSpeed(speed: number) {
+        this.speed = speed;
         this.audioPlayer.setSpeed(speed);
     }
 

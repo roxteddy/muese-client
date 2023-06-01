@@ -48,7 +48,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     loadingSubscription?: Subscription;
     muted = false;
     solo = false;
-    volume = PlayerComponent.DEFAULT_STEM_VOLUME;
+    volume = PlayerComponent.DEFAULT_VOLUME;
 
     constructor(private audioPlayer: AudioPlayerService) {}
 
@@ -161,7 +161,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
         this.audioPlayer.isInitialized().then(() => {
             if (currentStem === this.stem && this.stem) {
                 const url = `${SERVER_URL}/music/output/${this.trackFilename}/${this.stem.filename}`
-                this.setVolume(PlayerComponent.DEFAULT_STEM_VOLUME);
+                this.setVolume(PlayerComponent.DEFAULT_VOLUME);
                 this.loadingSubscription = this.audioPlayer.loadFromUrl(this.title, url).subscribe({
                     next: (v) => {
                         if (v.type === HttpEventType.DownloadProgress && typeof v.progress !== 'undefined') {
