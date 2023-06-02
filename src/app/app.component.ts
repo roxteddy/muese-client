@@ -111,7 +111,7 @@ export class AppComponent implements OnInit {
             this.loading = false;
 
             if (this.selectedTrack) {
-                this.selectedTrack = this.tracks.find(track => track.id === this.selectedTrack?.id);
+                this.selectedTrack = this.tracks.find(track => track.filename === this.selectedTrack?.filename);
             } else {
                 let availableTracks = this.getAvailableTracks();
                 if (availableTracks.length) {

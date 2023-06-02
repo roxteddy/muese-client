@@ -1,14 +1,18 @@
 import {
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
-    ElementRef, EventEmitter,
+    ElementRef,
+    EventEmitter,
     HostListener,
     Input,
-    OnChanges, Output,
-    SimpleChanges, ViewChildren
+    OnChanges,
+    Output,
+    SimpleChanges,
+    ViewChildren
 } from '@angular/core';
 import { StemPlayerComponent } from './stem-player/stem-player.component';
-import { DragData } from '../app.module';
+import { DragData, musicalChordNames } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
 import { ProgressStatus } from '../../app-ui/progress-bar/progress-bar.component';
 import { AudioPlayerService } from '../audio-player.service';
@@ -22,9 +26,10 @@ export interface StemPlayer {
 }
 
 @Component({
-  selector: 'app-player',
-  templateUrl: './player.component.html',
-  styleUrls: ['./player.component.scss']
+    selector: 'app-player',
+    templateUrl: './player.component.html',
+    styleUrls: ['./player.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayerComponent implements OnChanges {
     static readonly DEFAULT_PITCH = 0;
@@ -43,10 +48,12 @@ export class PlayerComponent implements OnChanges {
     @Output() prev: EventEmitter<void> = new EventEmitter<void>();
 
     autoplay = false;
+    bpmDisplay = '';
     dragData: DragData | null = null;
     duration = 0;
     loopActivated = false;
     paused = true;
+    pitchDisplay = '';
     progress = 0;
     ready = false;
     soloMode: StemPlayerComponent[] = [];
@@ -118,22 +125,9 @@ export class PlayerComponent implements OnChanges {
                     stem
                 }
             }
-            this.speed = PlayerComponent.DEFAULT_SPEED;
-            this.pitch = PlayerComponent.DEFAULT_PITCH;
+            this.setSpeed(PlayerComponent.DEFAULT_SPEED);
+            this.setPitch(PlayerComponent.DEFAULT_PITCH);
             this.audioPlayer.finish();
-        }
-    }
-
-    public getBPMValue(track?: Track): string {
-        const bpm = track ? track.bpm : -1;
-        switch (bpm) {
-            case -2:
-                return '??';
-            case -1:
-                // return "--";
-                return this.speed.toFixed(2) + 'x';
-            default:
-                return Math.round(bpm * this.speed).toString();
         }
     }
 
@@ -280,11 +274,30 @@ export class PlayerComponent implements OnChanges {
     private setPitch(pitch: number) {
         this.pitch = pitch;
         this.audioPlayer.setPitch(pitch * 100);
+
+        if (this.track && this.track.key !== -1) {
+            let index = ((this.track.key + this.pitch) % 12 + 12) % 12;
+            this.pitchDisplay = musicalChordNames[index];
+        } else {
+            this.pitchDisplay = this.pitch.toString();
+        }
     }
 
     private setSpeed(speed: number) {
         this.speed = speed;
         this.audioPlayer.setSpeed(speed);
+
+        const bpm = this.track ? this.track.bpm : -1;
+        switch (bpm) {
+            case -2:
+                this.bpmDisplay = '??';
+                break;
+            case -1:
+                this.bpmDisplay = this.speed.toFixed(2) + 'x';
+                break;
+            default:
+                this.bpmDisplay = Math.round(bpm * this.speed).toString();
+        }
     }
 
     private play(progress?: number): void {
@@ -304,4 +317,5 @@ export class PlayerComponent implements OnChanges {
 
     protected readonly StemType = StemType;
     protected readonly Object = Object;
+    protected readonly musicalChordNames = musicalChordNames;
 }

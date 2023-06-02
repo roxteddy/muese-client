@@ -1,7 +1,7 @@
 <div #list>
     <ul *ngIf="!loading">
         <li *ngFor="let track of tracks" [ngClass]="{active: track === selectedTrack}">
-            {{track.artists?.join(', ')}} - {{track.title}}
+            {{track.artists.join(', ')}} - {{track.title}}
             <button *ngIf="track.status === TrackStatus.READY" (click)="loadTrack(track)">Load</button>
             <ng-container *ngIf="track.status === TrackStatus.PROCESSING"> (.-.processing.-.)</ng-container>
             <ng-container *ngIf="track.status === TrackStatus.IDLE"> (-idle-)</ng-container>

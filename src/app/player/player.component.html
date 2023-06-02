@@ -42,7 +42,7 @@
                                    disablePlusButton: speed >= SPEED_MAX,
                                    label: 'BPM',
                                    showButtons: true,
-                                   value: getBPMValue(track)}">
+                                   value: bpmDisplay}">
                 </ng-container>
                 <ng-container  [ngTemplateOutlet]="trackDetail"
                                [ngTemplateOutletContext]="{
@@ -50,7 +50,7 @@
                                    disablePlusButton: pitch >= PITCH_MAX,
                                    label: 'Key',
                                    showButtons: true,
-                                   value: pitch}">
+                                   value: pitchDisplay}">
                 </ng-container>
             </div>
         </div>

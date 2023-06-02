@@ -1,12 +1,12 @@
 import { Stem } from './stem';
 
 export type Track = {
-    id: number
-    title: string
     artists: string[]
-    filename: string
-    duration: number
     bpm: number
+    duration: number
+    filename: string
+    key: number
+    title: string
     status: TrackStatus
     stems: Stem[]
 }

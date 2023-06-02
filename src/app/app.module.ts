@@ -43,3 +43,18 @@ export interface DragData {
     bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+export const musicalChordNames = [
+    "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", /// major
+    "Am", "A#m", "Bm", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m" /// minor
+];
+
+let camelotChordNames = [
+    "11B", "6B", "1B", "8B", "3B", "10B", "5B", "12B", "7B", "2B", "9B", "4B", /// major
+    "8A", "3A", "10A", "5A", "12A", "7A", "2A", "9A", "4A", "11A", "6A", "1A" /// minor
+];
+
+let openkeyChordNames = [
+    "4d", "11d", "6d", "1d", "8d", "3d", "10d", "5d", "12d", "7d", "2d", "9d", /// major
+    "1m", "8m", "3m", "10m", "5m", "12m", "7m", "2m", "9m", "4m", "11m", "6m" /// minor
+];
