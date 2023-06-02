@@ -3,7 +3,7 @@ import { Stem } from './stem';
 export type Track = {
     id: number
     title: string
-    artist: string
+    artists: string[]
     filename: string
     duration: number
     bpm: number
