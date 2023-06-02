@@ -5,6 +5,9 @@
     <div class="main">
         <div class="left">
             <div class="top-left">
+                <button mat-fab disabled>
+                    <mat-icon [svgIcon]="iconName"></mat-icon>
+                </button>
                 <div class="small-buttons">
                     <button mat-mini-fab
                             class="mute"
@@ -20,9 +23,6 @@
                         <mat-icon svgIcon="s"></mat-icon>
                     </button>
                 </div>
-                <button mat-fab disabled>
-                    <mat-icon [svgIcon]="iconName"></mat-icon>
-                </button>
             </div>
             <app-ui-progress-bar
                 [emitSeekOnDrag]="true"
