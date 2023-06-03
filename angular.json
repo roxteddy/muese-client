@@ -39,8 +39,9 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "src/assets/scripts/waveform-path.js",
-                "src/assets/scripts/Superpowered.js"
+                "src/assets/scripts/waveform-path.js",
+                "src/assets/scripts/Superpowered.js",
+                "node_modules/hammerjs/hammer.js"
             ]
           },
           "configurations": {

@@ -20,39 +20,34 @@ export class BalanceButtonComponent {
 
     @Output() balanceChange = new EventEmitter<number>();
 
-    lastPosition = -1;
+    isDragged = false;
 
     constructor(private readonly elementRef: ElementRef) {
     }
-    @HostListener('mousedown', ['$event'])
-    onMouseDown(e: MouseEvent) {
-        if (e.button === 0) {
-            this.lastPosition = e.clientX;
-            document.body.style.cursor = 'ew-resize';
-        }
+    @HostListener('panstart', ['$event'])
+    onMouseDown(e: HammerInput) {
+        this.isDragged = true;
+        document.body.style.cursor = 'ew-resize';
     }
 
-    @HostListener('document:mousemove', ['$event'])
-    onMouseMove(e: MouseEvent) {
-        if (this.lastPosition !== -1) {
-            e.preventDefault();
+    @HostListener('panmove', ['$event'])
+    onMouseMove(e: HammerInput) {
+        if (this.isDragged) {
             this.setBalance(this.calcBalance(e));
-            this.lastPosition = e.clientX;
         }
     }
 
-    @HostListener('document:mouseup', ['$event'])
-    onMouseUp(e: MouseEvent) {
-        if (this.lastPosition !== -1) {
-            e.preventDefault();
-            this.lastPosition = -1;
+    @HostListener('panend', ['$event'])
+    onMouseUp(e: HammerInput) {
+        if (this.isDragged) {
+            this.isDragged = false;
             document.body.style.cursor = 'unset';
         }
     }
 
-    @HostListener('dblclick', ['$event'])
-    onDoubleClick(e: MouseEvent) {
-        if (e.button === 0) {
+    @HostListener('tap', ['$event'])
+    onDoubleClick(e: HammerInput) {
+        if ((e as any).tapCount === 2) {
             this.setBalance(0);
         }
     }
@@ -62,12 +57,8 @@ export class BalanceButtonComponent {
         this.balanceChange.emit(balance);
     }
 
-    private calcBalance(e: MouseEvent) {
-        const rect: DOMRect = this.elementRef.nativeElement.getBoundingClientRect();
-        const movement = e.clientX - (this.lastPosition || 0);
-
-
-        let balance = this.balance + (movement / rect.width);
+    private calcBalance(e: HammerInput) {
+        let balance = e.deltaX / 100;
         if (balance < -1) {
             balance = -1;
         } else if (balance > 1) {

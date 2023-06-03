@@ -20,6 +20,8 @@
     "@angular/platform-browser": "^16.0.4",
     "@angular/platform-browser-dynamic": "^16.0.4",
     "@angular/router": "^16.0.4",
+    "@types/hammerjs": "^2.0.41",
+    "hammerjs": "^2.0.8",
     "ngx-scrollbar": "^12.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
