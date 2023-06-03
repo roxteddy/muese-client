@@ -3,7 +3,7 @@
             (next)="onNext($event)"
             (prev)="onPrev()"
 ></app-player>
-<div #list>
+<div class="list">
     <ul *ngIf="!loading">
         <li *ngFor="let track of tracks" [ngClass]="{active: track === selectedTrack}">
             {{track.artists.join(', ')}} - {{track.title}}

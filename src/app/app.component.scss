@@ -5,9 +5,14 @@
 
     app-player {
         height: 100%;
+        flex: auto 1 0;
     }
 
-    li.active {
-        color: red;
+    .list {
+        flex: 400px 0 0;
+
+        li.active {
+            color: red;
+        }
     }
 }

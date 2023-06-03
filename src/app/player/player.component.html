@@ -114,7 +114,6 @@
 </div>
 <ng-scrollbar [autoHeightDisabled]="false">
 <div class="tracks">
-
         <app-stem-player
             *ngFor="let key of Object.keys(stemPlayers)"
             [dragData]="dragData"
@@ -129,6 +128,5 @@
             (progressChange)="onProgressChange($event)"
             (clickSolo)="onSolo($event)">
         </app-stem-player>
-
 </div>
 </ng-scrollbar>
