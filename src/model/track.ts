@@ -1,6 +1,7 @@
 import { Stem } from './stem';
 
 export type Track = {
+    albums?: string[]
     artists: string[]
     bpm: number
     duration: number
