@@ -396,6 +396,10 @@
         }
     }
 
+    ng-scrollbar {
+        width: 100%;
+    }
+
     .tracks {
         width: 100%;
         overflow: auto;
@@ -422,5 +426,6 @@
             display: block;
             width: 100%;
         }
+
     }
 }

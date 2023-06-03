@@ -112,20 +112,23 @@
 
     </div>
 </div>
+<ng-scrollbar [autoHeightDisabled]="false">
 <div class="tracks">
-    <app-stem-player
-        *ngFor="let key of Object.keys(stemPlayers)"
-        [dragData]="dragData"
-        [iconName]="stemPlayers[key].iconName"
-        [progress]="progress"
-        [soloMode]="soloMode"
-        [stem]="stemPlayers[key].stem"
-        [title]="key"
-        [trackFilename]="track?.filename || ''"
-        (dragStatus)="onDragEvent($event)"
-        (loaded)="onTrackLoaded(key)"
-        (progressChange)="onProgressChange($event)"
-        (clickSolo)="onSolo($event)"
-    >
-    </app-stem-player>
+
+        <app-stem-player
+            *ngFor="let key of Object.keys(stemPlayers)"
+            [dragData]="dragData"
+            [iconName]="stemPlayers[key].iconName"
+            [progress]="progress"
+            [soloMode]="soloMode"
+            [stem]="stemPlayers[key].stem"
+            [title]="key"
+            [trackFilename]="track?.filename || ''"
+            (dragStatus)="onDragEvent($event)"
+            (loaded)="onTrackLoaded(key)"
+            (progressChange)="onProgressChange($event)"
+            (clickSolo)="onSolo($event)">
+        </app-stem-player>
+
 </div>
+</ng-scrollbar>
