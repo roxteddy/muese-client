@@ -1,6 +1,7 @@
 import './Superpowered.js'
 
 class Stem {
+    balance = 0;
     buffer;
     muted = false;
     name;
@@ -23,12 +24,16 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
 
     //mixer & buffers
     mixer;
+    mixer1;
+    mixer2;
     mixerBuffer1;
     mixerBuffer2;
 
 
     onReady() {
         this.mixer = new this.Superpowered.StereoMixer();
+        this.mixer1 = new this.Superpowered.StereoMixer();
+        this.mixer2 = new this.Superpowered.StereoMixer();
     }
 
     // Runs before the node is destroyed.
@@ -154,6 +159,13 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         this.lastProgress = -1;
     }
 
+    setBalance(name, balance) {
+        const stem = this.stems.find((stem => stem.name === name));
+        if (stem) {
+            stem.balance = balance;
+        }
+    }
+
     // Set pitch by cents of half-tone (1 Octave = 1200) {-2400:2400}
     setPitch(pitch) {
         for (let stem of this.stems) {
@@ -212,6 +224,9 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
                 break;
             case 'seek':
                 this.seek(message.progress);
+                break;
+            case 'setBalance':
+                this.setBalance(message.name, message.balance);
                 break;
             case 'setPitch':
                 this.setPitch(message.pitch);
@@ -277,8 +292,16 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
         ** but we may need mixer for individual balances
          */
 
-        if (this.mixer && this.stems.length > 0) {
-            this.mixer.process(
+        if (this.stems.length > 0) {
+            for (let i = 0; i < 4; i++) {
+                const stem = this.stems[i];
+                if (stem) {
+                    const balance = stem.balance;
+                    this.mixer1.inputGain[i * 2] = balance <= 0 ? 1 : 1 - balance;
+                    this.mixer1.inputGain[i * 2 + 1] = balance >= 0 ? 1 : 1 + balance;
+                }
+            }
+            this.mixer1.process(
                 this.stems[0].buffer?.pointer || 0,
                 this.stems[1]?.buffer?.pointer || 0,
                 this.stems[2]?.buffer?.pointer || 0,
@@ -288,7 +311,15 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
             );
 
             if (this.stems.length > 4) {
-                this.mixer.process(
+                for (let i = 0; i < 4; i++) {
+                    const stem = this.stems[i + 4];
+                    if (stem) {
+                        const balance = stem.balance;
+                        this.mixer2.inputGain[i * 2] = balance <= 0 ? 1 : 1 - balance;
+                        this.mixer2.inputGain[i * 2 + 1] = balance >= 0 ? 1 : 1 + balance;
+                    }
+                }
+                this.mixer2.process(
                     this.stems[4]?.buffer?.pointer || 0,
                     this.stems[5]?.buffer?.pointer || 0,
                     this.stems[6]?.buffer?.pointer || 0,

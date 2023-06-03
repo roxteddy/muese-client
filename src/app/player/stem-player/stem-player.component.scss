@@ -74,7 +74,6 @@
                 padding: 0;
                 gap: 24px;
 
-                width: 92px;
                 height: 56px;
 
 
@@ -83,6 +82,13 @@
                 flex: none;
                 order: 0;
                 flex-grow: 0;
+
+                app-ui-balance-button {
+                    display: block;
+                    width: 56px;
+                    height: 56px;
+                }
+
 
                 button[mat-fab] {
                     width: 56px;

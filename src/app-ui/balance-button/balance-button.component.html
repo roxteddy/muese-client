@@ -1,0 +1,8 @@
+<div class="wrapper" [class.active]="lastPosition !== -1">
+    <div class="logo">
+        <ng-content></ng-content>
+    </div>
+    <div class="round" [style.transform]="'rotate(' + 135 * balance + 'deg)'">
+        <div class="dot"></div>
+    </div>
+</div>

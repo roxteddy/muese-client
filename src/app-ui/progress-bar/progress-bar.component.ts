@@ -58,6 +58,7 @@ export class ProgressBarComponent implements OnChanges {
             if (this.emitSeekOnDrag) {
                 this.progress.emit(this.progressStatus);
             }
+            document.body.style.cursor = 'ew-resize';
         }
     }
 
@@ -117,6 +118,7 @@ export class ProgressBarComponent implements OnChanges {
                 rect: null
             }
             this.progress.emit(this.progressStatus);
+            document.body.style.cursor = 'unset';
         }
     }
 

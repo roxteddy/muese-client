@@ -5,9 +5,14 @@
     <div class="main">
         <div class="left">
             <div class="top-left">
-                <button mat-fab disabled>
+                <app-ui-balance-button
+                    [balance]="balance"
+                    (balanceChange)="onBalanceChange($event)">
                     <mat-icon [svgIcon]="iconName"></mat-icon>
-                </button>
+                </app-ui-balance-button>
+<!--                <button mat-fab disabled>-->
+<!--                    <mat-icon [svgIcon]="iconName"></mat-icon>-->
+<!--                </button>-->
                 <div class="small-buttons">
                     <button mat-mini-fab
                             class="mute"

@@ -43,6 +43,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     @Output() progressChange = new EventEmitter<number>();
     @Output() clickSolo = new EventEmitter<StemPlayerComponent>();
 
+    balance = 0;
     currentTime: number = 0
     loading = false;
     loadingSubscription?: Subscription;
@@ -72,6 +73,11 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy() {
         this.loadingSubscription?.unsubscribe();
+    }
+
+    public onBalanceChange(balance: number) {
+        this.balance = balance;
+        this.audioPlayer.setBalance(this.title, balance);
     }
 
     public onMute(muted?: boolean) {

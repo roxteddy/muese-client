@@ -162,6 +162,14 @@ export class AudioPlayerService {
         });
     }
 
+    setBalance(name: string, balance: number) {
+        this.playerProcessor?.sendMessageToAudioScope({
+            type: 'setBalance',
+            name,
+            balance
+        });
+    }
+
     /*
     ** setPitch
     ** pitch: cents of half-tone (1 Octave = 1200) {-2400:2400} - use multiple of 100 for better performance

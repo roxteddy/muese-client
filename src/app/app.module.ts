@@ -15,6 +15,7 @@ import { AudioPlayerService } from './audio-player.service';
 import { StemPlayerComponent } from './player/stem-player/stem-player.component';
 import { TrackUploadComponent } from './track-upload/track-upload.component';
 import { NgScrollbarModule } from 'ngx-scrollbar';
+import { BalanceButtonComponent } from '../app-ui/balance-button/balance-button.component';
 
 export interface DragData {
     rect: DOMRect
@@ -39,7 +40,8 @@ export interface DragData {
         AppUiModule,
         MatButtonModule,
         MatIconModule,
-        MatTooltipModule
+        MatTooltipModule,
+        BalanceButtonComponent
     ],
     providers: [AudioPlayerService],
     bootstrap: [AppComponent]
