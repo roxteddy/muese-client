@@ -62,6 +62,7 @@ export class ProgressBarComponent implements OnChanges {
 
     @HostListener('panstart', ['$event'])
     public onMouseDown(e: HammerInput) {
+        e.preventDefault();
         const rect = this.elementRef.nativeElement.getBoundingClientRect();
         this.progressStatus = {
             rect,

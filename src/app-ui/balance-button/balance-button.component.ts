@@ -24,6 +24,7 @@ export class BalanceButtonComponent {
 
     @HostListener('panstart', ['$event'])
     onPanStart(e: HammerInput) {
+        e.preventDefault();
         this.isDragged = true;
         document.body.style.cursor = 'ew-resize';
     }
@@ -31,6 +32,7 @@ export class BalanceButtonComponent {
     @HostListener('panmove', ['$event'])
     onPanMove(e: HammerInput) {
         if (this.isDragged) {
+            e.preventDefault();
             this.setBalance(this.calcBalance(e));
         }
     }
@@ -38,6 +40,7 @@ export class BalanceButtonComponent {
     @HostListener('panend', ['$event'])
     onPanEnd(e: HammerInput) {
         if (this.isDragged) {
+            e.preventDefault();
             this.isDragged = false;
             document.body.style.cursor = 'unset';
         }

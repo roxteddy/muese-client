@@ -93,26 +93,51 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
         }
     }
 
-    public onCanvasMouseDown(e: MouseEvent, container: HTMLDivElement) {
-        if (e.button === 0) {
-            let rect = container.getBoundingClientRect();
-            this.dragStatus.emit({
-                rect,
-                progress: (e.clientX - rect.left) / rect.width,
-                origin: this
-            });
+    public onCanvasTap(e: unknown, container: HTMLDivElement) {
+        let hammerEvent = e as HammerInput;
+        let clientX;
+        if (hammerEvent.srcEvent instanceof TouchEvent) {
+            clientX = hammerEvent.srcEvent.touches[0]?.clientX;
+        } else {
+            clientX = hammerEvent.srcEvent.clientX;
         }
+        const rect = container.getBoundingClientRect();
+        this.progressChange.emit((clientX - rect.left) / rect.width);
+    }
+
+    public onCanvasMouseDown(e: unknown, container: HTMLDivElement) {
+        let hammerEvent = e as HammerInput;
+        hammerEvent.preventDefault();
+        let clientX;
+        if (hammerEvent.srcEvent instanceof TouchEvent) {
+            clientX = hammerEvent.srcEvent.touches[0]?.clientX;
+        } else {
+            clientX = hammerEvent.srcEvent.clientX;
+        }
+        let rect = container.getBoundingClientRect();
+        this.dragStatus.emit({
+            rect,
+            progress: (clientX - rect.left) / rect.width,
+            origin: this
+        });
+
     }
 
     public onVolumeProgress(volumeStatus: ProgressStatus) {
         this.setVolume(volumeStatus.progress);
     }
 
-    @HostListener('document:mousemove', ['$event'])
-    public documentMouseMove(e: MouseEvent) {
+    @HostListener('panmove', ['$event'])
+    public documentMouseMove(e: HammerInput) {
         if (this.dragData?.origin == this) {
             e.preventDefault();
-            let progress = (e.clientX - this.dragData.rect.left) / this.dragData.rect.width;
+            let clientX;
+            if (e.srcEvent instanceof TouchEvent) {
+                clientX = e.srcEvent.touches[0]?.clientX;
+            } else {
+                clientX = e.srcEvent.clientX;
+            }
+            let progress = (clientX - this.dragData.rect.left) / this.dragData.rect.width;
             if (progress < 0) {
                 progress = 0;
             } else if (progress > 1) {
@@ -125,9 +150,10 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
         }
     }
 
-    @HostListener('window:mouseup', ['$event'])
-    public windowMouseUp(e: MouseEvent) {
+    @HostListener('panend', ['$event'])
+    public windowMouseUp(e: HammerInput) {
         if (this.dragData?.origin == this) {
+            e.preventDefault();
             this.progressChange.emit(this.dragData.progress);
             this.dragStatus.emit(null);
         }

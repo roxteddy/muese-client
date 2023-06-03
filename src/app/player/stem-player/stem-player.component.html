@@ -39,7 +39,8 @@
             ></app-ui-progress-bar>
         </div>
         <div #progressContainer class="progress-container"
-             (mousedown)="onCanvasMouseDown($event, progressContainer)">
+             (tap)="onCanvasTap($event, progressContainer)"
+             (panstart)="onCanvasMouseDown($event, progressContainer)">
 <!--            <canvas #progressCanvas class="progress-canvas"></canvas>-->
             <svg viewBox="0 0 377 32" preserveAspectRatio="none"><path #path></path></svg>
             <div class="progress-bar"
