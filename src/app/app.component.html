@@ -1,3 +1,8 @@
+<app-player *ngIf="selectedTrack"
+            [track]="selectedTrack"
+            (next)="onNext($event)"
+            (prev)="onPrev()"
+></app-player>
 <div #list>
     <ul *ngIf="!loading">
         <li *ngFor="let track of tracks" [ngClass]="{active: track === selectedTrack}">
@@ -13,8 +18,3 @@
     </ul>
     <p *ngIf="loading">loading...</p>
 </div>
-<app-player *ngIf="selectedTrack"
-            [track]="selectedTrack"
-            (next)="onNext($event)"
-            (prev)="onPrev()"
-></app-player>

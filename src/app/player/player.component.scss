@@ -1,8 +1,13 @@
 :host {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     width: 636px;
+    height: 100%;
+    min-width: 636px;
     background-color: #F2F2F2;
     font-family: 'Noah', serif;
+    overflow: hidden;
 
     .player {
         /* Auto layout */
@@ -13,7 +18,6 @@
         gap: 24px;
 
         .info {
-            width: 636px;
             height: 180px;
 
             /* Auto layout */
@@ -394,6 +398,12 @@
 
     .tracks {
         width: 100%;
+        overflow: auto;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
 
         /* Auto layout */
         display: flex;
@@ -404,59 +414,13 @@
         box-sizing: border-box;
 
         /* Inside auto layout */
-        flex: none;
+        flex: auto;
+        flex-shrink: 1;
         order: 2;
-        align-self: stretch;
-        flex-grow: 0;
 
         app-stem-player {
             display: block;
             width: 100%;
-        }
-    }
-}
-
-.speed-container {
-    position: relative;
-    height: 25px;
-    width: 400px;
-    background-color: grey;
-
-    /* Inside auto layout */
-    flex: none;
-    order: 3;
-    align-self: stretch;
-    flex-grow: 0;
-
-    .filler-1 {
-        position: absolute;
-        top: 0;
-        left: 12.5%;
-        height: 100%;
-        width: 12.5%;
-        background-color: papayawhip;
-    }
-    .filler-2 {
-        position: absolute;
-        top: 0;
-        left: 25%;
-        height: 100%;
-        width: 75%;
-        background-color: palegoldenrod;
-    }
-
-    .speed-progress {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 0;
-        background-color: red;
-        opacity: 0.66;
-        border-right: solid 1px yellow;
-
-        &.dragged {
-            background-color: blue;
         }
     }
 }

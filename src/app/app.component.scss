@@ -1,3 +1,13 @@
-li.active {
-    color: red;
+:host {
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+
+    app-player {
+        height: 100%;
+    }
+
+    li.active {
+        color: red;
+    }
 }
