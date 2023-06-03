@@ -18,6 +18,7 @@ import { ProgressStatus } from '../../app-ui/progress-bar/progress-bar.component
 import { AudioPlayerService } from '../audio-player.service';
 import { Track } from '../../model/track';
 import { Stem, StemType } from '../../model/stem';
+import { SERVER_URL } from '../app.component';
 
 export interface StemPlayer {
     iconName: string
@@ -32,6 +33,7 @@ export interface StemPlayer {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlayerComponent implements OnChanges {
+    static readonly DEFAULT_COVER_URL = '/assets/img/nopic.svg';
     static readonly DEFAULT_PITCH = 0;
     static readonly DEFAULT_SPEED = 1;
     static readonly DEFAULT_VOLUME = 0.75;
@@ -47,8 +49,10 @@ export class PlayerComponent implements OnChanges {
     @Output() next: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Output() prev: EventEmitter<void> = new EventEmitter<void>();
 
+    albumDisplay = '';
     autoplay = false;
     bpmDisplay = '';
+    coverUrl = PlayerComponent.DEFAULT_COVER_URL;
     dragData: DragData | null = null;
     duration = 0;
     loopActivated = false;
@@ -109,6 +113,14 @@ export class PlayerComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['track']) {
+            this.albumDisplay =
+                (this.track?.albums)
+                ? this.track.albums.map((album) => album.name).join(', ')
+                : '';
+            this.coverUrl =
+                (this.track?.albums && this.track.albums[0].cover)
+                ? `url(${SERVER_URL}/music/covers/${this.track.albums[0].cover})`
+                : 'url(/assets/img/nopic.svg)';
             this.duration = 0;
             this.paused = true;
             this.progress = 0;
@@ -315,7 +327,5 @@ export class PlayerComponent implements OnChanges {
         this.audioPlayer.setVolume(volume);
     }
 
-    protected readonly StemType = StemType;
     protected readonly Object = Object;
-    protected readonly musicalChordNames = musicalChordNames;
 }

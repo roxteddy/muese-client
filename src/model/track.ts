@@ -1,15 +1,15 @@
 import { Stem } from './stem';
 
 export type Track = {
-    albums?: string[]
-    artists: string[]
-    bpm: number
-    duration: number
-    filename: string
-    key: number
-    title: string
-    status: TrackStatus
-    stems: Stem[]
+    albums?: Album[];
+    artists: string[];
+    bpm: number;
+    duration: number;
+    filename: string;
+    key: number;
+    title: string;
+    status: TrackStatus;
+    stems: Stem[];
 }
 
 export enum TrackStatus {
@@ -18,4 +18,13 @@ export enum TrackStatus {
     PROCESSING,
     READY,
     ERROR,
+}
+
+export interface Album {
+    uuid: string;
+    cover?: string;
+    name: string;
+    releaseDate?: Date;
+    artists?: string[];
+    tracks?: Track;
 }
