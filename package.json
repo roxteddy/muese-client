@@ -25,7 +25,7 @@
     "tslib": "^2.3.0",
     "uuid": "^9.0.0",
     "web-audio-beat-detector": "^8.1.46",
-    "zone.js": "~0.12.0"
+    "zone.js": "0.13.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^15.2.7",
