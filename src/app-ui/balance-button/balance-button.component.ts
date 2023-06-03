@@ -22,23 +22,21 @@ export class BalanceButtonComponent {
 
     isDragged = false;
 
-    constructor(private readonly elementRef: ElementRef) {
-    }
     @HostListener('panstart', ['$event'])
-    onMouseDown(e: HammerInput) {
+    onPanStart(e: HammerInput) {
         this.isDragged = true;
         document.body.style.cursor = 'ew-resize';
     }
 
     @HostListener('panmove', ['$event'])
-    onMouseMove(e: HammerInput) {
+    onPanMove(e: HammerInput) {
         if (this.isDragged) {
             this.setBalance(this.calcBalance(e));
         }
     }
 
     @HostListener('panend', ['$event'])
-    onMouseUp(e: HammerInput) {
+    onPanEnd(e: HammerInput) {
         if (this.isDragged) {
             this.isDragged = false;
             document.body.style.cursor = 'unset';

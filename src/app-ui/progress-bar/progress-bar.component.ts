@@ -1,5 +1,5 @@
 import {
-    Component,
+    Component, ElementRef,
     EventEmitter,
     HostListener,
     Input,
@@ -36,6 +36,9 @@ export class ProgressBarComponent implements OnChanges {
     };
     wheeling = -1;
 
+    constructor(private readonly elementRef: ElementRef) {
+    }
+
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['seek']) {
             const progress = changes['seek'].currentValue;
@@ -48,18 +51,26 @@ export class ProgressBarComponent implements OnChanges {
         }
     }
 
-    public onMouseDown(e: MouseEvent, container: HTMLDivElement) {
-        if (e.button === 0) {
-            const rect = container.getBoundingClientRect();
-            this.progressStatus = {
-                rect,
-                progress: this.calcProgress(e, rect)
-            }
-            if (this.emitSeekOnDrag) {
-                this.progress.emit(this.progressStatus);
-            }
-            document.body.style.cursor = 'ew-resize';
+    @HostListener('tap', ['$event'])
+    onTap(e: HammerInput) {
+        this.progressStatus = {
+            ...this.progressStatus,
+            progress: this.calcProgress(e.srcEvent, this.elementRef.nativeElement.getBoundingClientRect())
         }
+        this.progress.emit(this.progressStatus);
+    }
+
+    @HostListener('panstart', ['$event'])
+    public onMouseDown(e: HammerInput) {
+        const rect = this.elementRef.nativeElement.getBoundingClientRect();
+        this.progressStatus = {
+            rect,
+            progress: this.calcProgress(e.srcEvent, rect)
+        }
+        if (this.emitSeekOnDrag) {
+            this.progress.emit(this.progressStatus);
+        }
+        document.body.style.cursor = 'ew-resize';
     }
 
     @HostListener('wheel', ['$event'])
@@ -95,13 +106,13 @@ export class ProgressBarComponent implements OnChanges {
         this.progress.emit(this.progressStatus);
     }
 
-    @HostListener('document:mousemove', ['$event'])
-    public documentMouseMove(e: MouseEvent) {
+    @HostListener('panmove', ['$event'])
+    public documentMouseMove(e: HammerInput) {
         if (this.progressStatus.rect) {
             e.preventDefault();
             this.progressStatus = {
                 ...this.progressStatus,
-                progress: this.calcProgress(e, this.progressStatus.rect)
+                progress: this.calcProgress(e.srcEvent, this.progressStatus.rect)
             }
             if (this.emitSeekOnDrag) {
                 this.progress.emit(this.progressStatus);
@@ -109,8 +120,8 @@ export class ProgressBarComponent implements OnChanges {
         }
     }
 
-    @HostListener('window:mouseup', ['$event'])
-    public windowMouseUp(e: MouseEvent) {
+    @HostListener('panend', ['$event'])
+    public windowMouseUp(e: TouchEvent) {
         if (this.progressStatus.rect) {
             e.preventDefault();
             this.progressStatus = {
@@ -122,8 +133,15 @@ export class ProgressBarComponent implements OnChanges {
         }
     }
 
-    private calcProgress(e: MouseEvent, rect: DOMRect) {
-        let progress = (e.clientX - rect.left) / rect.width;
+    private calcProgress(e: TouchEvent | MouseEvent | PointerEvent, rect: DOMRect) {
+        let clientX;
+        if (e instanceof TouchEvent) {
+            clientX = e.touches[0]?.clientX;
+        } else {
+            clientX = e.clientX;
+        }
+
+        let progress = (clientX - rect.left) / rect.width;
         if (progress < 0) {
             progress = 0;
         } else if (progress > 1) {

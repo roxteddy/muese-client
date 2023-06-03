@@ -1,8 +1,7 @@
 <div class="progress-bar">
     <div #container
          class="progress-container"
-         [ngClass]="{faded: faded, dragged: !!progressStatus.rect && wheeling !== -1}"
-         (mousedown)="onMouseDown($event, container)">
+         [ngClass]="{faded: faded, dragged: !!progressStatus.rect && wheeling !== -1}">
         <div #progress class="progress"
              [ngClass]="{dragged: !!progressStatus.rect}"
              [style.transform]="'scaleX(' + progressStatus.progress + ')'">
