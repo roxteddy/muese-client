@@ -5,13 +5,9 @@ import {
     filter,
     first,
     firstValueFrom,
-    map,
-    mergeMap,
     Observable,
-    of,
     ReplaySubject,
     Subject,
-    Subscription,
     switchMap, takeUntil
 } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
@@ -57,7 +53,7 @@ export class AudioPlayerService {
     /*
     ** Service methods
     */
-    getContext(): AudioContext {
+    getAudioContext(): AudioContext {
         return this.webaudioManager?.audioContext;
     }
 

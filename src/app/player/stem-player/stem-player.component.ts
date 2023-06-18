@@ -61,9 +61,21 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
             this.progress = 0;
             this.pathRef?.nativeElement?.setAttribute('d', '');
             this.path2Ref?.nativeElement?.setAttribute('d', '');
-            this.loadingSubscription?.unsubscribe();
+            this.unsubscribeLoading();
 
-            this.loadTrack(changes['stem'].currentValue);
+            this.loadTrack(changes['stem'].currentValue).then(
+                (arrayBuffer) => {
+                    // @ts-ignored
+                    if (!navigator.userAgentData?.mobile && this.stem) {
+                        this.analyzeTrack(arrayBuffer, this.stem);
+                    }
+                }, (e) => console.log(e)
+            ).finally(() => {
+                this.unsubscribeLoading();
+                this.loading = false;
+                this.loaded.emit();
+                this.progress = 0;
+            })
         }
         if (changes['soloMode']) {
             this.solo = this.soloMode.includes(this);
@@ -164,7 +176,7 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     }
 
     private analyzeTrack(arrayBuffer: ArrayBuffer, currentStem: Stem) {
-        this.audioPlayer.getContext()?.decodeAudioData(arrayBuffer).then(
+        this.audioPlayer.getAudioContext()?.decodeAudioData(arrayBuffer).then(
             (audioBuffer) => {
                 if (currentStem !== this.stem)
                     return;
@@ -190,7 +202,8 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     }
 
     private loadTrack(currentStem: Stem) {
-        this.audioPlayer.isInitialized().then(() => {
+        return new Promise<ArrayBuffer>(async (resolve, reject) => {
+            await this.audioPlayer.isInitialized();
             if (currentStem === this.stem && this.stem) {
                 const url = `${SERVER_URL}/music/output/${this.trackFilename}/${this.stem.filename}`
                 this.setVolume(PlayerComponent.DEFAULT_VOLUME);
@@ -198,23 +211,17 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
                     next: (v) => {
                         if (v.type === HttpEventType.DownloadProgress && typeof v.progress !== 'undefined') {
                             this.progress = v.progress;
-                        } else if (v.type === HttpEventType.Response && typeof  v.arrayBuffer !== 'undefined') {
-                            this.loadingSubscription?.unsubscribe();
-                            this.loading = false;
-                            this.loaded.emit();
-                            this.progress = 0;
-
-                            // @ts-ignored
-                            if (!navigator.userAgentData?.mobile) {
-                                this.analyzeTrack(v.arrayBuffer, currentStem);
+                        } else if (v.type === HttpEventType.Response) {
+                            if (v.arrayBuffer) {
+                                resolve(v.arrayBuffer);
+                            } else {
+                                reject('no buffer');
                             }
                         }
-                    },error: (e) => {
-                        this.loading = false;
-                        this.loaded.emit();
-                        this.loadingSubscription?.unsubscribe();
-                        console.log(e);
-                    }});
+                    }, error: (e) => reject(e)
+                });
+            } else {
+                reject('no stem or wrong stem');
             }
         });
     }
@@ -226,5 +233,10 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
     private setVolume(volume: number) {
         this.volume = volume;
         this.audioPlayer.setVolume(volume, this.title);
+    }
+
+    private unsubscribeLoading() {
+        this.loadingSubscription?.unsubscribe();
+        this.loadingSubscription = undefined;
     }
 }
