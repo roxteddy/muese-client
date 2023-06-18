@@ -204,12 +204,16 @@ export class StemPlayerComponent implements OnChanges, OnDestroy {
                             this.loaded.emit();
                             this.progress = 0;
 
-                            this.analyzeTrack(v.arrayBuffer, currentStem);
+                            // @ts-ignored
+                            if (!navigator.userAgentData?.mobile) {
+                                this.analyzeTrack(v.arrayBuffer, currentStem);
+                            }
                         }
                     },error: (e) => {
                         this.loading = false;
                         this.loaded.emit();
                         this.loadingSubscription?.unsubscribe();
+                        console.log(e);
                     }});
             }
         });

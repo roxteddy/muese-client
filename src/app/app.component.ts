@@ -8,7 +8,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { AudioPlayerService } from './audio-player.service';
 import { Track, TrackStatus } from '../model/track';
 
-export const SERVER_URL = 'https://roxteddy.noip.me:3000';
+export const SERVER_URL = 'https://muese.servehttp.com:3000';
 
 @Component({
     selector: 'app-root',

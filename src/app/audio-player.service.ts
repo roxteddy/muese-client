@@ -2,6 +2,7 @@ import { Injectable, RendererFactory2 } from '@angular/core';
 // @ts-ignored
 import { SuperpoweredWebAudio } from '../assets/scripts/Superpowered.js';
 import {
+    filter,
     first,
     firstValueFrom,
     map,
@@ -11,7 +12,7 @@ import {
     ReplaySubject,
     Subject,
     Subscription,
-    switchMap
+    switchMap, takeUntil
 } from 'rxjs';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 
@@ -24,6 +25,7 @@ export class AudioPlayerService {
     public end = new Subject<void>();
 
     private initSubject = new ReplaySubject<void>();
+    private loadingSubject = new Subject<string>();
     private messageSubject = new Subject<any>();
     private playerProcessor?: SuperpoweredWebAudio.AudioWorkletProcessor;
     // @ts-ignored
@@ -89,11 +91,14 @@ export class AudioPlayerService {
         type: HttpEventType,
         progress?: number,
         arrayBuffer?: ArrayBuffer }> {
+        this.loadingSubject.next(name);
         return this.httpClient.get(url, {
             observe: 'events',
             reportProgress: true,
             responseType: 'blob'
-        }).pipe(switchMap(async (event: HttpEvent<Blob>) => {
+        }).pipe(
+            takeUntil(this.loadingSubject.pipe(filter((n) => n === name))),
+            switchMap(async (event: HttpEvent<Blob>) => {
             if (event.type == HttpEventType.DownloadProgress) {
                 return {
                     type: event.type,
@@ -103,7 +108,7 @@ export class AudioPlayerService {
                 let blob = event.body;
                 if (blob) {
                     const arrayBuffer = await blob.arrayBuffer();
-                    console.log(await this.load(name, arrayBuffer));
+                    await this.load(name, arrayBuffer);
                     this.progress.next(0);
                     return {
                         type: HttpEventType.Response,

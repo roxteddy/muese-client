@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { SERVER_URL } from '../app.component';
 
 @Component({
   selector: 'app-track-upload',
@@ -25,7 +26,7 @@ export class TrackUploadComponent {
             formData.append('artist', form.value.artist);
             formData.append('title', form.value.title);
             formData.append('file', fileData);
-            this.httpClient.post('http://roxteddy.noip.me:3000/song', formData).subscribe({
+            this.httpClient.post(`${SERVER_URL}/track`, formData).subscribe({
                 next: () => {
                     this.dialogRef.close();
                 },
