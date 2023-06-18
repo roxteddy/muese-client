@@ -6,13 +6,11 @@
         <div class="left">
             <div class="top-left">
                 <app-ui-balance-button
+                    [ariaLabel]="title + ' balance spin button'"
                     [balance]="balance"
                     (balanceChange)="onBalanceChange($event)">
                     <mat-icon [svgIcon]="iconName"></mat-icon>
                 </app-ui-balance-button>
-<!--                <button mat-fab disabled>-->
-<!--                    <mat-icon [svgIcon]="iconName"></mat-icon>-->
-<!--                </button>-->
                 <div class="small-buttons">
                     <button mat-mini-fab
                             class="mute"

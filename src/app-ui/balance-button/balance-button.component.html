@@ -1,4 +1,11 @@
-<div class="wrapper" [class.active]="isDragged">
+<div class="wrapper"
+     role="spinbutton"
+     tabindex="0"
+     [attr.aria-label]="ariaLabel"
+     aria-valuemin="-1"
+     aria-valuemax="1"
+     [attr.aria-valuetext]="getAriaValueText(balance)"
+     [class.active]="isDragged">
     <div class="logo">
         <ng-content></ng-content>
     </div>

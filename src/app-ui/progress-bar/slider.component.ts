@@ -1,6 +1,5 @@
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     ElementRef,
     EventEmitter,
@@ -41,8 +40,7 @@ export class SliderComponent implements OnChanges {
     };
     wheeling = -1;
 
-    constructor(private readonly cdr: ChangeDetectorRef,
-                private readonly elementRef: ElementRef) {
+    constructor(private readonly elementRef: ElementRef) {
     }
 
     ngOnChanges(changes: SimpleChanges): void {

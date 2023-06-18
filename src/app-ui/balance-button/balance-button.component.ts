@@ -1,7 +1,6 @@
 import {
     ChangeDetectionStrategy,
     Component,
-    ElementRef,
     EventEmitter,
     HostListener,
     Input,
@@ -16,11 +15,22 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BalanceButtonComponent {
+    @Input() ariaLabel = 'Undefined balance button';
     @Input() balance = 0;
 
     @Output() balanceChange = new EventEmitter<number>();
 
     isDragged = false;
+
+    public getAriaValueText(balance: number) {
+        if (balance < 0) {
+            return `Left ${Math.round(balance * -1 * 100)} percent`;
+        } else if (balance > 0) {
+            return `Right ${Math.round(balance * 100)} percent`;
+        } else {
+            return `Middle`;
+        }
+    }
 
     @HostListener('panstart', ['$event'])
     onPanStart(e: HammerInput) {
