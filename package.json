@@ -8,7 +8,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-
+  "stackblitz": {
+    "startCommand": "ng serve"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^16.1.1",
