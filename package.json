@@ -9,7 +9,7 @@
     "test": "ng test"
   },
   "stackblitz": {
-    "startCommand": "ng serve"
+    "startCommand": "npm i && ng serve"
   },
   "private": true,
   "dependencies": {
