@@ -26,7 +26,6 @@ export class SliderComponent implements OnChanges {
     @Input() dragged = false;
     @Input() duration: number = -1;
     @Input() emitSeekOnWheel = false;
-    @Input() emitSeekOnDrag = false;
     @Input() faded = false;
     @Input() hasButton = false;
     @Input() scrollGranularity = 0.05;
@@ -103,7 +102,7 @@ export class SliderComponent implements OnChanges {
     onTap(e: HammerInput) {
         this.progressStatus = {
             ...this.progressStatus,
-            progress: this.calcProgress(e.srcEvent, this.elementRef.nativeElement.getBoundingClientRect())
+            progress: this.calculateProgress(e.srcEvent, this.elementRef.nativeElement.getBoundingClientRect())
         }
         this.progress.emit(this.progressStatus);
     }
@@ -114,11 +113,9 @@ export class SliderComponent implements OnChanges {
         const rect = this.elementRef.nativeElement.getBoundingClientRect();
         this.progressStatus = {
             rect,
-            progress: this.calcProgress(e.srcEvent, rect)
+            progress: this.calculateProgress(e.srcEvent, rect)
         }
-        if (this.emitSeekOnDrag) {
-            this.progress.emit(this.progressStatus);
-        }
+        this.progress.emit(this.progressStatus);
         document.body.style.cursor = 'ew-resize';
     }
 
@@ -161,11 +158,9 @@ export class SliderComponent implements OnChanges {
             e.preventDefault();
             this.progressStatus = {
                 ...this.progressStatus,
-                progress: this.calcProgress(e.srcEvent, this.progressStatus.rect)
+                progress: this.calculateProgress(e.srcEvent, this.progressStatus.rect)
             }
-            if (this.emitSeekOnDrag) {
-                this.progress.emit(this.progressStatus);
-            };
+            this.progress.emit(this.progressStatus);;
         }
     }
 
@@ -182,7 +177,7 @@ export class SliderComponent implements OnChanges {
         }
     }
 
-    private calcProgress(e: TouchEvent | MouseEvent | PointerEvent, rect: DOMRect) {
+    private calculateProgress(e: TouchEvent | MouseEvent | PointerEvent, rect: DOMRect) {
         let clientX;
         if (e instanceof TouchEvent) {
             clientX = e.touches[0]?.clientX;

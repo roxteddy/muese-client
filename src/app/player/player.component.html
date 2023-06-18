@@ -95,7 +95,6 @@
 
                 <app-ui-slider
                     [ariaLabel]="'Main volume'"
-                    [emitSeekOnDrag]="true"
                     [emitSeekOnWheel]="true"
                     [hasButton]="true"
                     [seek]="volume"
@@ -107,7 +106,6 @@
             <div class="timer">{{duration * progress / speed | date: 'mm:ss'}}</div>
             <app-ui-slider
                 [ariaLabel]="'Track progress slider'"
-                [emitSeekOnDrag]="true"
                 [hasButton]="true"
                 [scrollGranularity]="duration ? (1000 / duration * 5) : 0"
                 [seek]="dragData ? dragData.progress : progress"
