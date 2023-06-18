@@ -14,7 +14,7 @@ import {
 import { StemPlayerComponent } from './stem-player/stem-player.component';
 import { DragData, musicalChordNames } from '../app.module';
 import { MatDialog } from '@angular/material/dialog';
-import { ProgressStatus } from '../../app-ui/progress-bar/progress-bar.component';
+import { ProgressStatus } from '../../app-ui/progress-bar/slider.component';
 import { AudioPlayerService } from '../audio-player.service';
 import { Track } from '../../model/track';
 import { Stem, StemType } from '../../model/stem';
@@ -249,7 +249,7 @@ export class PlayerComponent implements OnChanges {
     // Private
     @HostListener('document:keypress', ['$event'])
     private handleKeyPress(e: KeyboardEvent): void {
-        if (e.code == 'Space' && !this.matDialog.openDialogs.length) {
+        if (e.code == 'Space' && document.getElementById('play-button') !== document.activeElement && !this.matDialog.openDialogs.length) {
             this.playPause();
         }
     }

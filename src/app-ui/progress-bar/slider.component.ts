@@ -14,17 +14,17 @@ export interface ProgressStatus {
 };
 
 @Component({
-    selector: 'app-ui-progress-bar',
-    templateUrl: './progress-bar.component.html',
-    styleUrls: ['./progress-bar.component.scss']
+    selector: 'app-ui-slider',
+    templateUrl: './slider.component.html',
+    styleUrls: ['./slider.component.scss']
 })
-export class ProgressBarComponent implements OnChanges {
+export class SliderComponent implements OnChanges {
+    @Input() ariaLabel: string = 'Undefined slider';
     @Input() dragged = false;
     @Input() emitSeekOnWheel = false;
     @Input() emitSeekOnDrag = false;
     @Input() faded = false;
     @Input() hasButton = false;
-    //TODO test if ok or need a subject
     @Input() scrollGranularity = 0.05;
     @Input() seek?: number;
 

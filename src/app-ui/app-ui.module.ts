@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProgressBarComponent } from './progress-bar/progress-bar.component';
+import { SliderComponent } from './progress-bar/slider.component';
 
 @NgModule({
   declarations: [
-    ProgressBarComponent
+    SliderComponent
   ],
     imports: [
         CommonModule
     ],
     exports: [
-        ProgressBarComponent
+        SliderComponent
     ]
 })
 export class AppUiModule { }

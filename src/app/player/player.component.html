@@ -89,24 +89,24 @@
             <div class="volume">
                 <mat-icon>speaker</mat-icon>
 
-                <app-ui-progress-bar
+                <app-ui-slider
                     [emitSeekOnDrag]="true"
                     [emitSeekOnWheel]="true"
                     [hasButton]="true"
                     [seek]="volume"
                     (progress)="onVolumeProgress($event)"
-                ></app-ui-progress-bar>
+                ></app-ui-slider>
             </div>
         </div>
         <div class="progress">
             <div class="timer">{{duration * progress / speed | date: 'mm:ss'}}</div>
-            <app-ui-progress-bar
+            <app-ui-slider
                 [emitSeekOnDrag]="true"
                 [hasButton]="true"
                 [scrollGranularity]="duration ? (1000 / duration * 5) : 0"
                 [seek]="dragData ? dragData.progress : progress"
                 (progress)="onProgressBarChange($event)"
-            ></app-ui-progress-bar>
+            ></app-ui-slider>
             <div class="timer">{{duration / speed | date:'mm:ss'}}</div>
         </div>
 

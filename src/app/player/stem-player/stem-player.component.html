@@ -29,14 +29,14 @@
                     </button>
                 </div>
             </div>
-            <app-ui-progress-bar
+            <app-ui-slider
                 [emitSeekOnDrag]="true"
                 [emitSeekOnWheel]="true"
                 [faded]="muted"
                 [hasButton]="true"
                 [seek]="volume"
                 (progress)="onVolumeProgress($event)"
-            ></app-ui-progress-bar>
+            ></app-ui-slider>
         </div>
         <div #progressContainer class="progress-container"
              (tap)="onCanvasTap($event, progressContainer)"

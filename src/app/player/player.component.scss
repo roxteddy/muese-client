@@ -347,7 +347,7 @@
                     padding: 0;
                     gap: 8px;
 
-                    app-ui-progress-bar {
+                    app-ui-slider {
                         display: block;
                         width: 100px;
                         --color: #A5A6F6;
@@ -381,7 +381,7 @@
                     font-weight: 700;
                 }
 
-                app-ui-progress-bar {
+                app-ui-slider {
                     display: block;
                     height: 100%;
                     --color: #DAC4CF;
