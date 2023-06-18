@@ -1,5 +1,8 @@
 import {
-    Component, ElementRef,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
     EventEmitter,
     HostListener,
     Input,
@@ -16,11 +19,13 @@ export interface ProgressStatus {
 @Component({
     selector: 'app-ui-slider',
     templateUrl: './slider.component.html',
-    styleUrls: ['./slider.component.scss']
+    styleUrls: ['./slider.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SliderComponent implements OnChanges {
     @Input() ariaLabel: string = 'Undefined slider';
     @Input() dragged = false;
+    @Input() duration: number = -1;
     @Input() emitSeekOnWheel = false;
     @Input() emitSeekOnDrag = false;
     @Input() faded = false;
@@ -36,7 +41,8 @@ export class SliderComponent implements OnChanges {
     };
     wheeling = -1;
 
-    constructor(private readonly elementRef: ElementRef) {
+    constructor(private readonly cdr: ChangeDetectorRef,
+                private readonly elementRef: ElementRef) {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -48,6 +54,50 @@ export class SliderComponent implements OnChanges {
                     progress
                 }
             }
+        }
+    }
+
+    public getAriaValueText(time: number, progressStatus: ProgressStatus) {
+        let ariaValueText;
+        if (time === -1) {
+            ariaValueText = progressStatus.progress * 100 + ' percent';
+        } else {
+            const currentTime = Math.round(this.duration * this.progressStatus.progress);
+            let minutes = Math.floor(currentTime / 60);
+            let seconds = currentTime % 60;
+            ariaValueText = `${minutes} minutes`;
+            if (seconds) {
+                ariaValueText += ` and ${seconds} seconds`;
+            }
+            minutes = Math.floor(time / 60);
+            seconds = time % 60;
+            ariaValueText += ` on ${minutes} minutes`;
+            if (seconds) {
+                ariaValueText += ` and ${seconds} seconds`;
+            }
+        }
+        return ariaValueText;
+    }
+
+    @HostListener('keydown', ['$event'])
+    private handleKeyPress(e: KeyboardEvent): void {
+        console.log(e);
+        if (e.code == 'ArrowLeft') {
+            e.preventDefault();
+            const progress = this.progressStatus.progress - 0.01;
+            this.progressStatus = {
+                ...this.progressStatus,
+                progress: progress < 0 ? 0 : progress
+            }
+            this.progress.emit(this.progressStatus);
+        } else if (e.code == 'ArrowRight') {
+            e.preventDefault();
+            const progress = this.progressStatus.progress + 0.01;
+            this.progressStatus = {
+                ...this.progressStatus,
+                progress: progress > 1 ? 1 : progress
+            }
+            this.progress.emit(this.progressStatus);
         }
     }
 

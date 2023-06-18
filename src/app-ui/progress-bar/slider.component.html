@@ -6,7 +6,7 @@
      tabindex="0"
      aria-valuemin="0"
      aria-valuemax="100"
-     [attr.aria-valuenow]="progressStatus.progress * 100"
+     [attr.aria-valuetext]="getAriaValueText(duration, progressStatus)"
      [ngClass]="{
         faded: faded,
         dragged: !!progressStatus.rect && wheeling !== -1

@@ -247,9 +247,10 @@ export class PlayerComponent implements OnChanges {
     }
 
     // Private
-    @HostListener('document:keypress', ['$event'])
+    @HostListener('document:keydown', ['$event'])
     private handleKeyPress(e: KeyboardEvent): void {
         if (e.code == 'Space' && document.getElementById('play-button') !== document.activeElement && !this.matDialog.openDialogs.length) {
+            e.preventDefault();
             this.playPause();
         }
     }

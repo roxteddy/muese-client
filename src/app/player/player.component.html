@@ -78,7 +78,11 @@
                         (click)="onPrev()">
                     <mat-icon>skip_previous</mat-icon>
                 </button>
-                <button mat-fab id="play-button" (click)="playPause()" [disabled]="!ready">
+                <button mat-fab
+                        id="play-button"
+                        aria-label="Play button"
+                        (click)="playPause()"
+                        [disabled]="!ready">
                     <mat-icon>{{paused ? 'play_arrow' : 'pause'}}</mat-icon>
                 </button>
                 <button mat-icon-button
@@ -90,6 +94,7 @@
                 <mat-icon>speaker</mat-icon>
 
                 <app-ui-slider
+                    [ariaLabel]="'Main volume'"
                     [emitSeekOnDrag]="true"
                     [emitSeekOnWheel]="true"
                     [hasButton]="true"
@@ -101,10 +106,12 @@
         <div class="progress">
             <div class="timer">{{duration * progress / speed | date: 'mm:ss'}}</div>
             <app-ui-slider
+                [ariaLabel]="'Track progress slider'"
                 [emitSeekOnDrag]="true"
                 [hasButton]="true"
                 [scrollGranularity]="duration ? (1000 / duration * 5) : 0"
                 [seek]="dragData ? dragData.progress : progress"
+                [duration]="track?.duration || 0"
                 (progress)="onProgressBarChange($event)"
             ></app-ui-slider>
             <div class="timer">{{duration / speed | date:'mm:ss'}}</div>
