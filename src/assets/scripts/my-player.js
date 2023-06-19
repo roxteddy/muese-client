@@ -247,15 +247,16 @@ class MyPlayer extends  SuperpoweredWebAudio.AudioWorkletProcessor {
 
         this.allocateBuffers(buffersize);
 
+        // Check for end
+        if (this.stems[0]?.player?.eofRecently()) {
+            this.sendMessageToMainScope({
+                type: 'end'
+            })
+        }
+
         for (let stem of this.stems) {
             let result = 0;
             if (stem?.player) {
-                // Check for end
-                if (stem.player?.eofRecently()) {
-                    this.sendMessageToMainScope({
-                        type: 'end'
-                    })
-                }
                 if (!this.duration) {
                     this.sendMessageToMainScope({
                         type: 'duration',

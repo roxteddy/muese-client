@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { delay } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,6 +21,7 @@ export class AppComponent implements OnInit {
     selectedTrack?: Track;
 
     constructor(private readonly audioPlayerService: AudioPlayerService,
+                private readonly cdr: ChangeDetectorRef,
                 private readonly dialog: MatDialog,
                 private readonly domSanitizer: DomSanitizer,
                 private readonly matIconRegistry: MatIconRegistry,
@@ -82,6 +83,7 @@ export class AppComponent implements OnInit {
             }
             this.selectedTrack = availableTracks[index];
         }
+        this.cdr.detectChanges();
     }
 
     public onPrev(): void {
